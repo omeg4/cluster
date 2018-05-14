@@ -53,10 +53,10 @@ then
 fpath=ToString[StringForm["/home/mbrunetti/cluster/sigesn/results/`1`",ToString[$projdir]]];
 params={$ingap,$buck,$vF,$thicc,$eps};
 etab={$ezi,$ezf,$ezstep};
-Export[fpath<>"/diag1.txt","Params and Etab initialized"]
+Export[fpath<>"diag1.txt","Params and Etab initialized"]
 suite=SiGeSuite[3,params,etab,$kappa,$projdir];
-Export[fpath<>"/suitediag.txt","Suite run complete"]
-Export[fpath<>"/results.m",suite];
+Export[fpath<>"suitediag.txt","Suite run complete"]
+Export[fpath<>"results.m",suite];
 Quit[]
 EOF
 	cat /home/mbrunetti/cluster/sigesn/sgsinit.m callfuncs.m > test.m
