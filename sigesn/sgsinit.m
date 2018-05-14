@@ -48,10 +48,10 @@ DirKeld[maxm_, matpars_, ingap_, Eperp_, kappa_, pm1_] := With[
     (* for \[Mu], 
     convert input to SI units and then take the number (should come \
 out in kg) and convert to units of Subscript[m, 0] *)
-    
     Egap = Abs[
       pm1*(ingap*Umev/Ujoul*Ujoul) - (d0*Unm/Um)*(Eperp*Uev/Uang*
-          Um)], \[Mu] = 
+          Um)],
+	\[Mu] =
      QuantityMagnitude[
       Abs[pm1*(ingap*Umev/Ujoul*Ujoul) - (d0*Unm/Um)*(Eperp*Uev/Uang*
             Um)]/(2*(vF*Um/Usec)^2), "ElectronMass"],
@@ -99,61 +99,6 @@ out in kg) and convert to units of Subscript[m, 0] *)
        1, -1}]}
 	]
 ]
-DirCoul[maxm_, matpars_, ingap_, Eperp_, eeps_, pm1_] := With[
-  {
-   (* unpack material parameters *)
-   d0 = matpars[[1]]/B2nm,
-   vF = (matpars[[2]]*10^(-9))/B2nm,
-   ds = matpars[[3]]/B2nm,
-   epsrel = matpars[[4]] - 1
-   },
-  Module[
-   {
-    (*pltarray,evTab,efTab,efTabRenorm,ef,ev,evNew,
-    Kevdir,Kefdir,Cevdir,Cefdir,Cevind,Cefind,bigarray,evout,efout,*)
-
-        maxcell = 10^-4,
-    maxiter = 4*10^5,
-    eps = eeps,
-    \[Mu] = Abs[pm1*ingap - d0*Eperp]/(2*vF^2),
-    shift = 10,
-    mmax = maxm,
-    radialeqs,
-    solnmat
-    (*radialEqKeld,radialEqDir,radialEqInd,radial\[Xi]Keld,
-    radial\[Xi]Dir,radial\[Xi]Ind*)
-    },
-   radialEqDir = -(1/(\[Mu]*2)) f''[r] - (1/(2 \[Mu]*r))* 
-      f'[r] - ((1/(eps*r)) - (m^2/(2*\[Mu]* r^2)))* f[r];
-   radial\[Xi]Dir[m_] = 
-    Simplify[
-     radialEqDir /. f -> (\[Psi][ArcTan[#]] &) /. r -> (Tan[\[Xi]]), 
-     Pi/2 > \[Xi] > 0];
-   solnmat = {};
-   evTab = {};
-   efTab = {};
-   bigarray = {};
-   evout = {};
-   efout = {};
-   Do[
-    ev = {};
-    {ev, ef} = 
-     NDEigensystem[{radial\[Xi]Dir[mind] + shift \[Psi][\[Xi]], 
-       DirichletCondition[\[Psi][\[Xi]] == 0, \[Xi] == 
-         Pi/2]}, \[Psi][\[Xi]], {\[Xi], 0, Pi/2}, mmax - mind + 1, 
-      Method -> {"SpatialDiscretization" -> {"FiniteElement", \
-{"MeshOptions" -> {"MaxCellMeasure" -> maxcell}}}, 
-        "Eigensystem" -> {"Arnoldi", MaxIterations -> maxiter}}]; 
-    evTab = Append[evTab, ev - shift]; 
-    efTab = Append[efTab, ef], {mind, 0, mmax}
-    ];
-   {Table[
-      evTab[[i - j + 1]][[j]], {i, Dimensions[evTab][[1]]}, {j, i, 
-       1, -1}]*H2eV, 
-    Table[efTab[[i - j + 1]][[j]], {i, Dimensions[efTab][[1]]}, {j, i,
-       1, -1}]}
-   ]
-  ]
 IndKeld[maxm_, matpars_, ingap_, Eperp_, kappa_, dee_, pm1_] := With[
   {
    (* unpack material parameters *)
@@ -183,7 +128,6 @@ IndKeld[maxm_, matpars_, ingap_, Eperp_, kappa_, dee_, pm1_] := With[
     (* for \[Mu], 
     convert input to SI units and then take the number (should come \
 out in kg) and convert to units of Subscript[m, 0] *)
-    
     Egap = Abs[
       pm1*(ingap*Umev/Ujoul*Ujoul) - (d0*Unm/Um)*(Eperp*Uev/Uang*
           Um)],
@@ -209,7 +153,8 @@ out in kg) and convert to units of Subscript[m, 0] *)
      Pi/2 > \[Xi] > 0]; solnmat = {}; evTab = {}; efTab = {}; 
    bigarray = {};
    Do[
-    ev = {}; {ev, ef} = 
+    ev = {};
+	{ev, ef} =
      NDEigensystem[{radial\[Xi]KInd[mind] + shift \[Psi][\[Xi]], 
        DirichletCondition[\[Psi][\[Xi]] == 0, \[Xi] == 
          Pi/2]}, \[Psi][\[Xi]], {\[Xi], 0, Pi/2}, mmax - mind + 1, 
@@ -218,71 +163,58 @@ out in kg) and convert to units of Subscript[m, 0] *)
         "Eigensystem" -> {"Arnoldi", MaxIterations -> maxiter}}]; 
     evTab = Append[evTab, ev - shift]; efTab = Append[efTab, ef],
     {mind, 0, mmax}
-    ]; {{Egap, \[Mu]}, 
+    ]; {{Egap, \[Mu]},
     Table[evTab[[i - j + 1]][[j]], {i, Dimensions[evTab][[1]]}, {j, i,
-        1, -1}]*H2eV, 
+        1, -1}]*H2eV,
     Table[efTab[[i - j + 1]][[j]], {i, Dimensions[efTab][[1]]}, {j, i,
        1, -1}]}
    ]
   ]
 NormalizeEF[EF_, rmax_] := Module[
   {norm},
-  norm = NIntegrate[r*(EF)^2, {r, 0, 10^6}, MinRecursion -> 5, 
+  norm = NIntegrate[r*(EF)^2, {r, 0, 10^6}, MinRecursion -> 5,
     MaxRecursion -> 20];
   EF/Sqrt[norm]
   ]
-SiGeSuite[mmax_, matpars_, Eperpmax_, kappa_] :=
- With[
-  { (* Make working with units more convenient *)
-   
-   Uhart = Quantity["Hartrees"],
-   Ujoul = Quantity["Joules"],
-   Uev = Quantity["Electronvolts"],
-   Umev = Quantity["Millielectronvolts"],
-   Um = Quantity["Meters"],
-   Unm = Quantity["Nanometers"],
-   Uang = Quantity["Angstroms"],
-   Ubohr = Quantity["BohrRadius"],
-   Uvolt = Quantity["Volts"],
-   Usec = Quantity["Seconds"]
-   },
+SiGeSuite[mmax_, matpars_, eztab_, kappa_, projdir_] :=
   Module[
    {
-    (* Unpack material parameters and get units straight *) 
+    (* Unpack material parameters and get units straight *)
     Egap = matpars[[1]]*Umev/Ujoul,
     (* Express bandgaps in Joules *)
     d0 = matpars[[2]]*Unm/Um,
-		(* Express buckling constant in meters *)
-    vF = matpars[[3]], (* 
-    Fermi velocity is already in m/s *)
-    
+	(* Express buckling constant in meters *)
+    vF = matpars[[3]],
+	(* Fermi velocity is already in m/s *)
     ds = matpars[[4]]*Unm/Um, (* Monolayer in thickness in meters *)
- 
-       erel = matpars[[5]] - 1,
+	erel = matpars[[5]] - 1,
     \[Kappa] = kappa,
-		min,max
+	min,
+	max
     },
-   (* We need to run the solver FOUR TIMES, once each for big/
-   small values of the intrinsic band gap *)
-   
-   min = 
-    Table[{Eperp, 
-      DirKeld[mmax, matpars[[2 ;;]], Egap, 
-       Eperp, \[Kappa], 1]}, {Eperp, 0, Eperpmax, 0.1}];
-   max = 
-    Table[{Eperp, 
-      DirKeld[mmax, matpars[[2 ;;]], Egap, 
-       Eperp, \[Kappa], -1]}, {Eperp, 0, Eperpmax, 0.1}];
+   min =
+    Table[{
+		Eperp,
+		DirKeld[mmax, matpars[[2 ;;]], Egap, Eperp, \[Kappa], 1]
+	},
+	{Eperp, eztab[[1]], eztab[[2]], eztab[[3]]}
+	];
+   max =
+    Table[{
+		Eperp,
+		DirKeld[mmax, matpars[[2 ;;]], Egap, Eperp, \[Kappa], -1]
+	  },
+	{Eperp, eztab[[1]], eztab[[2]], eztab[[3]]}
+	];
    (* Normalize and format EFs separately **)
-   (* 
-   Now format the output so that one value of Eperp gives two \[Mu], 
+   (* Now format the output so that one value of Eperp gives two \[Mu],
    two sets of eigenenergies and eigenfunctions, etc. *)
-   (* 
-   Let the output format be:
+   (* Let the output format be:
    {Eperp, (small-min){Egap,mu,evs,efs},(small-max){Egap,mu,evs,
    efs},(big-min){Egap,mu,evs,efs},(big-max){Egap,mu,evs,efs} } *)
-   
-   Table[{
+   Table[
+   Export[ToString[StringForm["/home/mbrunetti/cluster/sigesn/results/`1`/res_e`2`.m",projdir,i]],
+   {
      min[[i]][[1]],
      {
       "min",
@@ -290,8 +222,7 @@ SiGeSuite[mmax_, matpars_, Eperpmax_, kappa_] :=
       min[[i]][[2]][[1]][[1]],
       min[[i]][[2]][[2]],
       Table[
-       NormalizeEF[min[[i]][[2]][[3]][[j]][[k]], 10^6], {j, 
-        mmax}, {k, j}]
+       NormalizeEF[min[[i]][[2]][[3]][[j]][[k]], 10^6], {j, mmax}, {k, j}]
       },
      {
       "max",
@@ -299,13 +230,13 @@ SiGeSuite[mmax_, matpars_, Eperpmax_, kappa_] :=
       max[[i]][[2]][[1]][[1]],
       max[[i]][[2]][[2]],
       Table[
-       NormalizeEF[max[[i]][[2]][[3]][[j]][[k]], 10^6], {j, 
-        mmax}, {k, j}]
+       NormalizeEF[max[[i]][[2]][[3]][[j]][[k]], 10^6], {j, mmax}, {k, j}]
       }
-     },
-    {i, 1 + Eperpmax/0.1}]
+    }
+	],
+    {i, 1 + ((eztab[[2]]-eztab[[1]])/eztab[[3]])}
    ]
-  ]
+]
 getindeb[matrix_, type_, dind_, eperp_] := 
  matrix[[2]][[type]][[dind]][[2]][[eperp]][[2]][[2]][[1]][[1]]
 getindmu[matrix_, type_, dind_, eperp_] := 

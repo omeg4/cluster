@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 
-cd results
+cd results/
 
 export startdate=$(date -I)
 
@@ -54,7 +54,7 @@ fpath=ToString[StringForm["/home/mbrunetti/sigesn/results/`1`",ToString[$projdir
 params={$ingap,$buck,$vF,$thicc,$eps};
 etab={$ezi,$ezf,$ezstep};
 Export[fpath<>"/diag1.txt","Params and Etab initialized"]
-suite=SiGeSuite[3,params,$ezf,$kappa];
+suite=SiGeSuite[3,params,etab,$kappa,$projdir];
 Export[fpath<>"/suitediag.txt","Suite run complete"]
 Export[fpath<>"/results.m",suite];
 Quit[]
