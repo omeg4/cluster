@@ -50,7 +50,7 @@ then
 	#Direct
 	echo "Initializing direct calculations"
 	cat <<EOF > callfuncs.m
-fpath=ToString[StringForm["/home/mbrunetti/sigesn/results/`1`",ToString[$projdir]]];
+fpath=ToString[StringForm["/home/mbrunetti/cluster/sigesn/results/`1`",ToString[$projdir]]];
 params={$ingap,$buck,$vF,$thicc,$eps};
 etab={$ezi,$ezf,$ezstep};
 Export[fpath<>"/diag1.txt","Params and Etab initialized"]
@@ -59,7 +59,7 @@ Export[fpath<>"/suitediag.txt","Suite run complete"]
 Export[fpath<>"/results.m",suite];
 Quit[]
 EOF
-	cat /home/mbrunetti/sigesn/sgsinit.m callfuncs.m > test.m
+	cat /home/mbrunetti/cluster/sigesn/sgsinit.m callfuncs.m > test.m
 	pwd
 	cat <<EOF > submit_mathematica.pbs
 #!/bin/sh
