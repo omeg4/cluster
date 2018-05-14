@@ -45,16 +45,11 @@ DirKeld[maxm_, matpars_, ingap_, Eperp_, kappa_, pm1_] := With[
     maxiter = 4*10^5,
     \[Kappa] = kappa,
     \[Rho] = QuantityMagnitude[(ds*Unm/Ubohr)*epsrel/(2*kappa)],
-    (* for \[Mu], 
-    convert input to SI units and then take the number (should come \
-out in kg) and convert to units of Subscript[m, 0] *)
-    Egap = Abs[
-      pm1*(ingap*Umev/Ujoul*Ujoul) - (d0*Unm/Um)*(Eperp*Uev/Uang*
-          Um)],
+    (* for \[Mu], convert input to SI units and then take the number (should come out in kg) and convert to units of Subscript[m, 0] *)
+    Egap = Abs[pm1*(ingap*Umev/Ujoul*Ujoul) - (d0*Unm/Um)*(Eperp*Uev/Uang*Um)],
 	\[Mu] =
      QuantityMagnitude[
-      Abs[pm1*(ingap*Umev/Ujoul*Ujoul) - (d0*Unm/Um)*(Eperp*Uev/Uang*
-            Um)]/(2*(vF*Um/Usec)^2), "ElectronMass"],
+      Abs[pm1*(ingap*Umev/Ujoul*Ujoul) - (d0*Unm/Um)*(Eperp*Uev/Uang*Um)]/(2*(vF*Um/Usec)^2), "ElectronMass"],
     e = 1,
     shift = 10,
     mmax = maxm,
@@ -64,14 +59,8 @@ out in kg) and convert to units of Subscript[m, 0] *)
     (*radialEqKeld,radialEqDir,radialEqInd,radial\[Xi]Keld,
     radial\[Xi]Dir,radial\[Xi]Ind*)
     },
-   radialEqKeld = -(1/(\[Mu]*2)) f''[r] - (1/(2*\[Mu]*r))* 
-      f'[r] - (((((Pi*(e^2))/(2*\[Kappa]*\[Rho]))*(StruveH[0, 
-              r/\[Rho]] - BesselY[0, r/\[Rho]]))) - (m^2/(2*\[Mu]* 
-            r^2)))* f[r];
-   radial\[Xi]Keld[m_] = 
-    Simplify[
-     radialEqKeld /. f -> (\[Psi][ArcTan[#]] &) /. r -> (Tan[\[Xi]]), 
-     Pi/2 > \[Xi] > 0];
+   radialEqKeld = -(1/(\[Mu]*2)) f''[r] - (1/(2*\[Mu]*r))* f'[r] - (((((Pi*(e^2))/(2*\[Kappa]*\[Rho]))*(StruveH[0,r/\[Rho]] - BesselY[0, r/\[Rho]]))) - (m^2/(2*\[Mu]* r^2)))* f[r];
+   radial\[Xi]Keld[m_] = Simplify[radialEqKeld /. f -> (\[Psi][ArcTan[#]] &) /. r -> (Tan[\[Xi]]), Pi/2 > \[Xi] > 0];
    solnmat = {};
    evTab = {};
    efTab = {};
