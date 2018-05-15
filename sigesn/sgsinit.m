@@ -1,5 +1,9 @@
 (* Generic values for absorption: na, \[CapitalGamma], etc. *)
-
+B2nm = 0.052917721092;
+H2J = 4.35974417*(10^-18);
+H2eV = 27.21138602;
+T2S = 2.41884326505*(10^-17);
+lBN = (1/B2nm)*0.333;
 na = (5*10^15)*(10^-18)*(B2nm^2) ;
 damp = (10^13)*(T2S);
 damp2 = (10^12)*T2S;
