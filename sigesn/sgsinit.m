@@ -185,7 +185,7 @@ IndCoul[maxm_, matpars_, ingap_, Eperp_, kappa_, dee_, pm1_] := With[
     Ep = Eperp,
 	eps=matpars[[4]]
     },
-   radialEqKInd = -(1/(\[Mu]*2)) f''[r] - (1/(2 \[Mu]*r))* f'[r] - ((1/(eps*r) - (m^2/(2*\[Mu]* r^2)))* f[r];
+   radialEqKInd = -(1/(\[Mu]*2)) f''[r] - (1/(2 \[Mu]*r))* f'[r] - ((1/(eps*r)) - (m^2/(2*\[Mu]* r^2)))* f[r];
    radial\[Xi]KInd[m_] = Simplify[radialEqKInd /. f -> (\[Psi][ArcTan[#]] &) /. r -> (Tan[\[Xi]]), Pi/2 > \[Xi] > 0]; solnmat = {}; evTab = {}; efTab = {};
    bigarray = {};
    Do[
