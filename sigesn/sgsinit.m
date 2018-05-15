@@ -204,7 +204,7 @@ SiGeSuite[mmax_, matpars_, eztab_, kappa_] :=
    {Eperp, (small-min){Egap,mu,evs,efs},(small-max){Egap,mu,evs,
    efs},(big-min){Egap,mu,evs,efs},(big-max){Egap,mu,evs,efs} } *)
    Table[
-   Export[ToString@StringForm["results_e`1`",i],
+   Export[ToString@StringForm["results_e`1`.m",i],
    {
      min[[i]][[1]],
      {
