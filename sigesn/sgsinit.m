@@ -171,7 +171,7 @@ SiGeSuite[mmax_, matpars_, eztab_, kappa_] :=
   Module[
    {
     (* Unpack material parameters and get units straight *)
-    Egap = matpars[[1]]*Umev/Ujoul,
+    Egap = matpars[[1]],
     (* Express bandgaps in Joules *)
     d0 = matpars[[2]]*Unm/Um,
 	(* Express buckling constant in meters *)
@@ -226,7 +226,8 @@ SiGeSuite[mmax_, matpars_, eztab_, kappa_] :=
     }
 	],
     {i, 1 + ((eztab[[2]]-eztab[[1]])/eztab[[3]])}
-   ]
+   ];
+	resultfiles = FileNames["*result*"];
 ]
 getindeb[matrix_, type_, dind_, eperp_] := 
  matrix[[2]][[type]][[dind]][[2]][[eperp]][[2]][[2]][[1]][[1]]
