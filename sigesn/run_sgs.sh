@@ -50,7 +50,7 @@ then
 	#Direct
 	echo "Initializing direct calculations"
 	cat <<EOF > callfuncs.m
-SetDirectory[ToString[$(pwd)]]
+SetDirectory[\"$(pwd)\"]
 fpath=ToString[StringForm["/home/mbrunetti/cluster/sigesn/results/\`1\`/",$projdir]];
 params={$ingap,$buck,$vF,$thicc,$eps};
 etab={$ezi,$ezf,$ezstep};
