@@ -50,7 +50,7 @@ then
 	#Direct
 	echo "Initializing direct calculations"
 	cat <<EOF > callfuncs.m
-fpath=ToString[StringForm["/home/mbrunetti/cluster/sigesn/results/\`1\`",ToString[$projdir]]];
+fpath=ToString[StringForm["/home/mbrunetti/cluster/sigesn/results/\`1\`/",ToString[$projdir]]];
 params={$ingap,$buck,$vF,$thicc,$eps};
 etab={$ezi,$ezf,$ezstep};
 Export[fpath<>"diag1.txt","Params and Etab initialized"]
