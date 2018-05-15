@@ -82,12 +82,12 @@ DirKeld[maxm_, matpars_, ingap_, Eperp_, kappa_, pm1_] := With[
     efTab = Append[efTab, ef /. \[Xi] -> ArcTan[r]],
     {mind, 0, mmax}
     ];
-   {{\[Mu], Egap, Ep}, 
-    Table[evTab[[i - j + 1]][[j]], {i, Dimensions[evTab][[1]]}, {j, i,
-        1, -1}]*H2eV
+   {
+	{\[Mu], Egap, Ep},
+    Table[evTab[[i - j + 1]][[j]], {i, Dimensions[evTab][[1]]}, {j, i, 1, -1}]*H2eV,
      Table[
-      efTab[[i - j + 1]][[j]], {i, Dimensions[efTab][[1]]}, {j, i, 
-       1, -1}]}
+      efTab[[i - j + 1]][[j]], {i, Dimensions[efTab][[1]]}, {j, i, 1, -1}]
+	}
 	]
 ]
 IndKeld[maxm_, matpars_, ingap_, Eperp_, kappa_, dee_, pm1_] := With[
@@ -167,7 +167,7 @@ NormalizeEF[EF_, rmax_] := Module[
     MaxRecursion -> 20];
   EF/Sqrt[norm]
   ]
-SiGeSuite[mmax_, matpars_, eztab_, kappa_, projdir_] :=
+SiGeSuite[mmax_, matpars_, eztab_, kappa_] :=
   Module[
    {
     (* Unpack material parameters and get units straight *)
@@ -204,7 +204,7 @@ SiGeSuite[mmax_, matpars_, eztab_, kappa_, projdir_] :=
    {Eperp, (small-min){Egap,mu,evs,efs},(small-max){Egap,mu,evs,
    efs},(big-min){Egap,mu,evs,efs},(big-max){Egap,mu,evs,efs} } *)
    Table[
-   Export[ToString[StringForm["/home/mbrunetti/cluster/sigesn/results/`1`/res_e`2`.m",projdir,i]],
+   Export[ToString@StringForm["results_e`1`",i],
    {
      min[[i]][[1]],
      {
