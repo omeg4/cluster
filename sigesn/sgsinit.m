@@ -51,9 +51,7 @@ DirKeld[maxm_, matpars_, ingap_, Eperp_, kappa_, pm1_] := With[
     \[Rho] = QuantityMagnitude[(ds*Unm/Ubohr)*epsrel/(2*kappa)],
     (* for \[Mu], convert input to SI units and then take the number (should come out in kg) and convert to units of Subscript[m, 0] *)
     Egap = Abs[pm1*(ingap*Umev/Ujoul*Ujoul) - (d0*Unm/Um)*(Eperp*Uev/Uang*Um)],
-	\[Mu] =
-     QuantityMagnitude[
-      Abs[pm1*(ingap*Umev/Ujoul*Ujoul) - (d0*Unm/Um)*(Eperp*Uev/Uang*Um)]/(2*(vF*Um/Usec)^2), "ElectronMass"],
+	\[Mu] = QuantityMagnitude[Abs[pm1*(ingap*Umev/Ujoul*Ujoul) - (d0*Unm/Um)*(Eperp*Uev/Uang*Um)]/(2*(vF*Um/Usec)^2), "ElectronMass"],
     e = 1,
     shift = 10,
     mmax = maxm,

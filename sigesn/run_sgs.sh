@@ -50,7 +50,7 @@ then
 	#Direct
 	echo "Initializing direct calculations"
 	cat <<EOF > callfuncs.m
-fpath=ToString[StringForm["/home/mbrunetti/cluster/sigesn/results/\`1\`/",ToString[$projdir]]];
+fpath=ToString[StringForm["/home/mbrunetti/cluster/sigesn/results/\`1\`/",$projdir]];
 params={$ingap,$buck,$vF,$thicc,$eps};
 etab={$ezi,$ezf,$ezstep};
 Export[fpath<>"diag1.txt","Params and Etab initialized"]
@@ -67,7 +67,7 @@ EOF
 #Important: do not remove "#" symbol before PBS, keep it like that: "#PBS"
 
 
-#You can set your job name here: 
+#You can set your job name here:
 #PBS -N $mater-$jobby
 
 #DO NOT CHANGE THE NODE NUMBER:
