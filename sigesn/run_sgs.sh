@@ -98,7 +98,6 @@ qsub submit_mathematica.pbs
 #################################################
 elif [ $DorI = "IND" ]
 then
-
 	#Indirect
 	echo "D initial? [N_hBN]"
 	read di
@@ -108,14 +107,49 @@ then
 	read ds
 	echo "Initializing indirect calculations"
 	cat <<EOF > callfuncs.m
+SetDirectory["$(pwd)"];
 params={$ingap,$buck,$vF,$thicc,$eps};
 etab={$ezi,$ezf,$ezstep};
 dtab={$di,$df,$dstep};
-suite=SGSIndSuite[params,etab,dtab,ToString[$mater-$jobby],ToString[$fullpath]];
-fpath=ToString[$fullpath];
-Export[fpath<>"results.m",suite];
+suite=SGSIndSuite[params,etab,dtab];
 Quit[]
 EOF
+	cat /home/mbrunetti/cluster/sigesn/sgsinit.m callfuncs.m > test.m
+	pwd
+	cat <<EOF > submit_mathematica.pbs
+#!/bin/sh
+
+#Important: do not remove "#" symbol before PBS, keep it like that: "#PBS"
+
+
+#You can set your job name here:
+#PBS -N $mater-$jobby
+
+#DO NOT CHANGE THE NODE NUMBER:
+#PBS -l nodes=node27:ppn=1
+
+#Combine output and error files:
+#PBS -j oe
+
+#If you want specific log filename, use the following line:
+#PBS -o pbs.log
+
+export PBS_O_WORKDIR=$(pwd)
+echo \$PBS_O_WORKDIR
+
+echo "Starting Mathematica job"
+
+cd \$PBS_O_WORKDIR
+
+#Submit mathematica job
+#NOTE: Your test.m file SHOULD include the command "Quit[]" as the last command in the file
+
+math -script \$PBS_O_WORKDIR/test.m
+
+echo "Job finished"
+
+EOF
+qsub submit_mathematica.pbs
 #################################################
 #################################################
 elif [ $DorI = "PREV" ]
