@@ -211,7 +211,7 @@ SiGeSuite[mmax_, matpars_, eztab_, kappa_] :=
 			thismin=Import[ToString@resultfiles[[i]]],
 			MUTABMIN=Append[MUTABMIN, {thismin[[1]],thismin[[2]][[3]]}],
 			EVTABMIN=Append[EVTAB, {thismin[[1]],thismin[[2]][[4]]}],
-			ETRTABMIN=Append[ETRTABMIN, {thismin[[1]],Table[thismin[[2]][[4]][[j]][[j-1]]-thismin[[2]][[4]][[j+1]][[j]],{j,Length[thismin]}]}]
+			ETRTABMIN=Append[ETRTABMIN, {thismin[[1]],Table[thismin[[2]][[4]][[j]][[j]]-thismin[[2]][[4]][[j+1]][[j+1]],{j,Length[thismin]-1}]}]
 		},
 		{i, Length[resultfiles]}
 	];
