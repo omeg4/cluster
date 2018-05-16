@@ -279,6 +279,7 @@ calcdiralpha[matrix_, pars_, type_, eperp_] :=
   calcdirf0[matrix, type, eperp]*(2/damp)
 calcdirafac[matrix_, pars_, type_, eperp_] := 
  1 - Exp[-calcdiralpha[matrix, pars, type, eperp]*(pars[[4]]/B2nm)]
+
 getTindeb[matrix_, type_, dind_, eperp_] := 
  matrix[[type]][[2]][[dind]][[2]][[eperp]][[4]][[1]][[1]][[1]] // 
   QuantityMagnitude

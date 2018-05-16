@@ -1,0 +1,26 @@
+(* Generic values for absorption: na, \[CapitalGamma], etc. *)
+B2nm = 0.052917721092;
+H2J = 4.35974417*(10^-18);
+H2eV = 27.21138602;
+T2S = 2.41884326505*(10^-17);
+lBN = (1/B2nm)*0.333;
+na = (5*10^15)*(10^-18)*(B2nm^2) ;
+damp = (10^13)*(T2S);
+damp2 = (10^12)*T2S;
+damp3 = (10^11)*(T2S);
+l = (3.1 * 10^-10)*(10^9)/(B2nm) ;
+sipar2 = {1.9, 0.046, 6.5*10^5, 0.4, 11.9};
+gepar2 = {33, 0.0676, 6.2*10^5, 0.45, 16};
+snpar2 = {101, 0.085, 5.5*10^5, 0.5, 24};
+labels = {"B Exciton (Small Gap)", "A Exciton (Large Gap)"};
+Uhart = Quantity["Hartrees"];
+Ujoul = Quantity["Joules"];
+Uev = Quantity["Electronvolts"];
+Umev = Quantity["Millielectronvolts"];
+Um = Quantity["Meters"];
+Unm = Quantity["Nanometers"];
+Uang = Quantity["Angstroms"];
+Ubohr = Quantity["BohrRadius"];
+Uvolt = Quantity["Volts"];
+Usec = Quantity["Seconds"];
+Uemass = Quantity["ElectronMass"];
