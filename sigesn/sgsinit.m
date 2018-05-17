@@ -83,10 +83,10 @@ DirKeld[maxm_, matpars_, ingap_, Eperp_, kappa_, pm1_] := With[
     {mind, 0, mmax}
     ];
    {
-	{\[Mu], Egap, Ep},
+	{Egap, \[Mu], Ep},
     Table[evTab[[i - j + 1]][[j]], {i, Dimensions[evTab][[1]]}, {j, i, 1, -1}]*H2eV,
      Table[
-      efTab[[i - j + 1]][[j]], {i, Dimensions[efTab][[1]]}, {j, i, 1, -1}]
+      NormalizeEF[efTab[[i - j + 1]][[j]], 10^6], {i, Dimensions[efTab][[1]]}, {j, i, 1, -1}]
 	}
 	]
 ]
@@ -228,52 +228,42 @@ SiGeSuite[mmax_, matpars_, eztab_, kappa_] :=
     \[Kappa] = kappa,
 	min,
 	max
+	MUTABMIN={};
+	MUTABMAX={};
+	EVTABMIN={};
+	EVTABMAX={};
+	ETRTABMIN={};
+	ETRTABMAX={};
+	F0TAB={};
     },
-   min =
-    Table[{
+    Table[
+	Export[ToString@StringForm["calcs_e`1`.m",Eperp],
+	{
 		Eperp,
-		DirKeld[mmax, matpars[[2 ;;]], Egap, Eperp, \[Kappa], 1]
-	},
+		min={"min", DirKeld[mmax, matpars[[2 ;;]], Egap, Eperp, \[Kappa], 1]},
+		max={"max", DirKeld[mmax, matpars[[2 ;;]], Egap, Eperp, \[Kappa], -1]}
+	}],
 	{Eperp, eztab[[1]], eztab[[2]], eztab[[3]]}
 	];
-   max =
-    Table[{
-		Eperp,
-		DirKeld[mmax, matpars[[2 ;;]], Egap, Eperp, \[Kappa], -1]
-	  },
-	{Eperp, eztab[[1]], eztab[[2]], eztab[[3]]}
+	Export[ToString@StringForm["tabledone.txt","Table done, files saved. Starting analysis of data"];
+	resultfiles = FileNames["*calcs*"];
+	(* What to do with these separated files?
+		Analyze each and do:
+		List of {{Eperps},{quantities}}
+		Quantities would be EVs and Etrs and also f0, alpha, abs
+		*)
+	Table[
+		{
+			thismin=Import[ToString@resultfiles[[i]]],
+			MUTABMIN=Append[MUTABMIN, {thismin[[1]],thismin[[2]][[3]]}],
+			EVTABMIN=Append[EVTAB, {thismin[[1]],thismin[[2]][[4]]}],
+			ETRTABMIN=Append[ETRTABMIN, {thismin[[1]],Table[thismin[[2]][[4]][[j]][[j]]-thismin[[2]][[4]][[j+1]][[j+1]],{j,Length[thismin]-1}]}]
+		},
+		{i, Length[resultfiles]}
 	];
-   (* Normalize and format EFs separately **)
-   (* Now format the output so that one value of Eperp gives two \[Mu],
-   two sets of eigenenergies and eigenfunctions, etc. *)
-   (* Let the output format be:
-   {Eperp, (small-min){Egap,mu,evs,efs},(small-max){Egap,mu,evs,
-   efs},(big-min){Egap,mu,evs,efs},(big-max){Egap,mu,evs,efs} } *)
-   Table[
-   Export[ToString@StringForm["results_e`1`.m",i],
-   {
-     min[[i]][[1]],
-     {
-      "min",
-      min[[i]][[2]][[1]][[2]],
-      min[[i]][[2]][[1]][[1]],
-      min[[i]][[2]][[2]],
-      Table[
-       NormalizeEF[min[[i]][[2]][[3]][[j]][[k]], 10^6], {j, mmax}, {k, j}]
-      },
-     {
-      "max",
-      max[[i]][[2]][[1]][[2]],
-      max[[i]][[2]][[1]][[1]],
-      max[[i]][[2]][[2]],
-      Table[
-       NormalizeEF[max[[i]][[2]][[3]][[j]][[k]], 10^6], {j, mmax}, {k, j}]
-      }
-    }
-	],
-    {i, 1 + ((eztab[[2]]-eztab[[1]])/eztab[[3]])}
-   ];
-	resultfiles = FileNames["*result*"];
+	Export["fin-mutab-min.m",MUTABMIN//Transpose];
+	Export["fin-evtab-min.m",EVTABMIN//Transpose];
+	Export["fin-etrtab-min.m",EVTABMIN//Transpose];
 ]
 getindeb[matrix_, type_, dind_, eperp_] := 
  matrix[[2]][[type]][[dind]][[2]][[eperp]][[2]][[2]][[1]][[1]]
@@ -335,6 +325,7 @@ calcdiralpha[matrix_, pars_, type_, eperp_] :=
   calcdirf0[matrix, type, eperp]*(2/damp)
 calcdirafac[matrix_, pars_, type_, eperp_] := 
  1 - Exp[-calcdiralpha[matrix, pars, type, eperp]*(pars[[4]]/B2nm)]
+
 getTindeb[matrix_, type_, dind_, eperp_] := 
  matrix[[type]][[2]][[dind]][[2]][[eperp]][[4]][[1]][[1]][[1]] // 
   QuantityMagnitude
