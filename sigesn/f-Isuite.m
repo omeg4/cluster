@@ -6,11 +6,11 @@ SGSIndSuite[pars_, kappa_, ezrange_, drange_,funcname_] := Module[
 		ei = ezrange[[1]],
 		ef = ezrange[[2]],
 		estep = ezrange[[3]],
-		en = (ezrange[[2]]-ezrange[[1]])/ezrange[[3]],
+		en = 1 + (ezrange[[2]]-ezrange[[1]])/ezrange[[3]],
 		di = drange[[1]],
 		df = drange[[2]],
 		dstep = drange[[3]],
-		dn = (drange[[2]]-drange[[1]])/drange[[3]],
+		dn = 1 + (drange[[2]]-drange[[1]])/drange[[3]],
 		min,
 		max,
 		MUTABMIN={},
@@ -60,7 +60,7 @@ SGSIndSuite[pars_, kappa_, ezrange_, drange_,funcname_] := Module[
 					maxegap=thismax[[1]][[1]],
 					maxmu=thismax[[1]][[2]],
 					maxevs=thismax[[2]],
-					maxefs=thismax[[3]],
+					maxefs=thismax[[3]]
 				},
 			MUTABMIN=Append[MUTABMIN, {d, ep,minmu}];
 			EGTABMIN=Append[EGTABMIN, {d, ep,minegap}];

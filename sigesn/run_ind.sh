@@ -66,7 +66,7 @@ echo "Initializing indirect calculations"
 cat <<EOF > callfuncs.m
 params={$ingap,$buck,$vF,$thicc,$eps};
 etab={$ezi,$ezf,$ezstep};
-dtab={$di,$df,$dstep};
+dtab={$di,$df,$ds};
 Export["diag1.txt","Params, Dtab, and Etab initialized"]
 SGSIndSuite[params,$kappa,etab,dtab,$funcname];
 Quit[]

@@ -149,7 +149,7 @@ SiGeSuite[mmax_, matpars_, eztab_, kappa_] :=
 					maxegap=thismax[[1]][[1]],
 					maxmu=thismax[[1]][[2]],
 					maxevs=thismax[[2]],
-					maxefs=thismax[[3]],
+					maxefs=thismax[[3]]
 				},
 			MUTABMIN=Append[MUTABMIN, {ep,minmu}];
 			EGTABMIN=Append[EGTABMIN, {ep,minegap}];
