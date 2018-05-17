@@ -1,0 +1,41 @@
+/home/mbrunetti/cluster/sigesn/results/IND-si-2018-05-17-RF-ind-test
+Starting Mathematica job
+
+Syntax::com: Warning: comma encountered with no adjacent expression. The expression will be treated as Null.  (line 224 of "/home/mbrunetti/cluster/sigesn/results/IND-si-2018-05-17-RF-ind-test/test.m").
+
+Syntax::com: Warning: comma encountered with no adjacent expression. The expression will be treated as Null.  (line 261 of "/home/mbrunetti/cluster/sigesn/results/IND-si-2018-05-17-RF-ind-test/test.m").
+
+Table::iterb: Iterator {d, 1, 5, Null} does not have appropriate bounds.
+
+Table::iterb: Iterator {d, 1, 5, Null} does not have appropriate bounds.
+
+Export::argtu: Export called with 1 argument; 2 or 3 arguments are expected.
+
+Part::pkspec1: The expression i cannot be used as a part specification.
+
+Import::nffil: File not found during Import.
+
+Part::partd: Part specification $Failed[[1]] is longer than depth of object.
+
+Part::pkspec1: The expression i cannot be used as a part specification.
+
+Import::nffil: File not found during Import.
+
+Part::partd: Part specification $Failed[[2]] is longer than depth of object.
+
+Part::partd: Part specification 1[[1]] is longer than depth of object.
+
+General::stop: Further output of Part::partd will be suppressed during this calculation.
+
+Part::partw: Part 3 of 1[[1]] does not exist.
+
+Part::partw: Part 4 of 1[[1]] does not exist.
+
+Module::dup: Duplicate local variable exef found in local variable specification {mu = 1[[1]][[2]], gsev = 1[[2]][[1]][[1]], exef = 1[[2]][[2]][[2]], gsef = 1[[3]][[1]][[1]], exef = 1[[3]][[2]][[2]]}.
+
+Module::dup: Duplicate local variable exef found in local variable specification {mu = 1[[1]][[2]], gsev = 1[[2]][[1]][[1]], exef = 1[[2]][[3]][[2]], gsef = 1[[3]][[1]][[1]], exef = 1[[3]][[3]][[2]]}.
+
+Module::dup: Duplicate local variable exef found in local variable specification {mu = 1[[1]][[2]], gsev = 1[[2]][[1]][[1]], exef = 1[[2]][[2]][[2]], gsef = 1[[3]][[1]][[1]], exef = 1[[3]][[2]][[2]]}.
+
+General::stop: Further output of Module::dup will be suppressed during this calculation.
+Job finished
