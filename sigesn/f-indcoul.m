@@ -1,4 +1,4 @@
-IndKeld[maxm_, matpars_, ingap_, Eperp_, kappa_, dee_, pm1_] := With[
+IndCoul[maxm_, matpars_, ingap_, Eperp_, kappa_, dee_, pm1_] := With[
   {
    (* unpack material parameters *)
    d0 = matpars[[1]],
@@ -41,20 +41,19 @@ out in kg) and convert to units of Subscript[m, 0] *)
     solnmat,
     Ep = Eperp
     },
-   radialEqKInd = -(1/(\[Mu]*2)) f''[r] - (1/(2 \[Mu]*r))* f'[r] - (((Pi/(2*\[Kappa]*\[Rho])*(StruveH[0, Sqrt[r^2 + d^2]/\[Rho]] - BesselY[0, Sqrt[r^2 + d^2]/\[Rho]]))) - (m^2/(2*\[Mu]* r^2)))* f[r];
+   radialEqKInd = -(1/(\[Mu]*2))*f''[r] - (1/(2 \[Mu]*r))* f'[r] - ((1/(kappa*r)) - (m^2/(2*\[Mu]* r^2)))* f[r];
    radial\[Xi]KInd[m_] = Simplify[radialEqKInd /. f -> (\[Psi][ArcTan[#]] &) /. r -> (Tan[\[Xi]]), Pi/2 > \[Xi] > 0];
    solnmat = {}; evTab = {}; efTab = {};
    bigarray = {};
    Do[
     ev = {};
 	{ev, ef} =
-     NDEigensystem[{radial\[Xi]KInd[mind] + shift \[Psi][\[Xi]], 
-       DirichletCondition[\[Psi][\[Xi]] == 0, \[Xi] == 
-         Pi/2]}, \[Psi][\[Xi]], {\[Xi], 0, Pi/2}, mmax - mind + 1, 
-      Method -> {"SpatialDiscretization" -> {"FiniteElement", \
-{"MeshOptions" -> {"MaxCellMeasure" -> maxcell}}}, 
-        "Eigensystem" -> {"Arnoldi", MaxIterations -> maxiter}}]; 
-    evTab = Append[evTab, ev - shift]; efTab = Append[efTab/.{\[Xi]->ArcTan[r]}, ef],
+     NDEigensystem[{radial\[Xi]KInd[mind] + shift \[Psi][\[Xi]],
+       DirichletCondition[\[Psi][\[Xi]] == 0, \[Xi] ==
+         Pi/2]}, \[Psi][\[Xi]], {\[Xi], 0, Pi/2}, mmax - mind + 1,
+      Method -> {"SpatialDiscretization" -> {"FiniteElement",{"MeshOptions" -> {"MaxCellMeasure" -> maxcell}}},
+        "Eigensystem" -> {"Arnoldi", MaxIterations -> maxiter}}];
+    evTab = Append[evTab, ev - shift]; efTab = Append[efTab, ef/.{\[Xi]->ArcTan[r]}],
     {mind, 0, mmax}
     ];
 	{
@@ -65,3 +64,4 @@ out in kg) and convert to units of Subscript[m, 0] *)
        1, -1}]}
    ]
 ]
+

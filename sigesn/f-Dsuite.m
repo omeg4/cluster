@@ -26,12 +26,13 @@ SiGeSuite[mmax_, matpars_, eztab_, kappa_] :=
 	ABSTABMAX={},
 	AFACTABMAX={}
     },
-    Table[
-	Export[ToString@StringForm["calcs_e`1`.m",Eperp],
+	ne=0;
+    Table[{ne = ne + 1,
+	Export[ToString@StringForm["calcs_e`1`.m",IntegerString[ne,10,3]],
 	{
-		min={"min", DirKeld[mmax, matpars[[2 ;;]], Egap, Eperp, \[Kappa], 1]},
-		max={"max", DirKeld[mmax, matpars[[2 ;;]], Egap, Eperp, \[Kappa], -1]}
-	}],
+		{"min", DirKeld[mmax, matpars[[2 ;;]], Egap, Eperp, \[Kappa], 1]},
+		{"max", DirKeld[mmax, matpars[[2 ;;]], Egap, Eperp, \[Kappa], -1]}
+	}]},
 	{Eperp, eztab[[1]], eztab[[2]], eztab[[3]]}
 	];
 	Export[ToString@StringForm["tabledone.txt","Table done, files saved. Starting analysis of data"]];
