@@ -46,8 +46,8 @@ SGSIndSuite[pars_, kappa_, ezrange_, drange_,funcname_] := Module[
 	Table[
 		Module[
 			{
-			thismin=Import[ToString@resultfiles[[i]]][[1]][[2]],
-			thismax=Import[ToString@resultfiles[[i]]][[2]][[2]]
+			thismin=Import[resultfiles[[i]]][[1]][[2]],
+			thismax=Import[resultfiles[[i]]][[2]][[2]]
 			},
 			Module[
 				{

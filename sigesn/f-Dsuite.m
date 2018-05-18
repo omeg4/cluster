@@ -44,8 +44,8 @@ SiGeSuite[mmax_, matpars_, eztab_, kappa_] :=
 	Table[
 		Module[
 			{
-			thismin=Import[ToString@resultfiles[[i]]][[1]][[2]],
-			thismax=Import[ToString@resultfiles[[i]]][[2]][[2]]
+			thismin=Import[resultfiles[[i]]][[1]][[2]],
+			thismax=Import[resultfiles[[i]]][[2]][[2]]
 			},
 			Module[
 				{
@@ -57,7 +57,7 @@ SiGeSuite[mmax_, matpars_, eztab_, kappa_] :=
 					maxegap=thismax[[1]][[1]],
 					maxmu=thismax[[1]][[2]],
 					maxevs=thismax[[2]],
-					maxefs=thismax[[3]],
+					maxefs=thismax[[3]]
 				},
 			MUTABMIN=Append[MUTABMIN, {ep,minmu}];
 			EGTABMIN=Append[EGTABMIN, {ep,minegap}];
