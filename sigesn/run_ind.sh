@@ -72,7 +72,7 @@ SGSIndSuite[params,$kappa,etab,dtab,$funcname];
 Quit[]
 EOF
 
-cat /home/mbrunetti/cluster/sigesn/params.m /home/mbrunetti/cluster/sigesn/f-indkeld.m /home/mbrunetti/cluster/sigesn/f-indcoul.m /home/mbrunetti/cluster/sigesn/f-Isuite.m /home/mbrunetti/cluster/sigesn/f-filemine.m callfuncs.m > test.m
+cat /home/mbrunetti/cluster/sigesn/params.m /home/mbrunetti/cluster/sigesn/f-indkeld.m /home/mbrunetti/cluster/sigesn/f-indcoul.m /home/mbrunetti/cluster/sigesn/f-Isuite.m /home/mbrunetti/cluster/sigesn/f-normEF.m /home/mbrunetti/cluster/sigesn/f-filemine.m callfuncs.m > test.m
 cat <<EOF > submit_mathematica.pbs
 #!/bin/sh
 

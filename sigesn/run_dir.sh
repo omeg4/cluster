@@ -52,7 +52,7 @@ SiGeSuite[3,params,etab,$kappa];
 Export["suitediag.txt","Suite run complete"]
 Quit[]
 EOF
-cat /home/mbrunetti/cluster/sigesn/params.m /home/mbrunetti/cluster/sigesn/f-dirkeld.m /home/mbrunetti/cluster/sigesn/f-Dsuite.m /home/mbrunetti/cluster/sigesn/f-filemine.m callfuncs.m > test.m
+cat /home/mbrunetti/cluster/sigesn/params.m /home/mbrunetti/cluster/sigesn/f-dirkeld.m /home/mbrunetti/cluster/sigesn/f-Dsuite.m /home/mbrunetti/cluster/sigesn/f-normEF.m /home/mbrunetti/cluster/sigesn/f-filemine.m callfuncs.m > test.m
 cat <<EOF > submit_mathematica.pbs
 #!/bin/sh
 

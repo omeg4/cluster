@@ -59,8 +59,7 @@ DirKeld[maxm_, matpars_, ingap_, Eperp_, kappa_, pm1_] := With[
    {
 	{Egap, \[Mu], Ep},
     Table[evTab[[i - j + 1]][[j]], {i, Dimensions[evTab][[1]]}, {j, i, 1, -1}]*H2eV*1000*Quantity["Millielectronvolts"],
-     Table[
-      NormalizeEF[efTab[[i - j + 1]][[j]], 10^6], {i, Dimensions[efTab][[1]]}, {j, i, 1, -1}]
+	Table[NormalizeEF[efTab[[i - j + 1]][[j]], 10^6], {i, Dimensions[efTab][[1]]}, {j, i, 1, -1}]
 	}
 	]
 ]
