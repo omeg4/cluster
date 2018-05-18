@@ -35,7 +35,7 @@ SiGeSuite[mmax_, matpars_, eztab_, kappa_] :=
 	}]},
 	{Eperp, eztab[[1]], eztab[[2]], eztab[[3]]}
 	];
-	Export[ToString@StringForm["tabledone.txt","Table done, files saved. Starting analysis of data"]];
+	Export["tabledone.txt","Table done, files saved. Starting analysis of data"];
 	resultfiles = FileNames["*calcs*"];
 	(* What to do with these separated files?
 		Analyze each and do:
@@ -72,7 +72,7 @@ SiGeSuite[mmax_, matpars_, eztab_, kappa_] :=
 			ABSTABMAX=Append[ABSTABMAX, {ep, {absfromfile[thismax,2,maxmu,matpars[[4]],kappa,na,damp]/B2nm,absfromfile[thismax,3,maxmu,matpars[[4]],kappa,na,damp]/B2nm}}];
 			AFACTABMAX=Append[AFACTABMAX, {ep, {Exp[-absfromfile[thismax,2,maxmu,matpars[[4]],kappa,na,damp]*matpars[[4]]/B2nm],Exp[-absfromfile[thismax,2,maxmu,matpars[[4]],kappa,na,damp]*matpars[[4]]/B2nm]}}];
 			]
-		]
+		],
 		{i, Length[resultfiles]}
 	];
 	Export["fin-mutab-min.m",MUTABMIN//Transpose];
