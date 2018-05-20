@@ -1,7 +1,7 @@
 FileFig2D[data_,savename_,title_,axes_]:=Module[
 	{
-		xax = data[[1]],
-		yax = Flatten[{data[[2]]},1],
+		xax = data[[1]][[1]],
+		ymin = Flatten[{data[[1]][[2]]},1],
 		xlab = axes[[1]],
 		ylab = axes[[2]]
 	},

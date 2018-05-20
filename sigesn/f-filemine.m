@@ -48,22 +48,16 @@ BuildData[]:=Module[
 		],
 		{i, Length[resultfiles]}
 	];
-	Export["fin-mutab-min.m",MUTABMIN//Transpose];
-	Export["fin-egtab-min.m",EGTABMIN//Transpose];
-	Export["fin-evtab-min.m",EVTABMIN//Transpose];
-	Export["fin-f0tab-min.m",F0TABMIN//Transpose];
-	Export["fin-abstab-min.m",ABSTABMIN//Transpose];
-	Export["fin-afactab-min.m",AFACTABMIN//Transpose];
-	Export["fin-mutab-max.m",MUTABMAX//Transpose];
-	Export["fin-egtab-max.m",EGTABMAX//Transpose];
-	Export["fin-evtab-max.m",EVTABMAX//Transpose];
-	Export["fin-f0tab-max.m",F0TABMAX//Transpose];
-	Export["fin-abstab-max.m",ABSTABMAX//Transpose];
-	Export["fin-afactab-max.m",AFACTABMAX//Transpose];
+	Export["fin-mutab.m",{MUTABMIN//Transpose,MUTABMAX//Transpose}];
+	Export["fin-egtab.m",{EGTABMIN//Transpose,EGTABMAX//Transpose}];
+	Export["fin-evtab.m",{EVTABMIN//Transpose,EVTABMAX//Transpose}];
+	Export["fin-f0tab.m",{F0TABMIN//Transpose,F0TABMAX//Transpose}];
+	Export["fin-abstab.m",{ABSTABMIN//Transpose,ABSTABMAX//Transpose}];
+	Export["fin-afactab.m",{AFACTABMIN//Transpose,AFACTABMAX//Transpose}];
 ]
 
-Nintfromfile[ef1_,ef2_]:=NIntegrate[r*ef1*ef2, {r,0,10^6},MinRecursion->10,MaxRecursion->50]
+Nintfromfile[rn_,ef1_,ef2_]:=NIntegrate[(r^rn)*ef1*ef2, {r,0,10^6},MinRecursion->10,MaxRecursion->50]
 
-f0fromfile[filedata_,nf_]:=Module[{mu=filedata[[1]][[2]],gsev=filedata[[2]][[1]][[1]],exev=filedata[[2]][[nf]][[2]],gsef=filedata[[3]][[1]][[1]],exef=filedata[[3]][[nf]][[2]]},2*mu*(QuantityMagnitude@UnitConvert[exev-gsev,"Hartrees"])*Nintfromfile[gsef,exef]]
+f0fromfile[filedata_,nf_]:=Module[{mu=filedata[[1]][[2]],gsev=filedata[[2]][[1]][[1]],exev=filedata[[2]][[nf]][[2]],gsef=filedata[[3]][[1]][[1]],exef=filedata[[3]][[nf]][[2]]},2*mu*(QuantityMagnitude@UnitConvert[exev-gsev,"Hartrees"])*((1/4)*Nintfromfile[2,gsef,exef]^2)]
 
 absfromfile[filedata_,nf_,mu_,hl_,kappa_,na_,damp_]:=2*((4*\[Pi])/(Sqrt[kappa]*(137)))*(na/((hl/B2nm)*mu))*f0fromfile[filedata,nf]*(2/damp)
