@@ -1,7 +1,5 @@
 /home/mbrunetti/cluster/sigesn/results/DIR-si-2018-05-17-RF-test3
 Starting Mathematica job
 
-NIntegrate::slwcon: Numerical integration converging too slowly; suspect one of the following: singularity, value of the integration is 0, highly oscillatory integrand, or WorkingPrecision too small.
-
-NIntegrate::slwcon: Numerical integration converging too slowly; suspect one of the following: singularity, value of the integration is 0, highly oscillatory integrand, or WorkingPrecision too small.
+Syntax::com: Warning: comma encountered with no adjacent expression. The expression will be treated as Null.  (line 107 of "/home/mbrunetti/cluster/sigesn/results/DIR-si-2018-05-17-RF-test3/test2.m").
 Job finished
