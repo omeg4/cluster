@@ -1,6 +1,7 @@
 BuildData[]:=Module[
 		{
 				resultfiles = FileNames["*calcs*"],
+				inps = Import["inp.m"],
 				MUTABMIN={},
 				EGTABMIN={},
 				EVTABMIN={},
@@ -18,7 +19,9 @@ BuildData[]:=Module[
 		Module[
 			{
 			thismin=Import[resultfiles[[i]]][[1]][[2]],
-			thismax=Import[resultfiles[[i]]][[2]][[2]]
+			thismax=Import[resultfiles[[i]]][[2]][[2]],
+			kappa=inps[[2]],
+			matpars=inps[[1]]
 			},
 			Module[
 				{

@@ -47,6 +47,7 @@ cat <<EOF > callfuncs.m
 SetDirectory["$(pwd)"]
 params={$ingap,$buck,$vF,$thicc,$eps};
 etab={$ezi,$ezf,$ezstep};
+Export["inp.m",{params,$kappa,etab}]
 Export["diag1.txt","Params and Etab initialized"]
 SiGeSuite[3,params,etab,$kappa];
 Export["suitediag.txt","Suite run complete, beginning analysis of data files."]
