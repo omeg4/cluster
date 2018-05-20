@@ -1,0 +1,13 @@
+/home/mbrunetti/cluster/sigesn/results/DIR-si-2018-05-15-imitate
+Starting Mathematica job
+
+Syntax::com: Warning: comma encountered with no adjacent expression. The expression will be treated as Null.  (line 107 of "/home/mbrunetti/cluster/sigesn/results/DIR-si-2018-05-15-imitate/test2.m").
+
+Transpose::nmtx: The first two levels of {} cannot be transposed.
+
+Transpose::nmtx: The first two levels of {} cannot be transposed.
+
+Transpose::nmtx: The first two levels of {} cannot be transposed.
+
+General::stop: Further output of Transpose::nmtx will be suppressed during this calculation.
+Job finished
