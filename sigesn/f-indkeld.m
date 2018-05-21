@@ -59,10 +59,8 @@ out in kg) and convert to units of Subscript[m, 0] *)
     ];
 	{
 	{Egap, \[Mu], Ep, d},
-    Table[evTab[[i - j + 1]][[j]], {i, Dimensions[evTab][[1]]}, {j, i,
-        1, -1}]*H2eV,
-    Table[NormalizeEF[efTab[[i - j + 1]][[j]], 10^6], {i, Dimensions[efTab][[1]]}, {j, i,
-       1, -1}]
+    Table[evTab[[i - j + 1]][[j]], {i, Dimensions[evTab][[1]]}, {j, i, 1, -1}],
+    Table[NormalizeEF[efTab[[i - j + 1]][[j]], 10^6], {i, Dimensions[efTab][[1]]}, {j, i, 1, -1}]
 	}
    ]
 ]
