@@ -1,9 +1,13 @@
-ProcessSuite[data_:Import["suite.m"]]:=Module[
+ProcessSuite[]:=Module[
 	{
-		Nd=Dimensions[ data ][[1]],
-		Ne=Dimensions[ data ][[2]],
-		{params,kappa,etab,dtab}=Import["inp.m"]
+		data=Import["suite.m"],
+		params=Import["inp.m"][[1]],
+		kappa=Import["inp.m"][[2]],
+		etab=Import["inp.m"][[3]],
+		dtab=Import["inp.m"][[4]]
 	},
+	Nd=Dimensions[ data ][[1]];
+	Ne=Dimensions[ data ][[2]];
 	{
 	params,
 	Table[(*Big outer table, 2 elements, one for each type (min/max) *)
@@ -44,8 +48,6 @@ ProcessSuite[data_:Import["suite.m"]]:=Module[
 	]
 	}
 ]
-
-
 
 eperpfromsuite[onerun_]:=onerun[[1]][[3]]//QuantityMagnitude
 mufromsuite[onerun_]:=onerun[[1]][[2]]//QuantityMagnitude
