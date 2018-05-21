@@ -3,7 +3,7 @@
 
 cat <<EOF > callanalysis.m
 SetDirectory["$(pwd)"]
-BuildData[];
+ProcessSuite[];
 Quit[]
 EOF
 cat /home/mbrunetti/cluster/sigesn/params.m /home/mbrunetti/cluster/sigesn/f-dirkeld.m /home/mbrunetti/cluster/sigesn/f-Dsuite.m /home/mbrunetti/cluster/sigesn/f-normEF.m /home/mbrunetti/cluster/sigesn/f-filemine.m callanalysis.m > test2.m
