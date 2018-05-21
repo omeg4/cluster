@@ -3,6 +3,7 @@ ProcessSuite[data_:Import["suite.m"]]:=Module[
 		Nd=Dimensions[ data ][[1]],
 		Ne=Dimensions[ data ][[2]],
 		{params,kappa,etab,dtab}=Import["inp.m"]
+	},
 	{
 	params,
 	Table[(*Big outer table, 2 elements, one for each type (min/max) *)
