@@ -12,7 +12,7 @@ SiGeSuite[mmax_, matpars_, eztab_, kappa_] :=
 	erel = matpars[[5]] - 1,
     \[Kappa] = kappa,
 	min,
-	max,
+	max
     },
 	{
 		Table[
