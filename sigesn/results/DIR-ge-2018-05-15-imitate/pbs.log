@@ -5,11 +5,46 @@ Syntax::com: Warning: comma encountered with no adjacent expression. The express
 
 Import::nffil: File not found during Import.
 
-Transpose::nmtx: The first two levels of {} cannot be transposed.
+Part::partd: Part specification 2.475[[2]] is longer than depth of object.
 
-Transpose::nmtx: The first two levels of {} cannot be transposed.
+Part::partd: Part specification $Failed[[2]] is longer than depth of object.
 
-Transpose::nmtx: The first two levels of {} cannot be transposed.
+Part::partd: Part specification $Failed[[1]] is longer than depth of object.
 
-General::stop: Further output of Transpose::nmtx will be suppressed during this calculation.
+General::stop: Further output of Part::partd will be suppressed during this calculation.
+
+Part::partw: Part 3 of 2.475[[2]] does not exist.
+
+Part::partw: Part 3 of 1640.1 millielectronvolts does not exist.
+
+Part::partw: Part 3 of 2.475[[2]] does not exist.
+
+General::stop: Further output of Part::partw will be suppressed during this calculation.
+
+Quantity::compat: DimensionlessUnit and Hartrees are incompatible units
+
+                                        2
+NIntegrate::inumr: The integrand 2.475 r  3[[2]] has evaluated to non-numerical values for all sampling points in the region with boundaries {{0., 976.563}}.
+
+                                        2
+NIntegrate::inumr: The integrand 2.475 r  3[[2]] has evaluated to non-numerical values for all sampling points in the region with boundaries {{0., 976.563}}.
+
+                                        2
+NIntegrate::inumr: The integrand 2.475 r  3[[2]] has evaluated to non-numerical values for all sampling points in the region with boundaries {{0., 976.563}}.
+
+General::stop: Further output of NIntegrate::inumr will be suppressed during this calculation.
+
+Quantity::compat: DimensionlessUnit and Hartrees are incompatible units
+
+Quantity::compat: DimensionlessUnit and Hartrees are incompatible units
+
+General::stop: Further output of Quantity::compat will be suppressed during this calculation.
+
+NIntegrate::izero: Integral and error estimates are 0 on all integration subregions. Try increasing the value of the MinRecursion option. If value of integral may be 0, specify a finite value for the AccuracyGoal option.
+
+NIntegrate::izero: Integral and error estimates are 0 on all integration subregions. Try increasing the value of the MinRecursion option. If value of integral may be 0, specify a finite value for the AccuracyGoal option.
+
+NIntegrate::izero: Integral and error estimates are 0 on all integration subregions. Try increasing the value of the MinRecursion option. If value of integral may be 0, specify a finite value for the AccuracyGoal option.
+
+General::stop: Further output of NIntegrate::izero will be suppressed during this calculation.
 Job finished
