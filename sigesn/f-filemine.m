@@ -1,66 +1,61 @@
-BuildData[]:=Module[
+ProcessSuite[data_:Import["suite.m"]]:=Module[
+	{
+		Nd=Dimensions[ data ][[1]],
+		Ne=Dimensions[ data ][[2]],
+		{params,kappa,etab,dtab}=Import["inp.m"]
+	{
+	params,
+	Table[(*Big outer table, 2 elements, one for each type (min/max) *)
 		{
-				resultfiles = FileNames["*calcs*"],
-				inps = Import["inp.m"],
-				MUTABMIN={},
-				EGTABMIN={},
-				EVTABMIN={},
-				F0TABMIN={},
-				ABSTABMIN={},
-				AFACTABMIN={},
-				MUTABMAX={},
-				EGTABMAX={},
-				EVTABMAX={},
-				F0TABMAX={},
-				ABSTABMAX={},
-				AFACTABMAX={}
-		},
-	Table[
-		Module[
-			{
-			thismin=Import[resultfiles[[i]]][[1]][[2]],
-			thismax=Import[resultfiles[[i]]][[2]][[2]],
-			kappa=inps[[2]],
-			matpars=inps[[1]]
-			},
-			Module[
-				{
-					ep=thismin[[1]][[3]],
-					minegap=thismin[[1]][[1]],
-					minmu=thismin[[1]][[2]],
-					minevs=thismin[[2]],
-					minefs=thismin[[3]],
-					maxegap=thismax[[1]][[1]],
-					maxmu=thismax[[1]][[2]],
-					maxevs=thismax[[2]],
-					maxefs=thismax[[3]]
-				},
-			MUTABMIN=Append[MUTABMIN, {ep,minmu}];
-			EGTABMIN=Append[EGTABMIN, {ep,minegap}];
-			EVTABMIN=Append[EVTABMIN, {ep,minevs}];
-			F0TABMIN=Append[F0TABMIN, {ep, {f0fromfile[thismin,2],f0fromfile[thismin,3]}}];
-			ABSTABMIN=Append[ABSTABMIN, {ep, {absfromfile[thismin,2,minmu,matpars[[4]],kappa,na,damp]/B2nm,absfromfile[thismin,3,minmu,matpars[[4]],kappa,na,damp]/B2nm}}];
-			AFACTABMIN=Append[AFACTABMIN, {ep, {1 - Exp[-absfromfile[thismin,2,minmu,matpars[[4]],kappa,na,damp]*matpars[[4]]/B2nm], 1 - Exp[-absfromfile[thismin,2,minmu,matpars[[4]],kappa,na,damp]*matpars[[4]]/B2nm]}}];
-			MUTABMAX=Append[MUTABMAX, {ep,maxmu}];
-			EGTABMAX=Append[EGTABMAX, {ep,maxegap}];
-			EVTABMAX=Append[EVTABMAX, {ep,maxevs}];
-			F0TABMAX=Append[F0TABMAX, {ep, {f0fromfile[thismax,2],f0fromfile[thismax,3]}}];
-			ABSTABMAX=Append[ABSTABMAX, {ep, {absfromfile[thismax,2,maxmu,matpars[[4]],kappa,na,damp]/B2nm,absfromfile[thismax,3,maxmu,matpars[[4]],kappa,na,damp]/B2nm}}];
-			AFACTABMAX=Append[AFACTABMAX, {ep, {1 - Exp[-absfromfile[thismax,2,maxmu,matpars[[4]],kappa,na,damp]*matpars[[4]]/B2nm], 1 - Exp[-absfromfile[thismax,2,maxmu,matpars[[4]],kappa,na,damp]*matpars[[4]]/B2nm]}}];
+			labels[[type]],
+			Table[(* This is the table of D's, with Nd elements *)
+				{dfromsuite[ data[[Dn]][[1]][[type]] ],
+					Table[
+					{
+							Quantity[eperpfromsuite[ data[[Dn]][[En]][[type]] ],"Volts"/"Angstroms"],
+							Quantity[egapfromsuite[ data[[Dn]][[En]][[type]] ], "Electronvolts"],
+							Quantity[mufromsuite[ data[[Dn]][[En]][[type]] ],"ElectronMass"],
+							Table[
+								{
+									Quantity[1000*H2eV*EVfromsuite[ data[[Dn]][[En]][[type]],n,l ],"Millielectronvolts"],
+									Quantity[B2nm*r2fromsuite[ data[[Dn]][[En]][[type]],n,l ],"BohrRadius"],
+								},
+								{n,3},{l,0,n-1}
+							],
+							Table[
+								{
+									Quantity[1000*H2eV*Etrfromsuite[ data[[Dn]][[En]][[type]], 1, nf, 0, 1 ],"Millielectronvolts"],
+									f0fromsuite[ data[[Dn]][[En]][[type]], 1, nf, 0, 1 ],
+									UnitConvert[Quantity[absfromsuite[ data[[Dn]][[En]][[type]], 1, nf, 0, 1],1/"BohrRadius"],1/"Meters"],
+									afacfromsuite[ data[[Dn]][[En]][[type]], 1, nf, 0, 1 ]
+								},
+								{nf,{2,3}}
+							]
+								},
+						{En,Ne}
+							]
+						},
+					{Dn,Nd}
 			]
-		],
-		{i, Length[resultfiles]}
-	];
-	Export["fin-mutab.m",{MUTABMIN//Transpose,MUTABMAX//Transpose}];
-	Export["fin-egtab.m",{EGTABMIN//Transpose,EGTABMAX//Transpose}];
-	Export["fin-evtab.m",{EVTABMIN//Transpose,EVTABMAX//Transpose}];
-	Export["fin-f0tab.m",{F0TABMIN//Transpose,F0TABMAX//Transpose}];
-	Export["fin-abstab.m",{ABSTABMIN//Transpose,ABSTABMAX//Transpose}];
-	Export["fin-afactab.m",{AFACTABMIN//Transpose,AFACTABMAX//Transpose}];
-]
+				},
+				{type,2}
+	]
+	}
+
+
+
+eperpfromsuite[onerun_]:=onerun[[1]][[3]]//QuantityMagnitude
+mufromsuite[onerun_]:=onerun[[1]][[2]]//QuantityMagnitude
+egapfromsuite[onerun_]:=onerun[[1]][[1]]//QuantityMagnitude
+dfromsuite[onerun_]:=onerun[[1]][[4]]
+EVfromsuite[onerun_,n_,l_]:=onerun[[2]][[n]][[l+1]]
+EFfromsuite[onerun_,n_,l_]:=onerun[[3]][[n]][[l+1]]
+
+Etrfromsuite[onerun_,ni_,nf_,li_,lf_]:=(EVfromsuite[ onerun, nf, lf ] - EVfromsuite[ onerun, ni, li])
+normcheckfromsuite[onerun_,n_,l_]:=NIntegrate[r*(onerun[[3]][[n]][[l]]^2),{r,0,10^],MinRecursion->10,MaxRecursion->50]
+r2fromsuite[onerun_,n_,l_]:=Sqrt@NIntegrate[(r^3)*(onerun[[3]][[n]][[l+1]]^2),{r,0,10^6},MinRecursion->10,MaxRecursion->50]
+f0fromsuite[onerun_,ni_,nf_,li_,lf_]:=2*mufromsuite[onerun]*Etrfromsuite[ onerun, ni, nf, li, lf ]*Nintfromfile[2, EFfromsuite[onerun, ni, li], EFfromsuite[onerun, nf, lf]]
+absfromsuite[onerun_,params_,ni_,nf_,li_,lf_]:=2*((4*\[Pi])/(Sqrt[kappa]*(137)))*(na/((params[[4]]/B2nm)*mufromsuite[onerun]))*f0fromsuite[onerun,ni,nf,li,lf]*(2/damp)
+afacfromsuite[onerun_,params_,ni_,nf_,li_,lf_]:=1-Exp[-absfromsuite[onerun,params,ni,nf,li,lf]*(params[[4]]/B2nm)]
 
 Nintfromfile[rn_,ef1_,ef2_]:=NIntegrate[(r^rn)*ef1*ef2, {r,0,10^6},MinRecursion->10,MaxRecursion->50]
-
-f0fromfile[filedata_,nf_]:=Module[{mu=filedata[[1]][[2]],gsev=filedata[[2]][[1]][[1]],exev=filedata[[2]][[nf]][[2]],gsef=filedata[[3]][[1]][[1]],exef=filedata[[3]][[nf]][[2]]},2*mu*(QuantityMagnitude@UnitConvert[exev-gsev,"Hartrees"])*((1/4)*Nintfromfile[2,gsef,exef]^2)]
-
-absfromfile[filedata_,nf_,mu_,hl_,kappa_,na_,damp_]:=2*((4*\[Pi])/(Sqrt[kappa]*(137)))*(na/((hl/B2nm)*mu))*f0fromfile[filedata,nf]*(2/damp)

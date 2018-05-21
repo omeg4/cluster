@@ -67,7 +67,8 @@ cat <<EOF > callfuncs.m
 params={$ingap,$buck,$vF,$thicc,$eps};
 etab={$ezi,$ezf,$ezstep};
 dtab={$di,$df,$ds};
-Export["diag1.txt","Params, Dtab, and Etab initialized"]
+Export["diag1.txt","Params, Dtab, and Etab initialized"];
+Export["imp.m",{params,$kappa,etab,dtab}];
 SGSIndSuite[params,$kappa,etab,dtab,$funcname];
 Quit[]
 EOF

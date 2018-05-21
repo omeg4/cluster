@@ -26,18 +26,10 @@ SGSIndSuite[pars_, kappa_, ezrange_, drange_,funcname_] := Module[
 		ABSTABMAX={},
 		AFACTABMAX={}
    },
-	nd=0;
-	ne=0;
 	Table[
 	{
-		nd = nd + 1, ne = ne + 1,
-		Export[
-			ToString@StringForm["calcs_d`1`_e`2`.m",IntegerString[nd,10,3],IntegerString[ne,10,3]],
-			{
-				{"min",funcname[3, pars[[2;;]], pars[[1]], ep, kappa, d, 1]},
-				{"max",funcname[3, pars[[2;;]], pars[[1]], ep, kappa, d, -1]}
-			}
-		]
+		funcname[3, pars[[2;;]], pars[[1]], ep, kappa, d, 1],
+		funcname[3, pars[[2;;]], pars[[1]], ep, kappa, d, -1]
 	},
 	{d,di,df,dstep},{ep,ei,ef,estep}
 	];
