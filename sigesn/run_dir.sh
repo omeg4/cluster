@@ -54,6 +54,11 @@ labels={"min","max"};
 Export["suitediag.txt","Suite run complete, beginning analysis of data files."]
 Export["proc.m",ProcessSuite[]];
 prc=Import["proc.m"];
+Export["muplt.pdf",mkmuplt[prc]];
+Export["egapplt.pdf",mkegplt[prc]];
+Export["ebplt.pdf",mkebplt[prc]];
+Export["f0plt.pdf",mkf0plt[prc]];
+Export["absplt.pdf",mkabsplt[prc]];
 Quit[]
 EOF
 cat /home/mbrunetti/cluster/sigesn/params.m /home/mbrunetti/cluster/sigesn/f-dirkeld.m /home/mbrunetti/cluster/sigesn/f-Dsuite.m /home/mbrunetti/cluster/sigesn/f-normEF.m /home/mbrunetti/cluster/sigesn/f-filemine.m callfuncs.m > test.m

@@ -80,4 +80,44 @@ FPafac[proc_,mm_,nd_,ne_,nf_]:=	proc[[2]][[mm]][[2]][[nd]][[2]][[ne]][[5]][[nf-1
 FPDdim[proc_]:=					Dimensions[ proc[[2]][[1]][[2]] ][[1]]
 FPEdim[proc_]:=					Dimensions[ proc[[2]][[1]][[2]][[1]][[2]] ][[1]]
 
+mkmuplt[prc_]:=ListPlot[
+	Table[{FPeperp[prc, ne], FPmu[prc, type, ne]},{type,2},{ne,FPEdim[ip]}],
+	PlotLabel->"\[Mu] vs. Eperp",
+	LabelStyle->Directive[24,Black],
+	AxesLabel->{"Eperp [V/\[Angstrom]]","\[Mu] [m0]"},
+	PlotTheme->"Detailed"
+]
+
+mkegplt[prc_]:=ListPlot[
+	Table[{FPeperp[prc, ne], FPegap[prc, type, ne]},{type,2},{ne,FPEdim[ip]}],
+	PlotLabel->"Bandgap vs. Eperp",
+	LabelStyle->Directive[24,Black],
+	AxesLabel->{"Eperp [V/\[Angstrom]]","Egap [meV]"},
+	PlotTheme->"Detailed"
+]
+
+mkebplt[prc_]:=ListPlot[
+	Flatten[Table[{FPeperp[prc, ne], -FPev[prc, type, nd, ne, 1, 0]},{type,2},{nd,FPDdim[ip]},{ne,FPEdim[ip]}],1],
+	PlotLabel->"Binding Energy vs. Eperp",
+	LabelStyle->Directive[24,Black],
+	AxesLabel->{"Eperp [V/\[Angstrom]]","Eb [meV]"},
+	PlotTheme->"Detailed"
+]
+
+mkf0plt[prc_]:=ListPlot[
+	Flatten[Table[{FPeperp[prc, ne], FPf0[prc, type, nd, ne, 2]},{type,2},{nd,FPDdim[ip]},{ne,FPEdim[ip]}],1],
+	PlotLabel->"f0 vs. Eperp",
+	LabelStyle->Directive[24,Black],
+	AxesLabel->{"Eperp [V/\[Angstrom]]","f0"},
+	PlotTheme->"Detailed"
+]
+
+mkabsplt[prc_]:=ListPlot[
+	Flatten[Table[{FPeperp[prc, ne], FPabs[prc, type, nd, ne, 2]},{type,2},{nd,FPDdim[ip]},{ne,FPEdim[ip]}],1],
+	PlotLabel->"\[Alpha] vs. Eperp",
+	LabelStyle->Directive[24,Black],
+	AxesLabel->{"Eperp [V/\[Angstrom]]","\[Alpha] [m^(-1)]"},
+	PlotTheme->"Detailed"
+]
+
 Nintfromfile[rn_,ef1_,ef2_]:=NIntegrate[(r^rn)*ef1*ef2, {r,0,10^6},MinRecursion->10,MaxRecursion->50]

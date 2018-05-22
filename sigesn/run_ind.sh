@@ -73,6 +73,12 @@ Export["suite.m",SGSIndSuite[params,$kappa,etab,dtab,$funcname]];
 labels={"min","max"};
 Export["suitediag.txt","Suite run complete, processing..."];
 Export["proc.m",ProcessSuite[]];
+prc=Import["proc.m"];
+Export["muplt.pdf",mkmuplt[prc]];
+Export["egapplt.pdf",mkegplt[prc]];
+Export["ebplt.pdf",mkebplt[prc]];
+Export["f0plt.pdf",mkf0plt[prc]];
+Export["absplt.pdf",mkabsplt[prc]];
 Quit[]
 EOF
 
