@@ -35,8 +35,8 @@ ProcessSuite[]:=Module[
 							{
 								Quantity[1000*H2eV*Etrfromsuite[ data[[Dn]][[En]][[type]], 1, nf, 0, 1 ],"Millielectronvolts"],
 								f0fromsuite[ data[[Dn]][[En]][[type]], 1, nf, 0, 1 ],
-								UnitConvert[Quantity[absfromsuite[ data[[Dn]][[En]][[type]], params, 1, nf, 0, 1],1/"BohrRadius"],1/"Meters"],
-								afacfromsuite[ data[[Dn]][[En]][[type]], params, 1, nf, 0, 1 ]
+								UnitConvert[Quantity[absfromsuite[ data[[Dn]][[En]][[type]], params, kappa, 1, nf, 0, 1],1/"BohrRadius"],1/"Meters"],
+								afacfromsuite[ data[[Dn]][[En]][[type]], params, kappa, 1, nf, 0, 1 ]
 							},
 							{nf,{2,3}}
 						]
@@ -63,8 +63,8 @@ Etrfromsuite[onerun_,ni_,nf_,li_,lf_]:=(EVfromsuite[ onerun, nf, lf ] - EVfromsu
 normcheckfromsuite[onerun_,n_,l_]:=NIntegrate[r*(onerun[[3]][[n]][[l]]^2),{r,0,10^6},MinRecursion->10,MaxRecursion->50]
 r2fromsuite[onerun_,n_,l_]:=Sqrt@NIntegrate[(r^3)*(onerun[[3]][[n]][[l+1]]^2),{r,0,10^6},MinRecursion->10,MaxRecursion->50]
 f0fromsuite[onerun_,ni_,nf_,li_,lf_]:=2*mufromsuite[onerun]*Etrfromsuite[ onerun, ni, nf, li, lf ]*Nintfromfile[2, EFfromsuite[onerun, ni, li], EFfromsuite[onerun, nf, lf]]
-absfromsuite[onerun_,params_,ni_,nf_,li_,lf_]:=2*((4*\[Pi])/(Sqrt[kappa]*(137)))*(na/((params[[4]]/B2nm)*mufromsuite[onerun]))*f0fromsuite[onerun,ni,nf,li,lf]*(2/damp)
-afacfromsuite[onerun_,params_,ni_,nf_,li_,lf_]:=1-Exp[-absfromsuite[onerun,params,ni,nf,li,lf]*(params[[4]]/B2nm)]
+absfromsuite[onerun_,params_,kappa_,ni_,nf_,li_,lf_]:=2*((4*\[Pi])/(Sqrt[kappa]*(137)))*(na/((params[[4]]/B2nm)*mufromsuite[onerun]))*f0fromsuite[onerun,ni,nf,li,lf]*(2/damp)
+afacfromsuite[onerun_,params_,kappa_,ni_,nf_,li_,lf_]:=1-Exp[-absfromsuite[onerun,params,ni,nf,li,lf]*(params[[4]]/B2nm)]
 
 
 Nintfromfile[rn_,ef1_,ef2_]:=NIntegrate[(r^rn)*ef1*ef2, {r,0,10^6},MinRecursion->10,MaxRecursion->50]
