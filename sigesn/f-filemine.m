@@ -1,11 +1,14 @@
 ProcessSuite[]:=Module[
 	{
-		data=Import["suite.m"],
-		params=Import["inp.m"][[1]],
-		kappa=Import["inp.m"][[2]],
-		etab=Import["inp.m"][[3]],
-		dtab=Import["inp.m"][[4]]
+		data,
+		params,
+		kappa,
+		etab,
+		dtab,
+		labels={"min","max"}
 	},
+	data=Import["suite.m"];
+	{params,kappa,etab,dtab}=Import["inp.m"];
 	Nd=Dimensions[ data ][[1]];
 	Ne=Dimensions[ data ][[2]];
 	{
@@ -19,7 +22,7 @@ ProcessSuite[]:=Module[
 					Table[
 					{
 						Quantity[eperpfromsuite[ data[[Dn]][[En]][[type]] ],"Volts"/"Angstroms"],
-						Quantity[egapfromsuite[ data[[Dn]][[En]][[type]] ], "Electronvolts"],
+						Quantity[egapfromsuite[ data[[Dn]][[En]][[type]] ], "Millielectronvolts"],
 						Quantity[mufromsuite[ data[[Dn]][[En]][[type]] ],"ElectronMass"],
 						Table[
 							{
@@ -32,8 +35,8 @@ ProcessSuite[]:=Module[
 							{
 								Quantity[1000*H2eV*Etrfromsuite[ data[[Dn]][[En]][[type]], 1, nf, 0, 1 ],"Millielectronvolts"],
 								f0fromsuite[ data[[Dn]][[En]][[type]], 1, nf, 0, 1 ],
-								UnitConvert[Quantity[absfromsuite[ data[[Dn]][[En]][[type]], 1, nf, 0, 1],1/"BohrRadius"],1/"Meters"],
-								afacfromsuite[ data[[Dn]][[En]][[type]], 1, nf, 0, 1 ]
+								UnitConvert[Quantity[absfromsuite[ data[[Dn]][[En]][[type]], params, 1, nf, 0, 1],1/"BohrRadius"],1/"Meters"],
+								afacfromsuite[ data[[Dn]][[En]][[type]], params, 1, nf, 0, 1 ]
 							},
 							{nf,{2,3}}
 						]
