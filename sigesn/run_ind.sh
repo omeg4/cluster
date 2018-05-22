@@ -27,7 +27,7 @@ read mater
 echo "What's the name of this job?"
 read jobby
 
-export projdir="$DorI-$mater-$startdate-$jobby"
+export projdir="$jobby-$DorI-$mater-$startdate"
 
 mkdir $projdir
 cd $projdir
