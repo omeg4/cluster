@@ -12,7 +12,7 @@ ProcessSuite[]:=Module[
 	Nd=Dimensions[ data ][[1]];
 	Ne=Dimensions[ data ][[2]];
 	{
-	params,
+	Flatten[{params,kappa}],
 	Table[(*Big outer table, 2 elements, one for each type (min/max) *)
 		{
 			labels[[type]],
@@ -62,9 +62,22 @@ EFfromsuite[onerun_,n_,l_]:=onerun[[3]][[n]][[l+1]]
 Etrfromsuite[onerun_,ni_,nf_,li_,lf_]:=(EVfromsuite[ onerun, nf, lf ] - EVfromsuite[ onerun, ni, li])
 normcheckfromsuite[onerun_,n_,l_]:=NIntegrate[r*(onerun[[3]][[n]][[l]]^2),{r,0,10^6},MinRecursion->10,MaxRecursion->50]
 r2fromsuite[onerun_,n_,l_]:=Sqrt@NIntegrate[(r^3)*(onerun[[3]][[n]][[l+1]]^2),{r,0,10^6},MinRecursion->10,MaxRecursion->50]
-f0fromsuite[onerun_,ni_,nf_,li_,lf_]:=2*mufromsuite[onerun]*Etrfromsuite[ onerun, ni, nf, li, lf ]*Nintfromfile[2, EFfromsuite[onerun, ni, li], EFfromsuite[onerun, nf, lf]]
+f0fromsuite[onerun_,ni_,nf_,li_,lf_]:=2*mufromsuite[onerun]*Etrfromsuite[ onerun, ni, nf, li, lf ]*((1/4)*Nintfromfile[2, EFfromsuite[onerun, ni, li], EFfromsuite[onerun, nf, lf]]^2)
 absfromsuite[onerun_,params_,kappa_,ni_,nf_,li_,lf_]:=2*((4*\[Pi])/(Sqrt[kappa]*(137)))*(na/((params[[4]]/B2nm)*mufromsuite[onerun]))*f0fromsuite[onerun,ni,nf,li,lf]*(2/damp)
 afacfromsuite[onerun_,params_,kappa_,ni_,nf_,li_,lf_]:=1-Exp[-absfromsuite[onerun,params,ni,nf,li,lf]*(params[[4]]/B2nm)]
 
+FPparams[proc_]:=				proc[[1]]
+FPnhbn[proc_,nd_]:=				proc[[2]][[1]][[2]][[nd]][[1]]
+FPeperp[proc_,ne_]:=			proc[[2]][[1]][[2]][[1]][[2]][[ne]][[1]]
+FPegap[proc_,mm_,ne_]:=			proc[[2]][[mm]][[2]][[1]][[2]][[ne]][[2]]
+FPmu[proc_,mm_,ne_]:=			proc[[2]][[mm]][[2]][[1]][[2]][[ne]][[3]]
+FPev[proc_,mm_,nd_,ne_,n_,l_]:=	proc[[2]][[mm]][[2]][[nd]][[2]][[ne]][[4]][[n]][[l+1]][[1]]
+FPr2[proc_,mm_,nd_,ne_,n_,l_]:=	proc[[2]][[mm]][[2]][[nd]][[2]][[ne]][[4]][[n]][[l+1]][[2]]
+FPetr[proc_,mm_,nd_,ne_,nf_]:=	proc[[2]][[mm]][[2]][[nd]][[2]][[ne]][[5]][[nf-1]][[1]]
+FPf0[proc_,mm_,nd_,ne_,nf_]:=	proc[[2]][[mm]][[2]][[nd]][[2]][[ne]][[5]][[nf-1]][[2]]
+FPabs[proc_,mm_,nd_,ne_,nf_]:=	proc[[2]][[mm]][[2]][[nd]][[2]][[ne]][[5]][[nf-1]][[3]]
+FPafac[proc_,mm_,nd_,ne_,nf_]:=	proc[[2]][[mm]][[2]][[nd]][[2]][[ne]][[5]][[nf-1]][[4]]
+FPDdim[proc_]:=					Dimensions[ proc[[2]][[1]][[2]] ][[1]]
+FPEdim[proc_]:=					Dimensions[ proc[[2]][[1]][[2]][[1]][[2]] ][[1]]
 
 Nintfromfile[rn_,ef1_,ef2_]:=NIntegrate[(r^rn)*ef1*ef2, {r,0,10^6},MinRecursion->10,MaxRecursion->50]
