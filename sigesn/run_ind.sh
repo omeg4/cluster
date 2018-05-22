@@ -27,7 +27,7 @@ read mater
 echo "What's the name of this job?"
 read jobby
 
-export projdir="$DorI-$mater-$startdate-$jobby"
+export projdir="$jobby-$DorI-$mater-$startdate"
 
 mkdir $projdir
 cd $projdir
@@ -68,8 +68,11 @@ params={$ingap,$buck,$vF,$thicc,$eps};
 etab={$ezi,$ezf,$ezstep};
 dtab={$di,$df,$ds};
 Export["diag1.txt","Params, Dtab, and Etab initialized"];
-Export["imp.m",{params,$kappa,etab,dtab}];
+Export["inp.m",{params,$kappa,etab,dtab}];
 Export["suite.m",SGSIndSuite[params,$kappa,etab,dtab,$funcname]];
+labels={"min","max"};
+Export["suitediag.txt","Suite run complete, processing..."];
+Export["proc.m",ProcessSuite[]];
 Quit[]
 EOF
 
