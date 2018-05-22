@@ -68,7 +68,7 @@ params={$ingap,$buck,$vF,$thicc,$eps};
 etab={$ezi,$ezf,$ezstep};
 dtab={$di,$df,$ds};
 Export["diag1.txt","Params, Dtab, and Etab initialized"];
-Export["imp.m",{params,$kappa,etab,dtab}];
+Export["inp.m",{params,$kappa,etab,dtab}];
 Export["suite.m",SGSIndSuite[params,$kappa,etab,dtab,$funcname]];
 Quit[]
 EOF

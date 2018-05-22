@@ -41,7 +41,7 @@ out in kg) and convert to units of Subscript[m, 0] *)
     solnmat,
     Ep = Eperp
     },
-   radialEqKInd = -(1/(\[Mu]*2))*f''[r] - (1/(2 \[Mu]*r))* f'[r] - ((1/(kappa*r)) - (m^2/(2*\[Mu]* r^2)))* f[r];
+   radialEqKInd = -(1/(\[Mu]*2))*f''[r] - (1/(2 \[Mu]*r))* f'[r] - ((1/(kappa*Sqrt[r^2 + d^2])) - (m^2/(2*\[Mu]* r^2)))* f[r];
    radial\[Xi]KInd[m_] = Simplify[radialEqKInd /. f -> (\[Psi][ArcTan[#]] &) /. r -> (Tan[\[Xi]]), Pi/2 > \[Xi] > 0];
    solnmat = {}; evTab = {}; efTab = {};
    bigarray = {};
