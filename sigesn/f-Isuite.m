@@ -16,8 +16,8 @@ SGSIndSuite[pars_, kappa_, ezrange_, drange_,funcname_] := Module[
 	},
 	Table[
 	{
-		funcname[3, pars[[2;;]], pars[[1]], ep, kappa, d, 1],
-		funcname[3, pars[[2;;]], pars[[1]], ep, kappa, d, -1]
+		funcname[3, pars[[2;;]], pars[[1]], ep, kappa, (d*lBN)+(pars[[4]]/B2nm), 1],
+		funcname[3, pars[[2;;]], pars[[1]], ep, kappa, (d*lBN)+(pars[[4]]/B2nm), -1]
 	},
 	{d,di,df,dstep},{ep,ei,ef,estep}
 	]
