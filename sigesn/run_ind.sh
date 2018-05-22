@@ -70,6 +70,9 @@ dtab={$di,$df,$ds};
 Export["diag1.txt","Params, Dtab, and Etab initialized"];
 Export["inp.m",{params,$kappa,etab,dtab}];
 Export["suite.m",SGSIndSuite[params,$kappa,etab,dtab,$funcname]];
+labels={"min","max"};
+Export["suitediag.txt","Suite run complete, processing..."];
+Export["proc.m",ProcessSuite[]];
 Quit[]
 EOF
 
