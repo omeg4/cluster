@@ -1,0 +1,5 @@
+/home/mbrunetti/cluster/sigesn/results/krf-IND-si-2018-05-21
+Starting Mathematica job
+
+NIntegrate::slwcon: Numerical integration converging too slowly; suspect one of the following: singularity, value of the integration is 0, highly oscillatory integrand, or WorkingPrecision too small.
+Job finished
