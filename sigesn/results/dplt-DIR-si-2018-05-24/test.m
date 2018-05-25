@@ -135,7 +135,7 @@ ProcessSuite[]:=Module[
 	Nd=Dimensions[ data ][[1]];
 	Ne=Dimensions[ data ][[2]];
 	{
-	params,
+	Flatten[{params,kappa}],
 	Table[(*Big outer table, 2 elements, one for each type (min/max) *)
 		{
 			labels[[type]],
@@ -158,8 +158,8 @@ ProcessSuite[]:=Module[
 							{
 								Quantity[1000*H2eV*Etrfromsuite[ data[[Dn]][[En]][[type]], 1, nf, 0, 1 ],"Millielectronvolts"],
 								f0fromsuite[ data[[Dn]][[En]][[type]], 1, nf, 0, 1 ],
-								UnitConvert[Quantity[absfromsuite[ data[[Dn]][[En]][[type]], params, 1, nf, 0, 1],1/"BohrRadius"],1/"Meters"],
-								afacfromsuite[ data[[Dn]][[En]][[type]], params, 1, nf, 0, 1 ]
+								UnitConvert[Quantity[absfromsuite[ data[[Dn]][[En]][[type]], params, kappa, 1, nf, 0, 1],1/"BohrRadius"],1/"Meters"],
+								afacfromsuite[ data[[Dn]][[En]][[type]], params, kappa, 1, nf, 0, 1 ]
 							},
 							{nf,{2,3}}
 						]
@@ -185,19 +185,78 @@ EFfromsuite[onerun_,n_,l_]:=onerun[[3]][[n]][[l+1]]
 Etrfromsuite[onerun_,ni_,nf_,li_,lf_]:=(EVfromsuite[ onerun, nf, lf ] - EVfromsuite[ onerun, ni, li])
 normcheckfromsuite[onerun_,n_,l_]:=NIntegrate[r*(onerun[[3]][[n]][[l]]^2),{r,0,10^6},MinRecursion->10,MaxRecursion->50]
 r2fromsuite[onerun_,n_,l_]:=Sqrt@NIntegrate[(r^3)*(onerun[[3]][[n]][[l+1]]^2),{r,0,10^6},MinRecursion->10,MaxRecursion->50]
-f0fromsuite[onerun_,ni_,nf_,li_,lf_]:=2*mufromsuite[onerun]*Etrfromsuite[ onerun, ni, nf, li, lf ]*Nintfromfile[2, EFfromsuite[onerun, ni, li], EFfromsuite[onerun, nf, lf]]
-absfromsuite[onerun_,params_,ni_,nf_,li_,lf_]:=2*((4*\[Pi])/(Sqrt[kappa]*(137)))*(na/((params[[4]]/B2nm)*mufromsuite[onerun]))*f0fromsuite[onerun,ni,nf,li,lf]*(2/damp)
-afacfromsuite[onerun_,params_,ni_,nf_,li_,lf_]:=1-Exp[-absfromsuite[onerun,params,ni,nf,li,lf]*(params[[4]]/B2nm)]
+f0fromsuite[onerun_,ni_,nf_,li_,lf_]:=2*mufromsuite[onerun]*Etrfromsuite[ onerun, ni, nf, li, lf ]*((1/4)*Nintfromfile[2, EFfromsuite[onerun, ni, li], EFfromsuite[onerun, nf, lf]]^2)
+absfromsuite[onerun_,params_,kappa_,ni_,nf_,li_,lf_]:=2*((4*\[Pi])/(Sqrt[kappa]*(137)))*(na/((params[[4]]/B2nm)*mufromsuite[onerun]))*f0fromsuite[onerun,ni,nf,li,lf]*(2/damp)
+afacfromsuite[onerun_,params_,kappa_,ni_,nf_,li_,lf_]:=1-Exp[-absfromsuite[onerun,params,kappa,ni,nf,li,lf]*(params[[4]]/B2nm)]
 
+FPparams[proc_]:=				proc[[1]]
+FPnhbn[proc_,nd_]:=				proc[[2]][[1]][[2]][[nd]][[1]]
+FPeperp[proc_,ne_]:=			proc[[2]][[1]][[2]][[1]][[2]][[ne]][[1]]
+FPegap[proc_,mm_,ne_]:=			proc[[2]][[mm]][[2]][[1]][[2]][[ne]][[2]]
+FPmu[proc_,mm_,ne_]:=			proc[[2]][[mm]][[2]][[1]][[2]][[ne]][[3]]
+FPev[proc_,mm_,nd_,ne_,n_,l_]:=	proc[[2]][[mm]][[2]][[nd]][[2]][[ne]][[4]][[n]][[l+1]][[1]]
+FPr2[proc_,mm_,nd_,ne_,n_,l_]:=	proc[[2]][[mm]][[2]][[nd]][[2]][[ne]][[4]][[n]][[l+1]][[2]]
+FPetr[proc_,mm_,nd_,ne_,nf_]:=	proc[[2]][[mm]][[2]][[nd]][[2]][[ne]][[5]][[nf-1]][[1]]
+FPf0[proc_,mm_,nd_,ne_,nf_]:=	proc[[2]][[mm]][[2]][[nd]][[2]][[ne]][[5]][[nf-1]][[2]]
+FPabs[proc_,mm_,nd_,ne_,nf_]:=	proc[[2]][[mm]][[2]][[nd]][[2]][[ne]][[5]][[nf-1]][[3]]
+FPafac[proc_,mm_,nd_,ne_,nf_]:=	proc[[2]][[mm]][[2]][[nd]][[2]][[ne]][[5]][[nf-1]][[4]]
+FPDdim[proc_]:=					Dimensions[ proc[[2]][[1]][[2]] ][[1]]
+FPEdim[proc_]:=					Dimensions[ proc[[2]][[1]][[2]][[1]][[2]] ][[1]]
+
+mkmuplt[prc_]:=ListPlot[
+	Table[{FPeperp[prc, ne], FPmu[prc, type, ne]},{type,2},{ne,FPEdim[ip]}],
+	PlotLabel->"\[Mu] vs. Eperp",
+	LabelStyle->Directive[24,Black],
+	AxesLabel->{"Eperp [V/\[Angstrom]]","\[Mu] [m0]"},
+	PlotTheme->"Detailed"
+]
+
+mkegplt[prc_]:=ListPlot[
+	Table[{FPeperp[prc, ne], FPegap[prc, type, ne]},{type,2},{ne,FPEdim[ip]}],
+	PlotLabel->"Bandgap vs. Eperp",
+	LabelStyle->Directive[24,Black],
+	AxesLabel->{"Eperp [V/\[Angstrom]]","Egap [meV]"},
+	PlotTheme->"Detailed"
+]
+
+mkebplt[prc_]:=ListPlot[
+	Flatten[Table[{FPeperp[prc, ne], -FPev[prc, type, nd, ne, 1, 0]},{type,2},{nd,FPDdim[ip]},{ne,FPEdim[ip]}],1],
+	PlotLabel->"Binding Energy vs. Eperp",
+	LabelStyle->Directive[24,Black],
+	AxesLabel->{"Eperp [V/\[Angstrom]]","Eb [meV]"},
+	PlotTheme->"Detailed"
+]
+
+mkf0plt[prc_]:=ListPlot[
+	Flatten[Table[{FPeperp[prc, ne], FPf0[prc, type, nd, ne, 2]},{type,2},{nd,FPDdim[ip]},{ne,FPEdim[ip]}],1],
+	PlotLabel->"f0 vs. Eperp",
+	LabelStyle->Directive[24,Black],
+	AxesLabel->{"Eperp [V/\[Angstrom]]","f0"},
+	PlotTheme->"Detailed"
+]
+
+mkabsplt[prc_]:=ListPlot[
+	Flatten[Table[{FPeperp[prc, ne], FPabs[prc, type, nd, ne, 2]},{type,2},{nd,FPDdim[ip]},{ne,FPEdim[ip]}],1],
+	PlotLabel->"\[Alpha] vs. Eperp",
+	LabelStyle->Directive[24,Black],
+	AxesLabel->{"Eperp [V/\[Angstrom]]","\[Alpha] [m^(-1)]"},
+	PlotTheme->"Detailed"
+]
 
 Nintfromfile[rn_,ef1_,ef2_]:=NIntegrate[(r^rn)*ef1*ef2, {r,0,10^6},MinRecursion->10,MaxRecursion->50]
-SetDirectory["/home/mbrunetti/cluster/sigesn/results/drf-DIR-si-2018-05-21"]
+SetDirectory["/home/mbrunetti/cluster/sigesn/results/dplt-DIR-si-2018-05-24"]
 params={1.9,0.046,650000,0.4,11.9};
-etab={0,1,0.5};
+etab={0,2,0.25};
 Export["inp.m",{params,4.89,etab,{0,0,1}}]
 Export["diag1.txt","Params and Etab initialized"]
 Export["suite.m",SiGeSuite[3,params,etab,4.89]];
 labels={"min","max"};
 Export["suitediag.txt","Suite run complete, beginning analysis of data files."]
 Export["proc.m",ProcessSuite[]];
+prc=Import["proc.m"];
+Export["muplt.pdf",mkmuplt[prc]];
+Export["egapplt.pdf",mkegplt[prc]];
+Export["ebplt.pdf",mkebplt[prc]];
+Export["f0plt.pdf",mkf0plt[prc]];
+Export["absplt.pdf",mkabsplt[prc]];
 Quit[]
