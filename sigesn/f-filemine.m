@@ -81,7 +81,7 @@ FPDdim[proc_]:=					Dimensions[ proc[[2]][[1]][[2]] ][[1]]
 FPEdim[proc_]:=					Dimensions[ proc[[2]][[1]][[2]][[1]][[2]] ][[1]]
 
 mkmuplt[prc_]:=ListPlot[
-	Table[{FPeperp[prc, ne], FPmu[prc, type, ne]},{type,2},{ne,FPEdim[ip]}],
+	Table[{FPeperp[prc, ne], FPmu[prc, type, ne]},{type,2},{ne,FPEdim[prc]}],
 	PlotLabel->"\[Mu] vs. Eperp",
 	LabelStyle->Directive[24,Black],
 	AxesLabel->{"Eperp [V/\[Angstrom]]","\[Mu] [m0]"},
@@ -89,7 +89,7 @@ mkmuplt[prc_]:=ListPlot[
 ]
 
 mkegplt[prc_]:=ListPlot[
-	Table[{FPeperp[prc, ne], FPegap[prc, type, ne]},{type,2},{ne,FPEdim[ip]}],
+	Table[{FPeperp[prc, ne], FPegap[prc, type, ne]},{type,2},{ne,FPEdim[prc]}],
 	PlotLabel->"Bandgap vs. Eperp",
 	LabelStyle->Directive[24,Black],
 	AxesLabel->{"Eperp [V/\[Angstrom]]","Egap [meV]"},
@@ -97,7 +97,7 @@ mkegplt[prc_]:=ListPlot[
 ]
 
 mkebplt[prc_]:=ListPlot[
-	Flatten[Table[{FPeperp[prc, ne], -FPev[prc, type, nd, ne, 1, 0]},{type,2},{nd,FPDdim[ip]},{ne,FPEdim[ip]}],1],
+	Flatten[Table[{FPeperp[prc, ne], -FPev[prc, type, nd, ne, 1, 0]},{type,2},{nd,FPDdim[prc]},{ne,FPEdim[prc]}],1],
 	PlotLabel->"Binding Energy vs. Eperp",
 	LabelStyle->Directive[24,Black],
 	AxesLabel->{"Eperp [V/\[Angstrom]]","Eb [meV]"},
@@ -105,7 +105,7 @@ mkebplt[prc_]:=ListPlot[
 ]
 
 mkf0plt[prc_]:=ListPlot[
-	Flatten[Table[{FPeperp[prc, ne], FPf0[prc, type, nd, ne, 2]},{type,2},{nd,FPDdim[ip]},{ne,FPEdim[ip]}],1],
+	Flatten[Table[{FPeperp[prc, ne], FPf0[prc, type, nd, ne, 2]},{type,2},{nd,FPDdim[prc]},{ne,FPEdim[prc]}],1],
 	PlotLabel->"f0 vs. Eperp",
 	LabelStyle->Directive[24,Black],
 	AxesLabel->{"Eperp [V/\[Angstrom]]","f0"},
@@ -113,7 +113,7 @@ mkf0plt[prc_]:=ListPlot[
 ]
 
 mkabsplt[prc_]:=ListPlot[
-	Flatten[Table[{FPeperp[prc, ne], FPabs[prc, type, nd, ne, 2]},{type,2},{nd,FPDdim[ip]},{ne,FPEdim[ip]}],1],
+	Flatten[Table[{FPeperp[prc, ne], FPabs[prc, type, nd, ne, 2]},{type,2},{nd,FPDdim[prc]},{ne,FPEdim[prc]}],1],
 	PlotLabel->"\[Alpha] vs. Eperp",
 	LabelStyle->Directive[24,Black],
 	AxesLabel->{"Eperp [V/\[Angstrom]]","\[Alpha] [m^(-1)]"},
