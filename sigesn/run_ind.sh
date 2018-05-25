@@ -79,6 +79,7 @@ Export["egapplt.pdf",mkegplt[prc]];
 Export["ebplt.pdf",mkebplt[prc]];
 Export["f0plt.pdf",mkf0plt[prc]];
 Export["absplt.pdf",mkabsplt[prc]];
+Export["afacplt.pdf",mkafacplt[prc]];
 Quit[]
 EOF
 
