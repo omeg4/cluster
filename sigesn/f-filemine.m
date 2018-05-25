@@ -84,40 +84,60 @@ mkmuplt[prc_]:=ListPlot[
 	Table[{FPeperp[prc, ne], FPmu[prc, type, ne]},{type,2},{ne,FPEdim[prc]}],
 	PlotLabel->"\[Mu] vs. Eperp",
 	LabelStyle->Directive[24,Black],
-	AxesLabel->{"Eperp [V/\[Angstrom]]","\[Mu] [m0]"},
-	PlotTheme->"Detailed"
+	FrameLabel->{"Eperp [V/\[Angstrom]]","\[Mu] [m0]"},
+	PlotTheme->"Detailed",
+	ImageSize->{1600,900},
+	PlotLegends->SwatchLegend[{"Min","Max"}]
 ]
 
 mkegplt[prc_]:=ListPlot[
 	Table[{FPeperp[prc, ne], FPegap[prc, type, ne]},{type,2},{ne,FPEdim[prc]}],
 	PlotLabel->"Bandgap vs. Eperp",
 	LabelStyle->Directive[24,Black],
-	AxesLabel->{"Eperp [V/\[Angstrom]]","Egap [meV]"},
-	PlotTheme->"Detailed"
+	FrameLabel->{"Eperp [V/\[Angstrom]]","Egap [meV]"},
+	PlotTheme->"Detailed",
+	ImageSize->{1600,900},
+	PlotLegends->SwatchLegend[{"Min","Max"}]
 ]
 
 mkebplt[prc_]:=ListPlot[
 	Flatten[Table[{FPeperp[prc, ne], -FPev[prc, type, nd, ne, 1, 0]},{type,2},{nd,FPDdim[prc]},{ne,FPEdim[prc]}],1],
 	PlotLabel->"Binding Energy vs. Eperp",
 	LabelStyle->Directive[24,Black],
-	AxesLabel->{"Eperp [V/\[Angstrom]]","Eb [meV]"},
-	PlotTheme->"Detailed"
+	FrameLabel->{"Eperp [V/\[Angstrom]]","Eb [meV]"},
+	PlotTheme->"Detailed",
+	ImageSize->{1600,900},
+	PlotLegends->SwatchLegend[Flatten[Table[{ToString@StringForm["`1` at N=`2`",type,nd]},{type,{"Min","Max"}},{nd,FPDdim[prc]}]],LegendMarkerSize->20]
 ]
 
 mkf0plt[prc_]:=ListPlot[
 	Flatten[Table[{FPeperp[prc, ne], FPf0[prc, type, nd, ne, 2]},{type,2},{nd,FPDdim[prc]},{ne,FPEdim[prc]}],1],
 	PlotLabel->"f0 vs. Eperp",
 	LabelStyle->Directive[24,Black],
-	AxesLabel->{"Eperp [V/\[Angstrom]]","f0"},
-	PlotTheme->"Detailed"
+	FrameLabel->{"Eperp [V/\[Angstrom]]","f0"},
+	PlotTheme->"Detailed",
+	ImageSize->{1600,900},
+	PlotLegends->SwatchLegend[Flatten[Table[{ToString@StringForm["`1` at N=`2`",type,nd]},{type,{"Min","Max"}},{nd,FPDdim[prc]}]],LegendMarkerSize->20]
 ]
 
 mkabsplt[prc_]:=ListPlot[
 	Flatten[Table[{FPeperp[prc, ne], FPabs[prc, type, nd, ne, 2]},{type,2},{nd,FPDdim[prc]},{ne,FPEdim[prc]}],1],
 	PlotLabel->"\[Alpha] vs. Eperp",
 	LabelStyle->Directive[24,Black],
-	AxesLabel->{"Eperp [V/\[Angstrom]]","\[Alpha] [m^(-1)]"},
-	PlotTheme->"Detailed"
+	FrameLabel->{"Eperp [V/\[Angstrom]]","\[Alpha] [m^(-1)]"},
+	PlotTheme->"Detailed",
+	ImageSize->{1600,900},
+	PlotLegends->SwatchLegend[Flatten[Table[{ToString@StringForm["`1` at N=`2`",type,nd]},{type,{"Min","Max"}},{nd,FPDdim[prc]}]],LegendMarkerSize->20]
+]
+
+mkafacplt[prc_]:=ListPlot[
+	Flatten[Table[{FPeperp[prc, ne], FPafac[prc, type, nd, ne, 2]},{type,2},{nd,FPDdim[prc]},{ne,FPEdim[prc]}],1],
+	PlotLabel->"\[ScriptCapitalA] vs. Eperp",
+	LabelStyle->Directive[24,Black],
+	FrameLabel->{"Eperp [V/\[Angstrom]]","\[ScriptCapitalA]"},
+	PlotTheme->"Detailed",
+	ImageSize->{1600,900},
+	PlotLegends->SwatchLegend[Flatten[Table[{ToString@StringForm["`1` at N=`2`",type,nd]},{type,{"Min","Max"}},{nd,FPDdim[prc]}]],LegendMarkerSize->20]
 ]
 
 Nintfromfile[rn_,ef1_,ef2_]:=NIntegrate[(r^rn)*ef1*ef2, {r,0,10^6},MinRecursion->10,MaxRecursion->50]
