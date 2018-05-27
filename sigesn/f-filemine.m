@@ -140,4 +140,14 @@ mkafacplt[prc_]:=ListPlot[
 	PlotLegends->SwatchLegend[Flatten[Table[{ToString@StringForm["`1` at N=`2`",type,nd]},{type,{"Min","Max"}},{nd,FPDdim[prc]}]],LegendMarkerSize->20]
 ]
 
+makesaveplots[prc_]:=Module[
+	{},
+	Export["muplt.pdf",mkmuplt[prc]];
+	Export["egapplt.pdf",mkegplt[prc]];
+	Export["ebplt.pdf",mkebplt[prc]];
+	Export["f0plt.pdf",mkf0plt[prc]];
+	Export["absplt.pdf",mkabsplt[prc]];
+	Export["afacplt.pdf",mkafacplt[prc]];
+]
+
 Nintfromfile[rn_,ef1_,ef2_]:=NIntegrate[(r^rn)*ef1*ef2, {r,0,10^6},MinRecursion->10,MaxRecursion->50]
