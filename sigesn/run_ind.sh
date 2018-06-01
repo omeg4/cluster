@@ -62,7 +62,7 @@ read df
 echo "D step? [N_hBN]"
 read ds
 
-echo "Initializing indirect calculations"
+echo "Initializing indirect calculations using "$funcname
 cat <<EOF > callfuncs.m
 params={$ingap,$buck,$vF,$thicc,$eps};
 etab={$ezi,$ezf,$ezstep};
