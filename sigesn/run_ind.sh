@@ -7,19 +7,9 @@ export startdate=$(date -I)
 
 export DorI="IND"
 
-echo "COUL or KELD?"
+echo "IndCoul or IndKeld ?"
 
-read CorK
-if [ $CorK="COUL" ]
-then
-	export funcname=IndCoul
-elif [ $CorK="KELD" ]
-then
-	export funcname=IndKeld
-else
-	echo "Could not understand if you wanted COUL or KELD"
-fi
-
+read funcname
 echo "Material?"
 
 read mater
