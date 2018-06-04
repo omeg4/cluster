@@ -1,0 +1,22 @@
+/home/mbrunetti/cluster/sigesn/results/ikge2-IND-ge-2018-06-01
+Starting Mathematica job
+
+                                                                                    2
+NIntegrate::inumri: The integrand r InterpolatingFunction[{{0., 1.5708}}, <>][\[Xi]]  has evaluated to Overflow, Indeterminate, or Infinity for all sampling points in the region with boundaries {{0., 31250.}}.
+
+                                                                                    2
+NIntegrate::inumri: The integrand r InterpolatingFunction[{{0., 1.5708}}, <>][\[Xi]]  has evaluated to Overflow, Indeterminate, or Infinity for all sampling points in the region with boundaries {{0., 31250.}}.
+
+                                                                                    2
+NIntegrate::inumri: The integrand r InterpolatingFunction[{{0., 1.5708}}, <>][\[Xi]]  has evaluated to Overflow, Indeterminate, or Infinity for all sampling points in the region with boundaries {{0., 31250.}}.
+
+General::stop: Further output of NIntegrate::inumri will be suppressed during this calculation.
+
+NIntegrate::slwcon: Numerical integration converging too slowly; suspect one of the following: singularity, value of the integration is 0, highly oscillatory integrand, or WorkingPrecision too small.
+
+NIntegrate::slwcon: Numerical integration converging too slowly; suspect one of the following: singularity, value of the integration is 0, highly oscillatory integrand, or WorkingPrecision too small.
+
+NIntegrate::slwcon: Numerical integration converging too slowly; suspect one of the following: singularity, value of the integration is 0, highly oscillatory integrand, or WorkingPrecision too small.
+
+General::stop: Further output of NIntegrate::slwcon will be suppressed during this calculation.
+Job finished
