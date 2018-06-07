@@ -1,11 +1,3 @@
 /home/mbrunetti/cluster/sigesn/results/fssn-DIR-sn-2018-06-05
 Starting Mathematica job
-
-NIntegrate::slwcon: Numerical integration converging too slowly; suspect one of the following: singularity, value of the integration is 0, highly oscillatory integrand, or WorkingPrecision too small.
-
-NIntegrate::slwcon: Numerical integration converging too slowly; suspect one of the following: singularity, value of the integration is 0, highly oscillatory integrand, or WorkingPrecision too small.
-
-NIntegrate::slwcon: Numerical integration converging too slowly; suspect one of the following: singularity, value of the integration is 0, highly oscillatory integrand, or WorkingPrecision too small.
-
-General::stop: Further output of NIntegrate::slwcon will be suppressed during this calculation.
 Job finished

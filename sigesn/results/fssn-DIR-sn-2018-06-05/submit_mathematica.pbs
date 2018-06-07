@@ -4,7 +4,7 @@
 
 
 #You can set your job name here:
-#PBS -N sn-fssn
+#PBS -N fssn-DIR-sn-2018-06-05
 
 #DO NOT CHANGE THE NODE NUMBER:
 #PBS -l nodes=node27:ppn=1
