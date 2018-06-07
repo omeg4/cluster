@@ -4,7 +4,7 @@
 
 
 #You can set your job name here:
-#PBS -N si-small-sihbn
+#PBS -N small-sihbn-DIR-si-2018-05-27
 
 #DO NOT CHANGE THE NODE NUMBER:
 #PBS -l nodes=node27:ppn=1

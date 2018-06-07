@@ -150,7 +150,8 @@ ProcessSuite[]:=Module[
 						Table[
 							{
 								Quantity[1000*H2eV*EVfromsuite[ data[[Dn]][[En]][[type]],n,l ],"Millielectronvolts"],
-								Quantity[B2nm*r2fromsuite[ data[[Dn]][[En]][[type]],n,l ],"BohrRadius"]
+								Quantity[B2nm*r2fromsuite[ data[[Dn]][[En]][[type]],n,l ],"Nanometers"],
+								Quantity[EFfromsuite[ data[[Dn]][[En]][[type]],n,l]/.r->0,1/"BohrRadius"]
 							},
 							{n,3},{l,0,n-1}
 						],
@@ -175,15 +176,44 @@ ProcessSuite[]:=Module[
 	}
 ]
 
+checksuitenorm[suite_]:=Module[
+	{
+		Nd=Dimensions[ suite ][[1]],
+		Ne=Dimensions[ suite ][[2]]
+	},
+	Export["normcheck.m",
+		Table[
+			Table[
+				Table[
+					Table[
+						normcheckfromsuite[ suite[[Dn]][[En]][[type]] , n, l ], {n,3}, {l,0,n-1}
+					],
+					{En,Ne}
+				],
+				{Dn,Nd}
+			],
+			{type,2}
+		]
+	]
+]
+
+NormalizeEF[EF_, rmax_] := Module[
+  {norm},
+  norm = NIntegrate[r*(EF)^2, {r, 0, 10^6}, MinRecursion -> 5,
+    MaxRecursion -> 20];
+  EF/Sqrt[norm]
+]
+
 eperpfromsuite[onerun_]:=onerun[[1]][[3]]//QuantityMagnitude
 mufromsuite[onerun_]:=onerun[[1]][[2]]//QuantityMagnitude
 egapfromsuite[onerun_]:=onerun[[1]][[1]]//QuantityMagnitude
 dfromsuite[onerun_]:=onerun[[1]][[4]]
 EVfromsuite[onerun_,n_,l_]:=onerun[[2]][[n]][[l+1]]
 EFfromsuite[onerun_,n_,l_]:=onerun[[3]][[n]][[l+1]]
+Nintfromfile[rn_,ef1_,ef2_]:=NIntegrate[(r^rn)*ef1*ef2, {r,0,10^6},MinRecursion->10,MaxRecursion->50]
 
 Etrfromsuite[onerun_,ni_,nf_,li_,lf_]:=(EVfromsuite[ onerun, nf, lf ] - EVfromsuite[ onerun, ni, li])
-normcheckfromsuite[onerun_,n_,l_]:=NIntegrate[r*(onerun[[3]][[n]][[l]]^2),{r,0,10^6},MinRecursion->10,MaxRecursion->50]
+normcheckfromsuite[onerun_,n_,l_]:=NIntegrate[r*(onerun[[3]][[n]][[l+1]]^2),{r,0,10^6},MinRecursion->10,MaxRecursion->50]
 r2fromsuite[onerun_,n_,l_]:=Sqrt@NIntegrate[(r^3)*(onerun[[3]][[n]][[l+1]]^2),{r,0,10^6},MinRecursion->10,MaxRecursion->50]
 f0fromsuite[onerun_,ni_,nf_,li_,lf_]:=2*mufromsuite[onerun]*Etrfromsuite[ onerun, ni, nf, li, lf ]*((1/4)*Nintfromfile[2, EFfromsuite[onerun, ni, li], EFfromsuite[onerun, nf, lf]]^2)
 absfromsuite[onerun_,params_,kappa_,ni_,nf_,li_,lf_]:=2*((4*\[Pi])/(Sqrt[kappa]*(137)))*(na/((params[[4]]/B2nm)*mufromsuite[onerun]))*f0fromsuite[onerun,ni,nf,li,lf]*(2/damp)
@@ -196,6 +226,7 @@ FPegap[proc_,mm_,ne_]:=			proc[[2]][[mm]][[2]][[1]][[2]][[ne]][[2]]
 FPmu[proc_,mm_,ne_]:=			proc[[2]][[mm]][[2]][[1]][[2]][[ne]][[3]]
 FPev[proc_,mm_,nd_,ne_,n_,l_]:=	proc[[2]][[mm]][[2]][[nd]][[2]][[ne]][[4]][[n]][[l+1]][[1]]
 FPr2[proc_,mm_,nd_,ne_,n_,l_]:=	proc[[2]][[mm]][[2]][[nd]][[2]][[ne]][[4]][[n]][[l+1]][[2]]
+FPr0[proc_,mm_,nd_,ne_,n_,l_]:=	proc[[2]][[mm]][[2]][[nd]][[2]][[ne]][[4]][[n]][[l+1]][[3]]
 FPetr[proc_,mm_,nd_,ne_,nf_]:=	proc[[2]][[mm]][[2]][[nd]][[2]][[ne]][[5]][[nf-1]][[1]]
 FPf0[proc_,mm_,nd_,ne_,nf_]:=	proc[[2]][[mm]][[2]][[nd]][[2]][[ne]][[5]][[nf-1]][[2]]
 FPabs[proc_,mm_,nd_,ne_,nf_]:=	proc[[2]][[mm]][[2]][[nd]][[2]][[ne]][[5]][[nf-1]][[3]]
@@ -273,14 +304,8 @@ makesaveplots[prc_]:=Module[
 	Export["afacplt.pdf",mkafacplt[prc]];
 ]
 
-Nintfromfile[rn_,ef1_,ef2_]:=NIntegrate[(r^rn)*ef1*ef2, {r,0,10^6},MinRecursion->10,MaxRecursion->50]
 SetDirectory["/home/mbrunetti/cluster/sigesn/results/small-sihbn-DIR-si-2018-05-27"]
-params={13.5,0.046,433000,0.333,11.9};
-etab={0,2.7,0.1};
-Export["inp.m",{params,4.89,etab,{0,0,1}}]
-Export["diag1.txt","Params and Etab initialized"]
-Export["suite.m",SiGeSuite[3,params,etab,4.89]];
-labels={"min","max"};
-Export["suitediag.txt","Suite run complete, beginning analysis of data files."]
 Export["proc.m",ProcessSuite[]];
+"Reproc complete. Checking normalization.">>>"diag.txt"
+checksuitenorm[Import["suite.m"]];
 Quit[]
