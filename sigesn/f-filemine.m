@@ -27,7 +27,8 @@ ProcessSuite[]:=Module[
 						Table[
 							{
 								Quantity[1000*H2eV*EVfromsuite[ data[[Dn]][[En]][[type]],n,l ],"Millielectronvolts"],
-								Quantity[B2nm*r2fromsuite[ data[[Dn]][[En]][[type]],n,l ],"BohrRadius"]
+								Quantity[B2nm*r2fromsuite[ data[[Dn]][[En]][[type]],n,l ],"Nanometers"],
+								Quantity[EFfromsuite[ data[[Dn]][[En]][[type]],n,l]/.r->0,1/"BohrRadius"]
 							},
 							{n,3},{l,0,n-1}
 						],
@@ -52,15 +53,44 @@ ProcessSuite[]:=Module[
 	}
 ]
 
+checksuitenorm[suite_]:=Module[
+	{
+		Nd=Dimensions[ suite ][[1]],
+		Ne=Dimensions[ suite ][[2]]
+	},
+	Export["normcheck.m",
+		Table[
+			Table[
+				Table[
+					Table[
+						normcheckfromsuite[ suite[[Dn]][[En]][[type]] , n, l ], {n,3}, {l,0,n-1}
+					],
+					{En,Ne}
+				],
+				{Dn,Nd}
+			],
+			{type,2}
+		]
+	]
+]
+
+NormalizeEF[EF_, rmax_] := Module[
+  {norm},
+  norm = NIntegrate[r*(EF)^2, {r, 0, 10^6}, MinRecursion -> 5,
+    MaxRecursion -> 20];
+  EF/Sqrt[norm]
+]
+
 eperpfromsuite[onerun_]:=onerun[[1]][[3]]//QuantityMagnitude
 mufromsuite[onerun_]:=onerun[[1]][[2]]//QuantityMagnitude
 egapfromsuite[onerun_]:=onerun[[1]][[1]]//QuantityMagnitude
 dfromsuite[onerun_]:=onerun[[1]][[4]]
 EVfromsuite[onerun_,n_,l_]:=onerun[[2]][[n]][[l+1]]
 EFfromsuite[onerun_,n_,l_]:=onerun[[3]][[n]][[l+1]]
+Nintfromfile[rn_,ef1_,ef2_]:=NIntegrate[(r^rn)*ef1*ef2, {r,0,10^6},MinRecursion->10,MaxRecursion->50]
 
 Etrfromsuite[onerun_,ni_,nf_,li_,lf_]:=(EVfromsuite[ onerun, nf, lf ] - EVfromsuite[ onerun, ni, li])
-normcheckfromsuite[onerun_,n_,l_]:=NIntegrate[r*(onerun[[3]][[n]][[l]]^2),{r,0,10^6},MinRecursion->10,MaxRecursion->50]
+normcheckfromsuite[onerun_,n_,l_]:=NIntegrate[r*(onerun[[3]][[n]][[l+1]]^2),{r,0,10^6},MinRecursion->10,MaxRecursion->50]
 r2fromsuite[onerun_,n_,l_]:=Sqrt@NIntegrate[(r^3)*(onerun[[3]][[n]][[l+1]]^2),{r,0,10^6},MinRecursion->10,MaxRecursion->50]
 f0fromsuite[onerun_,ni_,nf_,li_,lf_]:=2*mufromsuite[onerun]*Etrfromsuite[ onerun, ni, nf, li, lf ]*((1/4)*Nintfromfile[2, EFfromsuite[onerun, ni, li], EFfromsuite[onerun, nf, lf]]^2)
 absfromsuite[onerun_,params_,kappa_,ni_,nf_,li_,lf_]:=2*((4*\[Pi])/(Sqrt[kappa]*(137)))*(na/((params[[4]]/B2nm)*mufromsuite[onerun]))*f0fromsuite[onerun,ni,nf,li,lf]*(2/damp)
@@ -150,4 +180,3 @@ makesaveplots[prc_]:=Module[
 	Export["afacplt.pdf",mkafacplt[prc]];
 ]
 
-Nintfromfile[rn_,ef1_,ef2_]:=NIntegrate[(r^rn)*ef1*ef2, {r,0,10^6},MinRecursion->10,MaxRecursion->50]

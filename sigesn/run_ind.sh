@@ -54,19 +54,22 @@ read ds
 
 echo "Initializing indirect calculations using "$funcname
 cat <<EOF > callfuncs.m
+SetDirectory["$(pwd)"]
 params={$ingap,$buck,$vF,$thicc,$eps};
 etab={$ezi,$ezf,$ezstep};
 dtab={$di,$df,$ds};
-Export["diag1.txt","Params, Dtab, and Etab initialized"];
 Export["inp.m",{params,$kappa,etab,dtab}];
+"Inputs saved. Initializing suite.">>>"diag.txt"
 Export["suite.m",SGSIndSuite[params,$kappa,etab,dtab,$funcname]];
+"Suite run complete. Processing data.">>>"diag.txt"
 labels={"min","max"};
-Export["suitediag.txt","Suite run complete, processing..."];
 Export["proc.m",ProcessSuite[]];
+"Processing complete. Checking normalization.">>>"diag.txt"
+checksuitenorm[Import["suite.m"]];
 Quit[]
 EOF
 
-cat /home/mbrunetti/cluster/sigesn/params.m /home/mbrunetti/cluster/sigesn/f-indkeld.m /home/mbrunetti/cluster/sigesn/f-indcoul.m /home/mbrunetti/cluster/sigesn/f-Isuite.m /home/mbrunetti/cluster/sigesn/f-normEF.m /home/mbrunetti/cluster/sigesn/f-filemine.m callfuncs.m > test.m
+cat /home/mbrunetti/cluster/sigesn/params.m /home/mbrunetti/cluster/sigesn/f-indkeld.m /home/mbrunetti/cluster/sigesn/f-indcoul.m /home/mbrunetti/cluster/sigesn/f-Isuite.m /home/mbrunetti/cluster/sigesn/f-filemine.m callfuncs.m > test.m
 cat <<EOF > submit_mathematica.pbs
 #!/bin/sh
 

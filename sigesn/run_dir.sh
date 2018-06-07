@@ -48,14 +48,16 @@ SetDirectory["$(pwd)"]
 params={$ingap,$buck,$vF,$thicc,$eps};
 etab={$ezi,$ezf,$ezstep};
 Export["inp.m",{params,$kappa,etab,{0,0,1}}]
-Export["diag1.txt","Params and Etab initialized"]
+"Inputs saved. Initializing suite.">>>"diag.txt"
 Export["suite.m",SiGeSuite[3,params,etab,$kappa]];
+"Suite run complete. Processing data.">>>"diag.txt"
 labels={"min","max"};
-Export["suitediag.txt","Suite run complete, beginning analysis of data files."]
 Export["proc.m",ProcessSuite[]];
+"Processing complete. Checking normalization.">>>"diag.txt"
+checksuitenorm[Import["suite.m"]];
 Quit[]
 EOF
-cat /home/mbrunetti/cluster/sigesn/params.m /home/mbrunetti/cluster/sigesn/f-dirkeld.m /home/mbrunetti/cluster/sigesn/f-Dsuite.m /home/mbrunetti/cluster/sigesn/f-normEF.m /home/mbrunetti/cluster/sigesn/f-filemine.m callfuncs.m > test.m
+cat /home/mbrunetti/cluster/sigesn/params.m /home/mbrunetti/cluster/sigesn/f-dirkeld.m /home/mbrunetti/cluster/sigesn/f-Dsuite.m /home/mbrunetti/cluster/sigesn/f-filemine.m callfuncs.m > test.m
 cat <<EOF > submit_mathematica.pbs
 #!/bin/sh
 
