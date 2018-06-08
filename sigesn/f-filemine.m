@@ -28,7 +28,8 @@ ProcessSuite[]:=Module[
 							{
 								Quantity[1000*H2eV*EVfromsuite[ data[[Dn]][[En]][[type]],n,l ],"Millielectronvolts"],
 								Quantity[B2nm*r2fromsuite[ data[[Dn]][[En]][[type]],n,l ],"Nanometers"],
-								Quantity[EFfromsuite[ data[[Dn]][[En]][[type]],n,l]/.r->0,1/"BohrRadius"]
+								Quantity[(1/Sqrt[2*Pi])*EFfromsuite[ data[[Dn]][[En]][[type]],n,l]/.r->0,1/"BohrRadius"],
+								Quantity[NMaximize[{Abs[r*EFfromsuite[ data[[Dn]][[En]][[type]],n,l]],0 <= r <= 3000}, r, Method->"SimulatedAnnealing"][[2]][[1]][[2]],"BohrRadius"]
 							},
 							{n,3},{l,0,n-1}
 						],
