@@ -151,7 +151,8 @@ ProcessSuite[]:=Module[
 							{
 								Quantity[1000*H2eV*EVfromsuite[ data[[Dn]][[En]][[type]],n,l ],"Millielectronvolts"],
 								Quantity[B2nm*r2fromsuite[ data[[Dn]][[En]][[type]],n,l ],"Nanometers"],
-								Quantity[EFfromsuite[ data[[Dn]][[En]][[type]],n,l]/.r->0,1/"BohrRadius"]
+								Quantity[(1/Sqrt[2*Pi])*EFfromsuite[ data[[Dn]][[En]][[type]],n,l]/.r->0,1/"BohrRadius"],
+								Quantity[NMaximize[{Abs[r*EFfromsuite[ data[[Dn]][[En]][[type]],n,l]],0 <= r <= 3000}, r, Method->"SimulatedAnnealing"][[2]][[1]][[2]],"BohrRadius"]
 							},
 							{n,3},{l,0,n-1}
 						],
@@ -219,20 +220,21 @@ f0fromsuite[onerun_,ni_,nf_,li_,lf_]:=2*mufromsuite[onerun]*Etrfromsuite[ onerun
 absfromsuite[onerun_,params_,kappa_,ni_,nf_,li_,lf_]:=2*((4*\[Pi])/(Sqrt[kappa]*(137)))*(na/((params[[4]]/B2nm)*mufromsuite[onerun]))*f0fromsuite[onerun,ni,nf,li,lf]*(2/damp)
 afacfromsuite[onerun_,params_,kappa_,ni_,nf_,li_,lf_]:=1-Exp[-absfromsuite[onerun,params,kappa,ni,nf,li,lf]*(params[[4]]/B2nm)]
 
-FPparams[proc_]:=				proc[[1]]
-FPnhbn[proc_,nd_]:=				proc[[2]][[1]][[2]][[nd]][[1]]
-FPeperp[proc_,ne_]:=			proc[[2]][[1]][[2]][[1]][[2]][[ne]][[1]]
-FPegap[proc_,mm_,ne_]:=			proc[[2]][[mm]][[2]][[1]][[2]][[ne]][[2]]
-FPmu[proc_,mm_,ne_]:=			proc[[2]][[mm]][[2]][[1]][[2]][[ne]][[3]]
-FPev[proc_,mm_,nd_,ne_,n_,l_]:=	proc[[2]][[mm]][[2]][[nd]][[2]][[ne]][[4]][[n]][[l+1]][[1]]
-FPr2[proc_,mm_,nd_,ne_,n_,l_]:=	proc[[2]][[mm]][[2]][[nd]][[2]][[ne]][[4]][[n]][[l+1]][[2]]
-FPr0[proc_,mm_,nd_,ne_,n_,l_]:=	proc[[2]][[mm]][[2]][[nd]][[2]][[ne]][[4]][[n]][[l+1]][[3]]
-FPetr[proc_,mm_,nd_,ne_,nf_]:=	proc[[2]][[mm]][[2]][[nd]][[2]][[ne]][[5]][[nf-1]][[1]]
-FPf0[proc_,mm_,nd_,ne_,nf_]:=	proc[[2]][[mm]][[2]][[nd]][[2]][[ne]][[5]][[nf-1]][[2]]
-FPabs[proc_,mm_,nd_,ne_,nf_]:=	proc[[2]][[mm]][[2]][[nd]][[2]][[ne]][[5]][[nf-1]][[3]]
-FPafac[proc_,mm_,nd_,ne_,nf_]:=	proc[[2]][[mm]][[2]][[nd]][[2]][[ne]][[5]][[nf-1]][[4]]
-FPDdim[proc_]:=					Dimensions[ proc[[2]][[1]][[2]] ][[1]]
-FPEdim[proc_]:=					Dimensions[ proc[[2]][[1]][[2]][[1]][[2]] ][[1]]
+FPparams[proc_]:=					proc[[1]]
+FPnhbn[proc_,nd_]:=					proc[[2]][[1]][[2]][[nd]][[1]]
+FPeperp[proc_,ne_]:=				proc[[2]][[1]][[2]][[1]][[2]][[ne]][[1]]
+FPegap[proc_,mm_,ne_]:=				proc[[2]][[mm]][[2]][[1]][[2]][[ne]][[2]]
+FPmu[proc_,mm_,ne_]:=				proc[[2]][[mm]][[2]][[1]][[2]][[ne]][[3]]
+FPev[proc_,mm_,nd_,ne_,n_,l_]:=		proc[[2]][[mm]][[2]][[nd]][[2]][[ne]][[4]][[n]][[l+1]][[1]]
+FPr2[proc_,mm_,nd_,ne_,n_,l_]:=		proc[[2]][[mm]][[2]][[nd]][[2]][[ne]][[4]][[n]][[l+1]][[2]]
+FPr0[proc_,mm_,nd_,ne_,n_,l_]:=		proc[[2]][[mm]][[2]][[nd]][[2]][[ne]][[4]][[n]][[l+1]][[3]]
+FPbohrad[proc_,mm_,nd_,ne_,n_,l_]:=	proc[[2]][[mm]][[2]][[nd]][[2]][[ne]][[4]][[n]][[l+1]][[4]]
+FPetr[proc_,mm_,nd_,ne_,nf_]:=		proc[[2]][[mm]][[2]][[nd]][[2]][[ne]][[5]][[nf-1]][[1]]
+FPf0[proc_,mm_,nd_,ne_,nf_]:=		proc[[2]][[mm]][[2]][[nd]][[2]][[ne]][[5]][[nf-1]][[2]]
+FPabs[proc_,mm_,nd_,ne_,nf_]:=		proc[[2]][[mm]][[2]][[nd]][[2]][[ne]][[5]][[nf-1]][[3]]
+FPafac[proc_,mm_,nd_,ne_,nf_]:=		proc[[2]][[mm]][[2]][[nd]][[2]][[ne]][[5]][[nf-1]][[4]]
+FPDdim[proc_]:=						Dimensions[ proc[[2]][[1]][[2]] ][[1]]
+FPEdim[proc_]:=						Dimensions[ proc[[2]][[1]][[2]][[1]][[2]] ][[1]]
 
 mkmuplt[prc_]:=ListPlot[
 	Table[{FPeperp[prc, ne], FPmu[prc, type, ne]},{type,2},{ne,FPEdim[prc]}],

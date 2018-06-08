@@ -1,3 +1,11 @@
 /home/mbrunetti/cluster/sigesn/results/big-sihbn-DIR-si-2018-05-27
 Starting Mathematica job
+
+NMaximize::cvmit: Failed to converge to the requested accuracy or precision within 100 iterations.
+
+NMaximize::cvmit: Failed to converge to the requested accuracy or precision within 100 iterations.
+
+NMaximize::cvmit: Failed to converge to the requested accuracy or precision within 100 iterations.
+
+General::stop: Further output of NMaximize::cvmit will be suppressed during this calculation.
 Job finished
