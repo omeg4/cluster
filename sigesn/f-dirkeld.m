@@ -19,8 +19,8 @@ DirKeld[maxm_, matpars_, ingap_, Eperp_, kappa_, pm1_] := With[
    },
   Module[
    {
-    maxcell = 10^-4,
-    maxiter = 4*10^5,
+    maxcell = 10^-6,
+    maxiter = 10^7,
     \[Kappa] = kappa,
     \[Rho] = QuantityMagnitude[(ds*Unm/Ubohr)*epsrel/(2*kappa)],
     (* for \[Mu], convert input to SI units and then take the number (should come out in kg) and convert to units of Subscript[m, 0] *)

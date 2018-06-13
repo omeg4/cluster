@@ -20,8 +20,8 @@ IndCoul[maxm_, matpars_, ingap_, Eperp_, kappa_, dee_, pm1_] := With[
   Module[
    {
     d = dee,
-    maxcell = 10^-4,
-    maxiter = 4*10^5,
+    maxcell = 10^-6,
+    maxiter = 10^7,
     \[Kappa] = kappa,
     \[Rho] = QuantityMagnitude[(ds*Unm/Ubohr)*epsrel/(2*kappa)],
     (* for \[Mu], 
