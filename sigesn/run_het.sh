@@ -24,7 +24,7 @@ echo "Initializing indirect calculations using "$funcname
 cat <<EOF > callfuncs.m
 SetDirectory["$(pwd)"]
 {params1,params2,kappa,etab,dtab}=Import["../../inputs.m"]
-Export["inp.m",{params1,param2,kappa,etab,dtab}];
+Export["inp.m",{params1,params2,kappa,etab,dtab}];
 "Inputs saved. Initializing suite.">>>"diag.txt"
 {time,suite}=IndHeteroSuite[params1,params2,kappa,etab,dtab,$funcname];
 Export["suite.m",suite];

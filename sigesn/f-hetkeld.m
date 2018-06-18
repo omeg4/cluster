@@ -1,4 +1,4 @@
-IndKeld[maxm_, matpars1_, matpars2_, Eperp_, kappa_, dee_, pm1_] := With[
+HetKeld[maxm_, matpars1_, matpars2_, Eperp_, kappa_, dee_, pm1_] := With[
   {
    (* unpack material parameters *)
    ingap1 = matpars1[[1]],
