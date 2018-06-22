@@ -19,7 +19,7 @@ DirKeld[maxm_, matpars_, ingap_, Eperp_, kappa_, pm1_] := With[
    },
   Module[
    {
-    maxcell = 10^-6,
+    maxcell = 10^-5,
     maxiter = 10^7,
     \[Kappa] = kappa,
     \[Rho] = QuantityMagnitude[(ds*Unm/Ubohr)*epsrel/(2*kappa)],
