@@ -1,0 +1,7 @@
+/home/mbrunetti/cluster/sigesn/results/vf6-fssi-DIR-si-2018-07-02
+Starting Mathematica job
+
+NIntegrate::slwcon: Numerical integration converging too slowly; suspect one of the following: singularity, value of the integration is 0, highly oscillatory integrand, or WorkingPrecision too small.
+
+NMaximize::cvmit: Failed to converge to the requested accuracy or precision within 100 iterations.
+Job finished
