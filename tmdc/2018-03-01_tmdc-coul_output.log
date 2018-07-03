@@ -1,0 +1,19 @@
+
+Starting Mathematica job
+
+Export::nodir: Directory /home/mbrunetti/tmdc/results/home/mbrunetti/tmdc/results/2018-03-01_tmdc-coul/ does not exist.
+
+Export::noopen: Cannot open /home/mbrunetti/tmdc/results//home/mbrunetti/tmdc/results/2018-03-01_tmdc-coul//2018-03-01_tmdc-coul.m.
+
+Export::nodir: Directory /home/mbrunetti/tmdc/results/home/mbrunetti/tmdc/results/2018-03-01_tmdc-coul/ does not exist.
+
+Export::noopen: Cannot open /home/mbrunetti/tmdc/results//home/mbrunetti/tmdc/results/2018-03-01_tmdc-coul//2018-03-01_tmdc-coul-eigenenergies.m.
+
+Export::nodir: Directory /home/mbrunetti/tmdc/results/home/mbrunetti/tmdc/results/2018-03-01_tmdc-coul/ does not exist.
+
+General::stop: Further output of Export::nodir will be suppressed during this calculation.
+
+Export::noopen: Cannot open /home/mbrunetti/tmdc/results//home/mbrunetti/tmdc/results/2018-03-01_tmdc-coul//2018-03-01_tmdc-coul-radius.m.
+
+General::stop: Further output of Export::noopen will be suppressed during this calculation.
+Job finished
