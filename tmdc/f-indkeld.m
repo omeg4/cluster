@@ -18,7 +18,7 @@ IndKeld[maxm_, matpars_, kappa_, dee_] := With[
    },
   Module[
    {
-    d = dee,
+    d = UnitConvert[Quantity[dee,"Angstroms"],"BohrRadius"]//QuantityMagnitude,
     maxcell = 10^-4,
     maxiter = 10^7,
     \[Kappa] = kappa,
