@@ -47,7 +47,7 @@ IndKeld[maxm_, matpars_, kappa_, dee_] := With[
     {mind, 0, mmax}
     ];
 	{
-	{Egap, \[Mu], Ep, d},
+	{\[Mu], d},
     Table[evTab[[i - j + 1]][[j]], {i, Dimensions[evTab][[1]]}, {j, i, 1, -1}],
     Table[NormalizeEF[efTab[[i - j + 1]][[j]], 10^6], {i, Dimensions[efTab][[1]]}, {j, i, 1, -1}]
 	}

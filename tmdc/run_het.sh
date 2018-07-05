@@ -21,10 +21,9 @@ echo "Initializing indirect calculations"
 cat <<EOF > callfuncs.m
 SetDirectory["$(pwd)"]
 {me,mh,chi2d,kappa,d}=Import["../../inputs.m"]
-Export["inp.m",{me,mh,chi2d,kappa}];
+Export["inp.m",{me,mh,chi2d,kappa, d}];
 "Inputs saved. Initializing suite.">>>"diag.txt"
-Export["suite.m",IndKeld[3,{me,mh,chi2d},kappa,d]
-Export["suite.m",suite];
+Export["suite.m",IndKeld[3,{me,mh,chi2d},kappa,d]];
 Quit[]
 EOF
 
