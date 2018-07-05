@@ -23,17 +23,11 @@ export fullpath=$(pwd)
 echo "Initializing indirect calculations using "$funcname
 cat <<EOF > callfuncs.m
 SetDirectory["$(pwd)"]
-{params1,params2,kappa,etab,dtab}=Import["../../inputs.m"]
-Export["inp.m",{params1,params2,kappa,etab,dtab}];
+{me,mh,chi2d,kappa,d}=Import["../../inputs.m"]
+Export["inp.m",{me,mh,chi2d,kappa}];
 "Inputs saved. Initializing suite.">>>"diag.txt"
-{time,suite}=IndHeteroSuite[params1,params2,kappa,etab,dtab,$funcname];
+Export["suite.m",IndKeld[3,{me,mh,chi2d},kappa,d]
 Export["suite.m",suite];
-"Suite run complete. Processing data.">>>"diag.txt"
-ToString@StringForm["Time to run suite: `` hours",time/3600]>>>"diag.txt"
-labels={"min","max"};
-Export["proc.m",ProcessSuite[]];
-"Processing complete. Checking normalization.">>>"diag.txt"
-checksuitenorm[Import["suite.m"]];
 Quit[]
 EOF
 

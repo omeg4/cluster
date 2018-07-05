@@ -1,10 +1,9 @@
-IndKeld[maxm_, matpars_, ingap_, Eperp_, kappa_, dee_, pm1_] := With[
+IndKeld[maxm_, matpars_, kappa_, dee_] := With[
   {
    (* unpack material parameters *)
-   d0 = matpars[[1]],
-   vF = matpars[[2]],
-   ds = matpars[[3]],
-   epsrel = matpars[[4]] - 1,
+   me = matpars[[1]],
+   mh = matpars[[2]],
+   chi2d = UnitConvert[Quantity[matpars[[3]],"Angstroms"],"BohrRadius"]//QuantityMagnitude,
    (* Define all the units *)
    Uhart = Quantity["Hartrees"],
    Ujoul = Quantity["Joules"],
@@ -20,26 +19,16 @@ IndKeld[maxm_, matpars_, ingap_, Eperp_, kappa_, dee_, pm1_] := With[
   Module[
    {
     d = dee,
-    maxcell = 10^-6,
+    maxcell = 10^-4,
     maxiter = 10^7,
     \[Kappa] = kappa,
-    \[Rho] = QuantityMagnitude[(ds*Unm/Ubohr)*epsrel/(2*kappa)],
-    (* for \[Mu], 
-    convert input to SI units and then take the number (should come \
-out in kg) and convert to units of Subscript[m, 0] *)
-    Egap = Abs[
-      pm1*(ingap*Umev/Ujoul*Ujoul) - (d0*Unm/Um)*(Eperp*Uev/Uang*
-          Um)],
-    \[Mu] = 
-     QuantityMagnitude[
-      Abs[pm1*(ingap*Umev/Ujoul*Ujoul) - (d0*Unm/Um)*(Eperp*Uev/Uang*
-            Um)]/(2*(vF*Um/Usec)^2), "ElectronMass"],
-    e = 1,
+    \[Rho] = 2 * Pi * chi2d / kappa,
+    \[Mu] = (me * mh) / (me + mh),
+	e = 1,
     shift = 10,
     mmax = maxm,
     radialeqs,
-    solnmat,
-    Ep = Eperp
+    solnmat
     },
    radialEqKInd = -(1/(\[Mu]*2)) f''[r] - (1/(2 \[Mu]*r))* f'[r] - (((Pi/(2*\[Kappa]*\[Rho])*(StruveH[0, Sqrt[r^2 + d^2]/\[Rho]] - BesselY[0, Sqrt[r^2 + d^2]/\[Rho]]))) - (m^2/(2*\[Mu]* r^2)))* f[r];
    radial\[Xi]KInd[m_] = Simplify[radialEqKInd /. f -> (\[Psi][ArcTan[#]] &) /. r -> (Tan[\[Xi]]), Pi/2 > \[Xi] > 0];
