@@ -28,7 +28,7 @@ Export["suite.m",suite];
 Quit[]
 EOF
 
-cat /home/mbrunetti/cluster/sigesn/params.m /home/mbrunetti/cluster/sigesn/f-hetkeld.m /home/mbrunetti/cluster/sigesn/f-hetcoul.m /home/mbrunetti/cluster/sigesn/f-Isuite.m /home/mbrunetti/cluster/sigesn/f-filemine.m callfuncs.m > test.m
+cat /home/mbrunetti/cluster/tmdc/params.m /home/mbrunetti/cluster/tmdc/f-indkeld.m /home/mbrunetti/cluster/tmdc/f-hetkeld.m /home/mbrunetti/cluster/tmdc/f-hetcoul.m /home/mbrunetti/cluster/tmdc/f-Isuite.m /home/mbrunetti/cluster/tmdc/f-filemine.m callfuncs.m > test.m
 cat <<EOF > submit_mathematica.pbs
 #!/bin/sh
 
