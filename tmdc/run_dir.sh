@@ -37,9 +37,9 @@ echo "Initializing direct calculations"
 cat <<EOF > callfuncs.m
 SetDirectory["$(pwd)"]
 params={$masse,$massh,$chi2d};
-Export["inp.m",{params,$kappa}]
+Export["inp.m",params,$kappa]
 "Inputs saved. Initializing suite.">>>"diag.txt"
-Export["suite.m",DirKeld[3,params,kappa]];
+Export["suite.m",DirKeld[3,params,$kappa]];
 Quit[]
 EOF
 cat /home/mbrunetti/cluster/tmdc/params.m /home/mbrunetti/cluster/tmdc/f-dirkeld.m /home/mbrunetti/cluster/tmdc/f-Dsuite.m /home/mbrunetti/cluster/tmdc/f-filemine.m callfuncs.m > test.m
