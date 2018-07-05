@@ -7,9 +7,6 @@ export startdate=$(date -I)
 
 export DorI="IND"
 
-echo "HetCoul or HetKeld ?"
-read funcname
-
 echo "What's the name of this job?"
 read jobby
 
@@ -20,7 +17,7 @@ cd $projdir
 
 export fullpath=$(pwd)
 
-echo "Initializing indirect calculations using "$funcname
+echo "Initializing indirect calculations"
 cat <<EOF > callfuncs.m
 SetDirectory["$(pwd)"]
 {me,mh,chi2d,kappa,d}=Import["../../inputs.m"]
