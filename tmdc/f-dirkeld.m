@@ -3,7 +3,7 @@ DirKeld[maxm_, matpars_, kappa_] := With[
    (* unpack material parameters *)
    me = matpars[[1]],
    mh = matpars[[2]],
-   chi2d = matpars[[3]],
+   chi2d = UnitConvert[Quantity[matpars[[3]],"Angstroms"],"BohrRadius"]//QuantityMagnitude,
    (* Define all the units *)
    Uhart = Quantity["Hartrees"],
    Ujoul = Quantity["Joules"],
@@ -21,6 +21,7 @@ DirKeld[maxm_, matpars_, kappa_] := With[
     maxcell = 10^-4,
     maxiter = 10^7,
     \[Kappa] = kappa,
+	\[Rho] = 2 * Pi * chi2d / kappa,
 	\[Mu] = (me * mh) / (me + mh),
     e = 1,
     shift = 10,
