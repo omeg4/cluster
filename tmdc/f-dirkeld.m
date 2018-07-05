@@ -1,10 +1,9 @@
-DirKeld[maxm_, matpars_, ingap_, Eperp_, kappa_, pm1_] := With[
+DirKeld[maxm_, matpars_, kappa_] := With[
   {
    (* unpack material parameters *)
-   d0 = matpars[[1]],
-   vF = matpars[[2]],
-   ds = matpars[[3]],
-   epsrel = matpars[[4]] - 1,
+   me = matpars[[1]],
+   mh = matpars[[2]],
+   chi2d = matpars[[3]],
    (* Define all the units *)
    Uhart = Quantity["Hartrees"],
    Ujoul = Quantity["Joules"],
@@ -22,18 +21,12 @@ DirKeld[maxm_, matpars_, ingap_, Eperp_, kappa_, pm1_] := With[
     maxcell = 10^-4,
     maxiter = 10^7,
     \[Kappa] = kappa,
-    \[Rho] = QuantityMagnitude[(ds*Unm/Ubohr)*epsrel/(2*kappa)],
-    (* for \[Mu], convert input to SI units and then take the number (should come out in kg) and convert to units of Subscript[m, 0] *)
-    Egap = Abs[pm1*(ingap*Umev/Ujoul*Ujoul) - (d0*Unm/Um)*(Eperp*Uev/Uang*Um)],
-	\[Mu] = QuantityMagnitude[Abs[pm1*(ingap*Umev/Ujoul*Ujoul) - (d0*Unm/Um)*(Eperp*Uev/Uang*Um)]/(2*(vF*Um/Usec)^2), "ElectronMass"],
+	\[Mu] = (me * mh) / (me + mh),
     e = 1,
     shift = 10,
     mmax = maxm,
     radialeqs,
-    solnmat,
-    Ep = Eperp
-    (*radialEqKeld,radialEqDir,radialEqInd,radial\[Xi]Keld,
-    radial\[Xi]Dir,radial\[Xi]Ind*)
+    solnmat
     },
    radialEqKeld = -(1/(\[Mu]*2)) f''[r] - (1/(2*\[Mu]*r))* f'[r] - (((((Pi*(e^2))/(2*\[Kappa]*\[Rho]))*(StruveH[0,r/\[Rho]] - BesselY[0, r/\[Rho]]))) - (m^2/(2*\[Mu]* r^2)))* f[r];
    radial\[Xi]Keld[m_] = Simplify[radialEqKeld /. f -> (\[Psi][ArcTan[#]] &) /. r -> (Tan[\[Xi]]), Pi/2 > \[Xi] > 0];

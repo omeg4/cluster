@@ -21,43 +21,28 @@ cd $projdir
 
 export fullpath=$(pwd)
 
-echo "Parameters:"
-echo "Band gap? [meV]"
-read ingap
-echo "Buckling? [nm]"
-read buck
-echo "v_F? [m/s]"
-read vF
-echo "Monolayer Thickness? [nm]"
-read thicc
-echo "Epsilon of the material?"
-read eps
-echo "Kappa for the environment?"
-read kappa
+echo "m_e?"
+read masse
 
-echo "E_z initial? [V/Ang]"
-read ezi
-echo "E_z final? [V/Ang]"
-read ezf
-echo "E_z step? [V/Ang]"
-read ezstep
+echo "m_h?"
+read massh
+
+echo "chi_2D?"
+read chi2d
+
+echo "Kappa?"
+read kappa
 
 echo "Initializing direct calculations"
 cat <<EOF > callfuncs.m
 SetDirectory["$(pwd)"]
-params={$ingap,$buck,$vF,$thicc,$eps};
-etab={$ezi,$ezf,$ezstep};
-Export["inp.m",{params,$kappa,etab,{0,0,1}}]
+params={$masse,$massh,$chi2d};
+Export["inp.m",{params,$kappa}]
 "Inputs saved. Initializing suite.">>>"diag.txt"
-Export["suite.m",SiGeSuite[3,params,etab,$kappa]];
-"Suite run complete. Processing data.">>>"diag.txt"
-labels={"min","max"};
-Export["proc.m",ProcessSuite[]];
-"Processing complete. Checking normalization.">>>"diag.txt"
-checksuitenorm[Import["suite.m"]];
+Export["suite.m",DirKeld[3,params,kappa]];
 Quit[]
 EOF
-cat /home/mbrunetti/cluster/sigesn/params.m /home/mbrunetti/cluster/sigesn/f-dirkeld.m /home/mbrunetti/cluster/sigesn/f-Dsuite.m /home/mbrunetti/cluster/sigesn/f-filemine.m callfuncs.m > test.m
+cat /home/mbrunetti/cluster/tmdc/params.m /home/mbrunetti/cluster/tmdc/f-dirkeld.m /home/mbrunetti/cluster/tmdc/f-Dsuite.m /home/mbrunetti/cluster/tmdc/f-filemine.m callfuncs.m > test.m
 cat <<EOF > submit_mathematica.pbs
 #!/bin/sh
 

@@ -21,8 +21,6 @@ ProcessSuite[]:=Module[
 					dfromsuite[ data[[Dn]][[1]][[type]] ],
 					Table[
 					{
-						Quantity[eperpfromsuite[ data[[Dn]][[En]][[type]] ],"Volts"/"Angstroms"],
-						Quantity[egapfromsuite[ data[[Dn]][[En]][[type]] ], "Millielectronvolts"],
 						Quantity[mufromsuite[ data[[Dn]][[En]][[type]] ],"ElectronMass"],
 						Table[
 							{

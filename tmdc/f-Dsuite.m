@@ -1,4 +1,4 @@
-SiGeSuite[mmax_, matpars_, eztab_, kappa_] :=
+TMDCSuite[mmax_, matpars_, eztab_, kappa_] :=
   Module[
    {
     (* Unpack material parameters and get units straight *)
