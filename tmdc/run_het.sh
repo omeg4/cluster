@@ -22,7 +22,7 @@ echo "Initializing indirect calculations"
 cat <<EOF > callfuncs.m
 SetDirectory["$(pwd)"]
 {me,mh,chi2d,kappa,d}=Import["inputs.m"]
-Export["suite.m",IndKeld[3,{me,mh,chi2d},kappa,d]];
+Export["suite.m",IndCoul[3,{me,mh,chi2d},kappa,d]];
 Quit[]
 EOF
 
