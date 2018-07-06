@@ -13,6 +13,7 @@ read jobby
 export projdir="$jobby-$DorI-$startdate"
 
 mkdir $projdir
+cp ../inputs.m $projdir
 cd $projdir
 
 export fullpath=$(pwd)
@@ -20,9 +21,7 @@ export fullpath=$(pwd)
 echo "Initializing indirect calculations"
 cat <<EOF > callfuncs.m
 SetDirectory["$(pwd)"]
-{me,mh,chi2d,kappa,d}=Import["../../inputs.m"]
-Export["inp.m",{me,mh,chi2d,kappa, d}];
-"Inputs saved. Initializing suite.">>>"diag.txt"
+{me,mh,chi2d,kappa,d}=Import["inputs.m"]
 Export["suite.m",IndKeld[3,{me,mh,chi2d},kappa,d]];
 Quit[]
 EOF

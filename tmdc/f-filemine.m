@@ -75,8 +75,7 @@ checksuitenorm[suite_]:=Module[
 
 NormalizeEF[EF_, rmax_] := Module[
   {norm},
-  norm = NIntegrate[r*(EF)^2, {r, 0, 10^6}, MinRecursion -> 5,
-    MaxRecursion -> 20];
+  norm = NIntegrate[r*(EF)^2, {r, 0, 10^6}, MinRecursion -> 10,MaxRecursion -> 50, WorkingPrecision->100];
   EF/Sqrt[norm]
 ]
 
