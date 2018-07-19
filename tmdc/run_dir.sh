@@ -7,12 +7,14 @@ export startdate=$(date -I)
 
 export DorI="DIR"
 
-echo "Material?"
-
-read mater
-
-echo "What's the name of this job?"
-read jobby
+export mater=$1
+export jobby=$2
+export bandg=$3
+export lambd=$4
+export alatt=$5
+export thopp=$6
+export chi2d=$7
+export kappa=$8
 
 export projdir="$jobby-$DorI-$mater-$startdate"
 
@@ -21,23 +23,13 @@ cd $projdir
 
 export fullpath=$(pwd)
 
-echo "m_e?"
-read masse
-
-echo "m_h?"
-read massh
-
-echo "chi_2D?"
-read chi2d
-
-echo "Kappa?"
-read kappa
-
 echo "Initializing direct calculations"
 cat <<EOF > callfuncs.m
 SetDirectory["$(pwd)"]
-params={$masse,$massh,$chi2d};
-Export["inp.m",params,$kappa]
+Emass = UnitConvert[(Quantity["ReducedPlanckConstant"]^2)*UnitConvert[Quantity[$bandg,"Electronvolts"],"Hartrees"]/(2*(UnitConvert[Quantity[$alatt,"Angstroms"],"BohrRadius"]^2)*(UnitConvert[Quantity[$thopp,"Electronvolts"],"Hartrees"]^2)),"ElectronMass"]//QuantityMagnitude;
+Hmass = UnitConvert[(Quantity["ReducedPlanckConstant"]^2)*UnitConvert[Quantity[$bandg - $lambd/2,"Electronvolts"],"Hartrees"]/(2*(UnitConvert[Quantity[$alatt,"Angstroms"],"BohrRadius"]^2)*(UnitConvert[Quantity[$thopp,"Electronvolts"],"Hartrees"]^2)),"ElectronMass"]//QuantityMagnitude;
+params={Emass,Hmass,$chi2d};
+Export["inp.m",{params,$kappa}//Flatten]
 "Inputs saved. Initializing suite.">>>"diag.txt"
 Export["suite.m",DirKeld[3,params,$kappa]];
 Quit[]
