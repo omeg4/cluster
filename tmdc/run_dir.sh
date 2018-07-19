@@ -26,7 +26,7 @@ export fullpath=$(pwd)
 echo "Initializing direct calculations"
 cat <<EOF > callfuncs.m
 SetDirectory["$(pwd)"]
-Emass = UnitConvert[(Quantity["ReducedPlanckConstant"]^2)*UnitConvert[Quantity[$bandg,"Electronvolts"],"Hartrees"]/(2*(UnitConvert[Quantity[$alatt,"Angstroms"],"BohrRadius"]^2)*(UnitConvert[Quantity[$thopp,"Electronvolts"],"Hartrees"]^2)),"ElectronMass"]//QuantityMagnitude;
+Emass = UnitConvert[(Quantity["ReducedPlanckConstant"]^2)*UnitConvert[Quantity[$bandg - $lambd/2,"Electronvolts"],"Hartrees"]/(2*(UnitConvert[Quantity[$alatt,"Angstroms"],"BohrRadius"]^2)*(UnitConvert[Quantity[$thopp,"Electronvolts"],"Hartrees"]^2)),"ElectronMass"]//QuantityMagnitude;
 Hmass = UnitConvert[(Quantity["ReducedPlanckConstant"]^2)*UnitConvert[Quantity[$bandg - $lambd/2,"Electronvolts"],"Hartrees"]/(2*(UnitConvert[Quantity[$alatt,"Angstroms"],"BohrRadius"]^2)*(UnitConvert[Quantity[$thopp,"Electronvolts"],"Hartrees"]^2)),"ElectronMass"]//QuantityMagnitude;
 params={Emass,Hmass,$chi2d};
 Export["inp.m",{params,$kappa}//Flatten]
