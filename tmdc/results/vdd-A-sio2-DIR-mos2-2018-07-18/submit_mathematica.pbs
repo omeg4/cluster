@@ -1,0 +1,31 @@
+#!/bin/sh
+
+#Important: do not remove "#" symbol before PBS, keep it like that: "#PBS"
+
+
+#You can set your job name here:
+#PBS -N mos2-vdd-A-sio2
+
+#DO NOT CHANGE THE NODE NUMBER:
+#PBS -l nodes=node27:ppn=1
+
+#Combine output and error files:
+#PBS -j oe
+
+#If you want specific log filename, use the following line:
+#PBS -o pbs.log
+
+export PBS_O_WORKDIR=/home/mbrunetti/cluster/tmdc/results/vdd-A-sio2-DIR-mos2-2018-07-18
+echo $PBS_O_WORKDIR
+
+echo "Starting Mathematica job"
+
+cd $PBS_O_WORKDIR
+
+#Submit mathematica job
+#NOTE: Your test.m file SHOULD include the command "Quit[]" as the last command in the file
+
+math -script $PBS_O_WORKDIR/test.m
+
+echo "Job finished"
+
