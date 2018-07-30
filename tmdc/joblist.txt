@@ -1,2 +1,2 @@
-ws2 		| hanbicki	 	| 0.44	|	0.45	 	| 6.03 	| 2.45
-wse2		| hanbicki		| 0.53	|	0.52		| 7.18	| 2.45
+ws2 		| hanbicki-vac	 	| 0.44	|	0.45	 	| 6.03 	| 1
+wse2		| hanbicki-vac		| 0.53	|	0.52		| 7.18	| 1
