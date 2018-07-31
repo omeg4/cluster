@@ -19,6 +19,8 @@ export projdir="$jobby-$DorI-$mater-$startdate"
 mkdir $projdir
 cd $projdir
 
+cp ../../f-dirkeld.m ../../run_dir.sh ../../f-Dsuite.m .
+
 export fullpath=$(pwd)
 
 echo "Parameters:"
