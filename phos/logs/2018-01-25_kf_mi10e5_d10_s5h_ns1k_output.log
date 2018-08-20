@@ -1,0 +1,5 @@
+
+Starting Mathematica job
+
+Eigensystem::maxit2: Warning: maximum number of iterations, 100000, has been reached by the Arnoldi algorithm without convergence to the specified tolerance, but the current best computed value has been returned. You can use method options with Method -> {Arnoldi, opts} to increase the size of basis vectors, the maximum number of iterations, reduce the tolerance, or use an estimate as a shift, any of which may help.
+Job finished

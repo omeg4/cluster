@@ -1,0 +1,7 @@
+
+Starting Mathematica job
+
+Eigensystem::maxit2: Warning: maximum number of iterations, 1000, has been reached by the Arnoldi algorithm without convergence to the specified tolerance, but the current best computed value has been returned. You can use method options with Method -> {Arnoldi, opts} to increase the size of basis vectors, the maximum number of iterations, reduce the tolerance, or use an estimate as a shift, any of which may help.
+
+Eigensystem::chnpdef: Warning: there is a possibility that the second matrix SparseArray[<93934848>, {6001016, 6001016}] in the first argument is not positive definite, which is necessary for the Arnoldi method to give accurate results.
+Job finished
