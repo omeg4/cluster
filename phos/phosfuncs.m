@@ -21,7 +21,7 @@ CompPhos[nmax_,params_,d_,pot_,s_]:=Module[
 	},
 	{ev, ef} = NDEigensystem[
 			{
-				- (1/2) * ( (1/mx)*D[f[x,y],{x,2},{y,0}] + (1/my)*D[f[x,y],{x,0},{y,2}]) - V[x,y] * f[x,y] + shift*f[x,y],
+				- (1/2) * ( (1/mx)*D[f[x,y],{x,2},{y,0}] + (1/my)*D[f[x,y],{x,0},{y,2}]) + V[x,y] * f[x,y] + shift*f[x,y],
 				DirichletCondition[f[x,y] == 0, True]
 			},
 			f[x,y],
