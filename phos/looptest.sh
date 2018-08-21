@@ -2,7 +2,7 @@
 #
 
 while IFS='' read -r line || [[ -n "$line" ]]; do
-	cd ~/cluster/tmdc
+	cd ~/cluster/phos
 	IFS="|" read -r -a element <<< $line
 	export jobby=${element[0]}
 	export cork=${element[1]}
