@@ -1,6 +1,2 @@
-phostest1 | "C" | 1 | 1 | 1 | 1 | 0 | 100
-phostest1 | "C" | 1 | 1 | 1 | 1 | 0 | 1000
-phostest1 | "C" | 1 | 1 | 1 | 1 | 0 | 2000
-phostest1 | "C" | 1 | 1 | 1 | 1 | 0 | 5000
-phostest1 | "C" | 1 | 1 | 1 | 1 | 0 | 10000
-
+phostest1coul | "C" | 1 | 1 | 1 | 1 | 0 | 1000
+phostest1coul | "C" | 1 | 1 | 1 | 1 | 0 | 10000

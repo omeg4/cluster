@@ -13,11 +13,14 @@ export chi2d=$5
 export kappa=$6
 export dee=$7
 export sss=$8
+export nmax=4
 
-export projdir="$jobby-s$sss-$cork-$startdate"
+export projdir="$jobby-$sss-$startdate"
 
 mkdir $projdir
 cd $projdir
+
+echo $(pwd)
 
 export fullpath=$(pwd)
 
@@ -38,7 +41,7 @@ cat <<EOF > submit_mathematica.pbs
 
 
 #You can set your job name here:
-#PBS -N $jobby-$sss-$cork
+#PBS -N $jobby-$sss
 
 #DO NOT CHANGE THE NODE NUMBER:
 #PBS -l nodes=node27:ppn=1
