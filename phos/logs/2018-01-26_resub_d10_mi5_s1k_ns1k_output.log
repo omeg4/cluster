@@ -1,6 +1,0 @@
-
-Starting Mathematica job
-
-General::nomem: The current computation was aborted because there was insufficient memory available to complete the computation.
-/var/spool/torque/mom_priv/jobs/95491.head.SC: line 27: 30983 Killed                  math -script phos/test.m
-Job finished

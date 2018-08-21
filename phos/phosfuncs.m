@@ -1,27 +1,57 @@
 (* Set up the NDEigensystem function wrapper *)
-CompPhosKeld[mux_,muy_,kap_,rh_,dee_,nmax_,s_,ns_]:=Module[
+Coulomb[k_,d_][x_,y_]:= -1 / (k*Sqrt[x^2 + y^2 + d^2])
+
+Keldysh[k_,d_,chi_][x_,y_] := - (Pi / (chi)) * (StruveH[0,Sqrt[x^2 + y^2 + d^2]/(chi / (2 * k))] - BesselY[0,Sqrt[x^2 + y^2 + d^2]/(chi / (2 * k))])
+
+CompPhos[nmax_,params_,d_,pot_,s_]:=Module[
 	{
-		kappa = kap,
-		rho = rh,(* Don't I need (chi_2D * 2pi / kappa) ??? *)
-		d = dee,
-		mx = mux,
-		my = muy,
-		maxcell = s/ns,
+		mx = params[[1]],
+		my = params[[2]],
+		chi = params[[3]],
+		kappa = params[[4]],
 		shift = 10,
 		omega = 10,
+		V = If[pot=="K",
+			Keldysh[params[[4]],d,params[[3]]],
+			Coulomb[params[[4]],d]
+		],
 		ev,
 		ef,
 		norms
 	},
 	{ev, ef} = NDEigensystem[
 			{
-				- (1/2) * ( (1/mx)*D[f[x,y],{x,2},{y,0}] + (1/my)*D[f[x,y],{x,0},{y,2}]) - ( (Pi / ( 2 * kappa * rho )) * (StruveH[0,Sqrt[x^2 + y^2 + d^2]/rho] - BesselY[0,Sqrt[x^2 + y^2 + d^2]/rho] )) * f[x,y] + shift*f[x,y],
+				- (1/2) * ( (1/mx)*D[f[x,y],{x,2},{y,0}] + (1/my)*D[f[x,y],{x,0},{y,2}]) - V[x,y] * f[x,y] + shift*f[x,y],
 				DirichletCondition[f[x,y] == 0, True]
 			},
 			f[x,y],
 			{x,y} \[Element] Rectangle[{-s,-s},{s,s}],
 			nmax,
-			Method->{"SpatialDiscretization"->{"FiniteElement",{"MeshOptions"->{"MaxCellMeasure"->maxcell}}},"Eigensystem"->{"Arnoldi",MaxIterations->10^5}}
+			Method->{"SpatialDiscretization"->{"FiniteElement"},"Eigensystem"->{"Arnoldi",MaxIterations->10^5}}
 	];
-	{ev - shift, ef}
+	{
+		{mx,my,chi,kappa,d,s},
+		{ev - shift, ef}
+	}
 ]
+
+NormalizeEF[EF_,s_] := Module[
+  {norm},
+  norm = NIntegrate[(EF)^2,{x,-s,s},{y,-s,s}, MinRecursion -> 5,
+    MaxRecursion -> 20];
+  EF/Sqrt[norm]
+]
+
+(* ProcessPhos[]:=Module[*)
+(*     {*)
+(*         data = Import["suite.m"],*)
+(*         params = data[[1]],*)
+(*         dtab*)
+(*     },*)
+(*     Nd = Dimensions[data][[1]];*)
+(*     {params,*)
+(*         Table[*)
+(*             {*)
+(*                 Quantity[1000*H2eV*data*)
+(*     }*)
+(* ]*)

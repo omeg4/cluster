@@ -1,4 +1,0 @@
-
-Starting Mathematica job
-/var/spool/torque/mom_priv/jobs/95486.head.SC: line 27: 29538 Killed                  math -script phos/test.m
-Job finished
