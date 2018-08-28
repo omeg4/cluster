@@ -7,12 +7,8 @@ export startdate=$(date -I)
 
 export DorI="DIR"
 
-echo "Material?"
-
-read mater
-
-echo "What's the name of this job?"
-read jobby
+export mater=$1
+export jobby=$2
 
 export projdir="$jobby-$DorI-$mater-$startdate"
 
@@ -23,26 +19,15 @@ cp ../../f-dirkeld.m ../../run_dir.sh ../../f-Dsuite.m .
 
 export fullpath=$(pwd)
 
-echo "Parameters:"
-echo "Band gap? [meV]"
-read ingap
-echo "Buckling? [nm]"
-read buck
-echo "v_F? [m/s]"
-read vF
-echo "Monolayer Thickness? [nm]"
-read thicc
-echo "Epsilon of the material?"
-read eps
-echo "Kappa for the environment?"
-read kappa
-
-echo "E_z initial? [V/Ang]"
-read ezi
-echo "E_z final? [V/Ang]"
-read ezf
-echo "E_z step? [V/Ang]"
-read ezstep
+export ingap=$3
+export buck=$4
+export vF=$5
+export thicc=$6
+export eps=$7
+export kappa=$8
+export ezi=$9
+export ezf=${10}
+export ezstep=${11}
 
 echo "Initializing direct calculations"
 cat <<EOF > callfuncs.m

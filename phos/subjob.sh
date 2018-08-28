@@ -13,6 +13,7 @@ export chi2d=$5
 export kappa=$6
 export dee=$7
 export sss=$8
+export nss=$9
 export nmax=4
 
 export projdir="$jobby-$sss-$startdate"
@@ -27,7 +28,7 @@ export fullpath=$(pwd)
 cat <<EOF > funccall.m
 SetDirectory["$(pwd)"]
 Export["inps.txt",{$jobby,$cork,$mux,$muy,$chi2d,$kappa,$dee,$sss}];
-result=CompPhos[$nmax,{$mux,$muy,$chi2d,$kappa},$dee,$cork,$sss];
+result=CompPhos[$nmax,{$mux,$muy,$chi2d,$kappa},$dee,$cork,$sss,$nss];
 Export["suite.m",result]
 Quit[]
 EOF

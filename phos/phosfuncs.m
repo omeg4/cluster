@@ -3,7 +3,7 @@ Coulomb[k_,d_][x_,y_]:= -1 / (k*Sqrt[x^2 + y^2 + d^2])
 
 Keldysh[k_,d_,chi_][x_,y_] := - (Pi / (chi)) * (StruveH[0,Sqrt[x^2 + y^2 + d^2]/(chi / (2 * k))] - BesselY[0,Sqrt[x^2 + y^2 + d^2]/(chi / (2 * k))])
 
-CompPhos[nmax_,params_,d_,pot_,s_]:=Module[
+CompPhos[nmax_,params_,d_,pot_,s_,ns_]:=Module[
 	{
 		mx = params[[1]],
 		my = params[[2]],
