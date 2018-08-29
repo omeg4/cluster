@@ -7,6 +7,7 @@ export startdate=$(date -I)
 
 export jobby=$1
 export cork=$2
+export dorr=${10}
 export mux=$3
 export muy=$4
 export chi2d=$5
@@ -27,8 +28,8 @@ export fullpath=$(pwd)
 
 cat <<EOF > funccall.m
 SetDirectory["$(pwd)"]
-Export["inps.txt",{$jobby,$cork,$mux,$muy,$chi2d,$kappa,$dee,$sss}];
-result=CompPhos[$nmax,{$mux,$muy,$chi2d,$kappa},$dee,$cork,$sss,$nss];
+Export["inps.txt",{$jobby,$cork,$dorr,$mux,$muy,$chi2d,$kappa,$dee,$sss,$nss}];
+result=CompPhos[$nmax,{$mux,$muy,$chi2d,$kappa},$dee,$cork,$dorr,$sss,$nss];
 Export["suite.m",result]
 Quit[]
 EOF

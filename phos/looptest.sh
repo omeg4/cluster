@@ -13,5 +13,6 @@ while IFS='' read -r line || [[ -n "$line" ]]; do
 	export dee=${element[6]}
 	export sss=${element[7]}
 	export nss=${element[8]}
-	./subjob.sh $jobby $cork $mux $muy $chi2d $kappa $dee $sss $nss
+	export dorr=${element[9]}
+	./subjob.sh $jobby $cork $mux $muy $chi2d $kappa $dee $sss $nss $dorr
 done < "$1"

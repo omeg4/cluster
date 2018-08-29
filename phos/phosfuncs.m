@@ -3,7 +3,7 @@ Coulomb[k_,d_][x_,y_]:= -1 / (k*Sqrt[x^2 + y^2 + d^2])
 
 Keldysh[k_,d_,chi_][x_,y_] := - (Pi / (chi)) * (StruveH[0,Sqrt[x^2 + y^2 + d^2]/(chi / (2 * k))] - BesselY[0,Sqrt[x^2 + y^2 + d^2]/(chi / (2 * k))])
 
-CompPhos[nmax_,params_,d_,pot_,s_,ns_]:=Module[
+CompPhos[nmax_,params_,d_,pot_,reg_,s_,ns_]:=Module[
 	{
 		mx = params[[1]],
 		my = params[[2]],
@@ -14,6 +14,10 @@ CompPhos[nmax_,params_,d_,pot_,s_,ns_]:=Module[
 		V = If[pot=="K",
 			Keldysh[params[[4]],d,params[[3]]],
 			Coulomb[params[[4]],d]
+		],
+		omega = If[reg=="D",
+			Disk[{0,0},s],
+			Rectangle[{-s,-s},{s,s}]
 		],
 		ev,
 		ef,
@@ -27,7 +31,7 @@ CompPhos[nmax_,params_,d_,pot_,s_,ns_]:=Module[
 			f[x,y],
 			{x,y} \[Element] Rectangle[{-s,-s},{s,s}],
 			nmax,
-			Method->{"SpatialDiscretization"->{"FiniteElement"},"Eigensystem"->{"Arnoldi",MaxIterations->10^5}}
+			Method->{"SpatialDiscretization"->{"FiniteElement",{"MeshOptions"->{"MaxCellMeasure"->s/ns}}},"Eigensystem"->{"Arnoldi",MaxIterations->10^6}}
 	];
 	{
 		{mx,my,chi,kappa,d,s},
