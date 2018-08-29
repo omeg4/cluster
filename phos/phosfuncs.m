@@ -10,7 +10,6 @@ CompPhos[nmax_,params_,d_,pot_,reg_,s_,ns_]:=Module[
 		chi = params[[3]],
 		kappa = params[[4]],
 		shift = 10,
-		omega = 10,
 		V = If[pot=="K",
 			Keldysh[params[[4]],d,params[[3]]],
 			Coulomb[params[[4]],d]
@@ -29,7 +28,7 @@ CompPhos[nmax_,params_,d_,pot_,reg_,s_,ns_]:=Module[
 				DirichletCondition[f[x,y] == 0, True]
 			},
 			f[x,y],
-			{x,y} \[Element] Rectangle[{-s,-s},{s,s}],
+			{x,y} \[Element] omega,
 			nmax,
 			Method->{"SpatialDiscretization"->{"FiniteElement",{"MeshOptions"->{"MaxCellMeasure"->s/ns}}},"Eigensystem"->{"Arnoldi",MaxIterations->10^6}}
 	];
