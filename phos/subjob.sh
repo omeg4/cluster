@@ -17,7 +17,7 @@ export sss=$8
 export nss=$9
 export nmax=4
 
-export projdir="$jobby-$sss-$startdate"
+export projdir="$jobby-$startdate"
 
 mkdir $projdir
 cd $projdir
