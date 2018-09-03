@@ -60,10 +60,10 @@ ProcessPhos[data_]:=Module[
 				evs[[i]],
 				Table[
 					{
-						N[NIntegrate[efs[[i]]*Conjugate[efs[[j]]],{x,-s,s},{y,-s,s}, MinRecursion->10,MaxRecursion->100,WorkingPrecision->100],10],
+						N[NIntegrate[efs[[i]]*Conjugate[efs[[j]]],{x,-s,s},{y,-s,s}, MinRecursion->10,MaxRecursion->100,WorkingPrecision->100],5],
 
-						N[NIntegrate[efs[[i]]*x*Conjugate[efs[[j]]],{x,-s,s},{y,-s,s}, MinRecursion->10,MaxRecursion->100,WorkingPrecision->100],10],
-						N[NIntegrate[efs[[i]]*y*Conjugate[efs[[j]]],{x,-s,s},{y,-s,s}, MinRecursion->10,MaxRecursion->100,WorkingPrecision->100],10]
+						N[NIntegrate[efs[[i]]*x*Conjugate[efs[[j]]],{x,-s,s},{y,-s,s}, MinRecursion->10,MaxRecursion->100,WorkingPrecision->100],5],
+						N[NIntegrate[efs[[i]]*y*Conjugate[efs[[j]]],{x,-s,s},{y,-s,s}, MinRecursion->10,MaxRecursion->100,WorkingPrecision->100],5]
 					},
 					{j,Length[evs]}
 				]
