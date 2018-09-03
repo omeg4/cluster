@@ -28,9 +28,15 @@ export fullpath=$(pwd)
 
 cat <<EOF > funccall.m
 SetDirectory["$(pwd)"]
-Export["inps.txt",{$jobby,$cork,$dorr,$mux,$muy,$chi2d,$kappa,$dee,$sss,$nss}];
-result=CompPhos[$nmax,{$mux,$muy,$chi2d,$kappa},$dee,$cork,$dorr,$sss,$nss];
-Export["suite.m",result]
+s = $sss;
+ns = $nss;
+d = $dee;
+kappa = $kappa;
+chi = $chi2d;
+Export["inps.txt",{$jobby,$cork,$dorr,$mux,$muy,chi,kappa,d,s,ns}];
+result=CompPhos[$nmax,{$mux,$muy,chi,kappa},$dee,V[$cork],omega[$dorr],s,ns];
+Export["suite.m",result];
+Export["proc.m",ProcessPhos[result]];
 Quit[]
 EOF
 
