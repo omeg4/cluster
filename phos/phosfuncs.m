@@ -1,13 +1,12 @@
 (* ::Package:: *)
 
 (* Set up the NDEigensystem function wrapper *)
-Coulomb[k_,d_][x_,y_]:= -1 / (k*Sqrt[x^2 + y^2 + d^2])
-
-Keldysh[k_,d_,chi_][x_,y_] := - (Pi / (chi)) * (StruveH[0,Sqrt[x^2 + y^2 + d^2]/(chi / (2 * k))] - BesselY[0,Sqrt[x^2 + y^2 + d^2]/(chi / (2 * k))])
-
-Harmosc[mx_,my_,eps_,d_,v0_][x_,y_]:= (1/(2*eps*(d^3)))*(x^2+y^2) - (1/(eps*d))
-
-psi1d[a_][n_][x_]:=Sqrt[1/(Sqrt[Pi]*a)]*1/Sqrt[(2^n)*Factorial[n]]*Exp[-(x^2)/(2*a)]*HermiteH[n,x/a]
+Vcoul[k_,d_][x_,y_]:= -1 / (k*Sqrt[x^2 + y^2 + d^2])
+Vkeld[k_,d_,chi_][x_,y_] := - (Pi / (chi)) * (StruveH[0,Sqrt[x^2 + y^2 + d^2]/(chi / (2 * k))] - BesselY[0,Sqrt[x^2 + y^2 + d^2]/(chi / (2 * k))])
+VCho[eps_,d_][x_,y_]:= (1/(2*eps*(d^3)))*(x^2+y^2) - (1/(eps*d))
+VKho[kappa_,chi_,d_][x_,y_]:=-Pi/(4*kappa*((2*Pi*chi/(2*kappa))^2)*d)*(StruveH[-1,d/((2*Pi*chi/(2*kappa)))]-BesselY[-1,d/((2*Pi*chi/(2*kappa)))])
+hoCpsi[m_,eps_,d_][n_][x_]:=With[{a=Sqrt[1/Sqrt[(2*m*(1/(2*eps*d^3)))]]},Sqrt[1/(Sqrt[Pi]*a)]*1/Sqrt[(2^n)*Factorial[n]]*Exp[-(x^2)/(2*(a^2))]*HermiteH[n,x/a]]
+hoCen[mx_,my_,eps_,d_][n_,m_]:=With[{gamma=1/(2*eps*d^3),v0=(1/(eps*d))},Sqrt[2*gamma/mx]*(n+1/2)+Sqrt[2*gamma/my]*(m+1/2)-v0]
 
 V[pot_] := If[pot=="K",
 	Keldysh[kappa,d,chi],
@@ -33,7 +32,7 @@ CompPhos[nmax_,params_,dee_,pot_]:=Module[
 		tds,
 		tdstrans,
 		eps=10^-3,
-		MC=10^-4
+		MC=10^-3
 	},
 	tds=- (1/2) * ( (1/mx)*D[f[x,y],{x,2},{y,0}] + (1/my)*D[f[x,y],{x,0},{y,2}]) + pot[x,y] * f[x,y] + shift*f[x,y];
 	tdstrans=Simplify[tds/.{f->(u[ArcTan[#1],ArcTan[#2]]&)}/.{x->(Tan[\[Xi]]),y->(Tan[\[Psi]])},{(Pi/2)>\[Xi]>-(Pi/2),(Pi/2)>\[Psi]>-(Pi/2)}];
@@ -45,7 +44,7 @@ CompPhos[nmax_,params_,dee_,pot_]:=Module[
 			u[\[Xi],\[Psi]],
 			{\[Xi],\[Psi]}\[Element]Rectangle[{-Pi/2+eps,-Pi/2+eps},{Pi/2-eps,Pi/2-eps}],
 			nmax,
-			Method->{"SpatialDiscretization"->{"FiniteElement",{"MeshOptions"->{"MaxCellMeasure"->MC}}},"Eigensystem"->{"Arnoldi",MaxIterations->10^5}}
+			Method->{"SpatialDiscretization"->{"FiniteElement",{"MeshOptions"->{"MaxCellMeasure"->MC}}},"Eigensystem"->{"Arnoldi","MaxIterations"->10^6}}
 	];
 	{
 		{mx,my,chi,kappa,d},
