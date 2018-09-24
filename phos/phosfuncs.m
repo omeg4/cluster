@@ -31,8 +31,8 @@ CompPhos[nmax_,params_,dee_,pot_]:=Module[
 		norms,
 		tds,
 		tdstrans,
-		eps=10^-6,
-		MC=10^-6
+		eps=10^-5,
+		MC=10^-5
 	},
 	tds=- (1/2) * ( (1/mx)*D[f[x,y],{x,2},{y,0}] + (1/my)*D[f[x,y],{x,0},{y,2}]) + pot[x,y] * f[x,y] + shift*f[x,y];
 	tdstrans=Simplify[tds/.{f->(u[ArcTan[#1],ArcTan[#2]]&)}/.{x->(Tan[\[Xi]]),y->(Tan[\[Psi]])},{(Pi/2)>\[Xi]>-(Pi/2),(Pi/2)>\[Psi]>-(Pi/2)}];
