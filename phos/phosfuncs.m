@@ -18,7 +18,7 @@ omega[reg_] := If[reg=="D",
 	Rectangle[{-s,-s},{s,s}]
 ]
 
-CompPhos[nmax_,params_,dee_,pot_]:=Module[
+CompPhos[nmax_,params_,dee_,pot_,eps_]:=Module[
 	{
 		mx = params[[1]],
 		my = params[[2]],
@@ -30,9 +30,7 @@ CompPhos[nmax_,params_,dee_,pot_]:=Module[
 		ef,
 		norms,
 		tds,
-		tdstrans,
-		eps=5*10^-5,
-		MC=5*10^-5
+		tdstrans
 	},
 	tds=- (1/2) * ( (1/mx)*D[f[x,y],{x,2},{y,0}] + (1/my)*D[f[x,y],{x,0},{y,2}]) + pot[x,y] * f[x,y] + shift*f[x,y];
 	tdstrans=Simplify[tds/.{f->(u[ArcTan[#1],ArcTan[#2]]&)}/.{x->(Tan[\[Xi]]),y->(Tan[\[Psi]])},{(Pi/2)>\[Xi]>-(Pi/2),(Pi/2)>\[Psi]>-(Pi/2)}];
@@ -44,10 +42,10 @@ CompPhos[nmax_,params_,dee_,pot_]:=Module[
 			u[\[Xi],\[Psi]],
 			{\[Xi],\[Psi]}\[Element]Rectangle[{-Pi/2+eps,-Pi/2+eps},{Pi/2-eps,Pi/2-eps}],
 			nmax,
-			Method->{"SpatialDiscretization"->{"FiniteElement",{"MeshOptions"->{"MaxCellMeasure"->MC}}},"Eigensystem"->{"Arnoldi","MaxIterations"->10^6}}
+			Method->{"SpatialDiscretization"->{"FiniteElement",{"MeshOptions"->{"MaxCellMeasure"->eps}}},"Eigensystem"->{"Arnoldi","MaxIterations"->10^6}}
 	];
 	{
-		{mx,my,chi,kappa,d},
+		{mx,my,chi,kappa,d,eps},
 		{UnitConvert[Quantity[ev - shift,"Hartrees"],"Millielectronvolts"], ef}
 	}
 ]
@@ -62,24 +60,48 @@ NormalizeEF[EF_,s_] := Module[
 ProcessPhos[data_]:=Module[
 	{
 		params = data[[1]],
+		mx=data[[1]][[1]],
+		my=data[[1]][[2]],
 		evs = data[[2]][[1]],
-		efs = data[[2]][[2]]
+		efs = data[[2]][[2]],
+		s=1/data[[1]][[6]],
+		norms,
+		efn,
+		normtable,
+		xtable,
+		ytable,
+		xyavgtable,
+		xyredtable
 	},
-	{params,
-		Table[
-			{
-				evs[[i]],
-				Table[
-					{
-						N[NIntegrate[efs[[i]]*Conjugate[efs[[j]]],{x,-s,s},{y,-s,s}, MinRecursion->10,MaxRecursion->100,WorkingPrecision->100],5],
-
-						N[NIntegrate[efs[[i]]*x*Conjugate[efs[[j]]],{x,-s,s},{y,-s,s}, MinRecursion->10,MaxRecursion->100,WorkingPrecision->100],5],
-						N[NIntegrate[efs[[i]]*y*Conjugate[efs[[j]]],{x,-s,s},{y,-s,s}, MinRecursion->10,MaxRecursion->100,WorkingPrecision->100],5]
-					},
-					{j,Length[evs]}
-				]
-			},
-			{i,Length[evs]}
-		]
-	}
+	(* normalize eigenfunctions first *)
+	norms=Table[
+			NIntegrate[
+				(efs[[i]]/.{\[Xi]->ArcTan[x],\[Psi]->ArcTan[y]})^2,
+				{x,-s,s},{y,-s,s},
+				MinRecursion->20,MaxRecursion->200,WorkingPrecision->100
+			],
+		{i,Length[efs]}
+	];
+	efn=Table[efs[[i]]/Sqrt[norms[[i]]],{i,Length[efs]}];
+	normtable=Table[
+		N[NIntegrate[(efn[[i]]/.{\[Xi]->ArcTan[x],\[Psi]->ArcTan[y]})*(Conjugate[efn[[j]]]/.{\[Xi]->ArcTan[x],\[Psi]->ArcTan[y]}),{x,-s,s},{y,-s,s}, MinRecursion->20,MaxRecursion->200,WorkingPrecision->100],5]//Chop,
+		{i,10},{j,i,10}
+		];
+	xtable=Table[
+		N[2*mx*Abs[evs[[i]]-evs[[j]]]*(NIntegrate[(efn[[i]]/.{\[Xi]->ArcTan[x],\[Psi]->ArcTan[y]})*x*(Conjugate[efn[[j]]]/.{\[Xi]->ArcTan[x],\[Psi]->ArcTan[y]}),{x,-s,s},{y,-s,s}, MinRecursion->20,MaxRecursion->200,WorkingPrecision->100])^2,5]//Chop,
+		{i,10},{j,i,10}
+		];
+	ytable=Table[
+		N[2*my*Abs[evs[[i]]-evs[[j]]]*(NIntegrate[(efn[[i]]/.{\[Xi]->ArcTan[x],\[Psi]->ArcTan[y]})*y*(Conjugate[efn[[j]]]/.{\[Xi]->ArcTan[x],\[Psi]->ArcTan[y]}),{x,-s,s},{y,-s,s}, MinRecursion->20,MaxRecursion->200,WorkingPrecision->100])^2,5]//Chop,
+		{i,10},{j,i,10}
+		];
+	xyavgtable=Table[
+		N[2*((mx+my)/2)*Abs[evs[[i]]-evs[[j]]]*(NIntegrate[(efn[[i]]/.{\[Xi]->ArcTan[x],\[Psi]->ArcTan[y]})*Sqrt[x^2+y^2]*(Conjugate[efn[[j]]]/.{\[Xi]->ArcTan[x],\[Psi]->ArcTan[y]}),{x,-s,s},{y,-s,s}, MinRecursion->20,MaxRecursion->200,WorkingPrecision->100])^2,5]//Chop,
+		{i,10},{j,i,10}
+		];
+	xyredtable=Table[
+		N[2*((mx*my)/(mx+my))*Abs[evs[[i]]-evs[[j]]]*(NIntegrate[(efn[[i]]/.{\[Xi]->ArcTan[x],\[Psi]->ArcTan[y]})*Sqrt[x^2+y^2]*(Conjugate[efn[[j]]]/.{\[Xi]->ArcTan[x],\[Psi]->ArcTan[y]}),{x,-s,s},{y,-s,s}, MinRecursion->20,MaxRecursion->200,WorkingPrecision->100])^2,5]//Chop,
+		{i,10},{j,i,10}
+		];
+		{params,evs,normtable,xtable,ytable,xyavgtable,xyredtable}
 ]
