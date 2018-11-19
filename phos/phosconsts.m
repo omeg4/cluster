@@ -1,3 +1,5 @@
+(* ::Package:: *)
+
 (* Set up phosphorene parameters *)
 mey = { 1.2, 1.3, 0.7527, 1.12 };
 mex = { 0.17, 0.1, 0.1990, 0.17 };

@@ -6,16 +6,12 @@ cd results/
 export startdate=$(date -I)
 
 export jobby=$1
-export cork=$2
-export dorr=${10}
-export mux=$3
-export muy=$4
-export chi2d=$5
-export kappa=$6
-export dee=$7
-export sss=$8
-export nss=$9
-export nmax=4
+export kappa=$2
+export di=$3
+export df=$4
+export pot=$5
+export eps=$6
+export nmax=10
 
 export projdir="$jobby-$startdate"
 
@@ -28,15 +24,14 @@ export fullpath=$(pwd)
 
 cat <<EOF > funccall.m
 SetDirectory["$(pwd)"]
-s = $sss;
-ns = $nss;
-d = $dee;
 kappa = $kappa;
-chi = $chi2d;
-Export["inps.txt",{$jobby,$cork,$dorr,$mux,$muy,chi,kappa,d,s,ns}];
-result=CompPhos[$nmax,{$mux,$muy,chi,kappa},$dee,V[$cork],omega[$dorr],s,ns];
+Export["inps.txt",{$jobby,mus,chiphos,kappa,{$di,$df},$pot,$eps}];
+result=Table[
+	CompPhos[$nmax,{mus[[i]][[1]],mus[[i]][[2]],chiphos,kappa},nhbn,$pot,$eps],
+	{i,4},{nhbn,$di,$df}
+	];
 Export["suite.m",result];
-Export["proc.m",ProcessPhos[result]];
+Export["proc.m",ProcessPhosInd[result]];
 Quit[]
 EOF
 
@@ -49,7 +44,7 @@ cat <<EOF > submit_mathematica.pbs
 
 
 #You can set your job name here:
-#PBS -N $jobby-$sss
+#PBS -N $jobby
 
 #DO NOT CHANGE THE NODE NUMBER:
 #PBS -l nodes=node27:ppn=1
