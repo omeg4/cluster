@@ -1,7 +1,7 @@
 (* ::Package:: *)
 
 (* Set up the NDEigensystem function wrapper *)
-VCoul[k_][d_][x_,y_]:= -1 / (k*Sqrt[x^2 + y^2 + d^2])
+VCoul[k_][d_,chi_][x_,y_]:= -1 / (k*Sqrt[x^2 + y^2 + d^2])
 VKeld[k_][d_,chi_][x_,y_] := - (1/(4*chi)) * (StruveH[0,Sqrt[x^2 + y^2 + d^2]/(2*Pi*chi/k)] - BesselY[0,Sqrt[x^2 + y^2 + d^2]/(2*Pi*chi/k)])
 VCho[eps_][d_,chi_][x_,y_]:= (1/(2*eps*(d^3)))*(x^2+y^2) - (1/(eps*d))
 VKho[kappa_][d_,chi_][x_,y_]:=-Pi/(4*kappa*((2*Pi*chi/(2*kappa))^2)*d)*(StruveH[-1,d/((2*Pi*chi/(2*kappa)))]-BesselY[-1,d/((2*Pi*chi/(2*kappa)))])
@@ -148,7 +148,7 @@ ProcessPhosInd[data_]:=Table[
 	(*     ];*)
 		{params,evs,normtable(*,xtable,ytable,xyavgtable,xyredtable*)}
 	],
-	{i,4},{d,Length[data [[1]]]}
+	{i,Dimensions[data][[1]]},{d,Dimensions[data][[2]]}
 ]
 
 FPparams[proc_]:=proc[[1]]

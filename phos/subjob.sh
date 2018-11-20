@@ -28,7 +28,7 @@ kappa = $kappa;
 Export["inps.txt",{$jobby,mus,chiphos,kappa,{$di,$df},$pot,$eps}];
 result=Table[
 	CompPhos[$nmax,{mus[[i]][[1]],mus[[i]][[2]],chiphos,kappa},nhbn,$pot,$eps],
-	{i,4},{nhbn,$di,$df}
+	{i,1},{nhbn,$di,$df}
 	];
 Export["suite.m",result];
 Export["proc.m",ProcessPhosInd[result]];
