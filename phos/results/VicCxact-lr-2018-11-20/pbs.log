@@ -1,0 +1,19 @@
+/home/mbrunetti/cluster/phos/results/VicCxact-lr-2018-11-20
+Starting Mathematica job
+
+NIntegrate::slwcon: Numerical integration converging too slowly; suspect one of the following: singularity, value of the integration is 0, highly oscillatory integrand, or WorkingPrecision too small.
+
+NIntegrate::eincr: The global error of the strategy GlobalAdaptive has increased more than 2000 times. The global error is expected to decrease monotonically after a number of integrand evaluations. Suspect one of the following: the working precision is insufficient for the specified precision goal; the integrand is highly oscillatory or it is not a (piecewise) smooth function; or the true value of the integral is 0. Increasing the value of the GlobalAdaptive option MaxErrorIncreases might lead to a convergent numerical integration. NIntegrate obtained 554.003678544562314160910513267196993271789242799634185650960099761298171322430691096493849985945706172161672730650944427274809708719823984234915453583 and 0.0000675667633678687545197773038418845206252330714997565210752762653879805411913086352840186874267402944474784712533829708487582148155436954607300868796328 for the integral and error estimates.
+
+NIntegrate::slwcon: Numerical integration converging too slowly; suspect one of the following: singularity, value of the integration is 0, highly oscillatory integrand, or WorkingPrecision too small.
+
+NIntegrate::eincr: The global error of the strategy GlobalAdaptive has increased more than 2000 times. The global error is expected to decrease monotonically after a number of integrand evaluations. Suspect one of the following: the working precision is insufficient for the specified precision goal; the integrand is highly oscillatory or it is not a (piecewise) smooth function; or the true value of the integral is 0. Increasing the value of the GlobalAdaptive option MaxErrorIncreases might lead to a convergent numerical integration. NIntegrate obtained 21414.9745141609913273303654867524610724985430390655321749079573740297248923183813555639095976965520241481910540566804144176256327283707464207448160968 and 0.00144636657409600528712126594533596282334943949952501088900079380626442928603311030816851677771459879538015285954299853209540284219290275739346841667617 for the integral and error estimates.
+
+NIntegrate::slwcon: Numerical integration converging too slowly; suspect one of the following: singularity, value of the integration is 0, highly oscillatory integrand, or WorkingPrecision too small.
+
+General::stop: Further output of NIntegrate::slwcon will be suppressed during this calculation.
+
+NIntegrate::eincr: The global error of the strategy GlobalAdaptive has increased more than 2000 times. The global error is expected to decrease monotonically after a number of integrand evaluations. Suspect one of the following: the working precision is insufficient for the specified precision goal; the integrand is highly oscillatory or it is not a (piecewise) smooth function; or the true value of the integral is 0. Increasing the value of the GlobalAdaptive option MaxErrorIncreases might lead to a convergent numerical integration. NIntegrate obtained 2852.44362696698962183418770232697672408671611478137945550641181469071285979629191223331847047772083137213948319613793286319485328631250718375840838738 and 0.000707725688769005076452753099755078727155298397056056866161317270207935338743905253181448309419752278909945897774644670116675031762283072571034590629614 for the integral and error estimates.
+
+General::stop: Further output of NIntegrate::eincr will be suppressed during this calculation.
+Job finished

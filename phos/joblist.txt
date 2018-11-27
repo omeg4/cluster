@@ -1,3 +1,3 @@
-VicCHO-lr	|	4.89	|	1	|	20	|	VCho[4.89]	|	10^-3
-VicCHO-mr	|	4.89	|	1	|	20	|	VCho[4.89]	|	10^-4
-VicCHO-hr	|	4.89	|	1	|	20	|	VCho[4.89]	|	10^-5
+VicCxact-lr	|	4.89	|	1	|	20	|	VCoul[4.89]	|	10^-3
+VicCxact-mr	|	4.89	|	1	|	20	|	VCoul[4.89]	|	10^-4
+VicCxact-hr	|	4.89	|	1	|	20	|	VCoul[4.89]	|	10^-5

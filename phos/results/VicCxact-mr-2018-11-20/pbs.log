@@ -1,0 +1,27 @@
+/home/mbrunetti/cluster/phos/results/VicCxact-mr-2018-11-20
+Starting Mathematica job
+
+NDEigensystem::femcscd: The PDE is convection dominated and the result may not be stable. Adding artificial diffusion may help.
+
+NDEigensystem::femcscd: The PDE is convection dominated and the result may not be stable. Adding artificial diffusion may help.
+
+NDEigensystem::femcscd: The PDE is convection dominated and the result may not be stable. Adding artificial diffusion may help.
+
+General::stop: Further output of NDEigensystem::femcscd will be suppressed during this calculation.
+
+NIntegrate::slwcon: Numerical integration converging too slowly; suspect one of the following: singularity, value of the integration is 0, highly oscillatory integrand, or WorkingPrecision too small.
+
+NIntegrate::eincr: The global error of the strategy GlobalAdaptive has increased more than 2000 times. The global error is expected to decrease monotonically after a number of integrand evaluations. Suspect one of the following: the working precision is insufficient for the specified precision goal; the integrand is highly oscillatory or it is not a (piecewise) smooth function; or the true value of the integral is 0. Increasing the value of the GlobalAdaptive option MaxErrorIncreases might lead to a convergent numerical integration. NIntegrate obtained 452.514314108908764877875213108550547516024877066557462286996619977076577911592685479530040531934982915536997303372740023391476400381390175097638327487 and 0.000233987295513902894095394403187086103471006863929179236976878083709244644147090842990620551906005185563801669990945144930498066768375776719448196741747 for the integral and error estimates.
+
+NIntegrate::slwcon: Numerical integration converging too slowly; suspect one of the following: singularity, value of the integration is 0, highly oscillatory integrand, or WorkingPrecision too small.
+
+NIntegrate::eincr: The global error of the strategy GlobalAdaptive has increased more than 2000 times. The global error is expected to decrease monotonically after a number of integrand evaluations. Suspect one of the following: the working precision is insufficient for the specified precision goal; the integrand is highly oscillatory or it is not a (piecewise) smooth function; or the true value of the integral is 0. Increasing the value of the GlobalAdaptive option MaxErrorIncreases might lead to a convergent numerical integration. NIntegrate obtained 18520.8177029427711113558484199790442640280633186133326505996577035821448369709213760918528095969360103845773698396806647018439734039953622989924528533 and 0.0123551748006137520556495572343421941972472036865210393597539257204313175040806264244054303607886674950949474006864003921295604857581533203070701245734 for the integral and error estimates.
+
+NIntegrate::slwcon: Numerical integration converging too slowly; suspect one of the following: singularity, value of the integration is 0, highly oscillatory integrand, or WorkingPrecision too small.
+
+General::stop: Further output of NIntegrate::slwcon will be suppressed during this calculation.
+
+NIntegrate::eincr: The global error of the strategy GlobalAdaptive has increased more than 2000 times. The global error is expected to decrease monotonically after a number of integrand evaluations. Suspect one of the following: the working precision is insufficient for the specified precision goal; the integrand is highly oscillatory or it is not a (piecewise) smooth function; or the true value of the integral is 0. Increasing the value of the GlobalAdaptive option MaxErrorIncreases might lead to a convergent numerical integration. NIntegrate obtained 2949.42443610460056248890039656672231980368241217865544189849002311750777323571575238888540623214800230736810051958694183896089558289765925526712120096 and 0.00291354573786808966042932572392566338539525399687028780567615266854401702163199444648818015693251903042433593289787134185048835175555930855064052869996 for the integral and error estimates.
+
+General::stop: Further output of NIntegrate::eincr will be suppressed during this calculation.
+Job finished
