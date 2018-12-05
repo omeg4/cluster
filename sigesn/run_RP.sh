@@ -5,55 +5,67 @@ cd results/
 
 export startdate=$(date -I)
 
-export projdir="BFTORP"
+export projdir="rawRP"
 
 mkdir $projdir
 cd $projdir
 
-cp ../../f-filemine.m ../../all-direct-defs.m .
+cp ../../f-filemine.m ../../all-direct-defs.wl .
 
 export fullpath=$(pwd)
 
 cat <<EOF > test.m
 SetDirectory["$(pwd)"]
 Import["f-filemine.m"]
-Import["all-direct-defs.m"]
-Export["BFTORP.m",
-  ParallelTable[
-   RegionPlot[
-    {
-     t < QuantityMagnitude[
-        mc["TcKavVs"][[type]][[nn]][[ep]][QConc[conc*10^14], de], 
-        "Kelvins"] &&
-      t < QuantityMagnitude[
-        Re[mc["ElpupVs"][[type]][[nn]][[ep]][QFreq[10^13], de, 
-            0][[3]]]/(2*KB), "Kelvins"],
-     QuantityMagnitude[
-       mc["TcKavVs"][[type]][[nn]][[ep]][QConc[conc*10^14], de], 
-       "Kelvins"] < t < 
-      QuantityMagnitude[
-       Re[mc["ElpupVs"][[type]][[nn]][[ep]][QFreq[10^13], de, 
-           0][[3]]]/(2*KB), "Kelvins"],
-     t > QuantityMagnitude[
-       Re[mc["ElpupVs"][[type]][[nn]][[ep]][QFreq[10^13], de, 
-           0][[3]]]/(2*KB), "Kelvins"]
-     }, {conc, 1, 50}, {t, 150, 350},
-    PlotLegends -> {"T < (\!\(\*SubscriptBox[\(T\), \(pol\)]\) & \!\(\
-\*SubscriptBox[\(T\), \(c\)]\)) - Stable BEC", 
-      "(\!\(\*SubscriptBox[\(T\), \(c\)]\) < T < \
-\!\(\*SubscriptBox[\(T\), \(pol\)]\)) - Stable normal LP", 
-      "(T > \!\(\*SubscriptBox[\(T\), \(pol\)]\)) - No stable LP", ""},
-    FrameLabel -> {"\!\(\*SubscriptBox[\(n\), \(pol\)]\) \
-[\[Times]\!\(\*SuperscriptBox[\(10\), \(14\)]\) \!\(\*SuperscriptBox[\
-\(m\), \(-2\)]\)]", "T [K]"},
-    PerformanceGoal -> "Speed",
-    ImageSize -> {1000, 1000},
-    LabelStyle -> Directive[Black, 30]
-    ],
-   {mc, {simc, gemc, snmc, ssmc, bsmc}}, {type, 2}, {nn, 10}, {ep, 
-    bsmc["Emax"]}, {de, -0.1, 0.1, 0.01}
-   ]
-  ] // AbsoluteTiming
+Import["all-direct-defs.wl"]
+Export["rawRP.m",
+ParallelTable[
+	{
+	  mc[[2]],
+	  type,
+	  nn,
+	  FPeperp[mc[[1]]["prc"],ep],
+	  QFreq[gamex*(10^13)],
+	  de,
+	  conc,
+	  t,
+	  {
+		{
+			mc[[1]]["exres"][[type]][[ep]],
+			mc[[1]]["Eck"][[type]][[ep]][de,0],
+			mc[[1]]["Eck"][[type]][[ep]][de,0]-mc[[1]]["exres"][[type]][[ep]]
+		},
+		{
+			QFreq[gamex*(10^13)],
+			mc[[1]]["gamcav"][[type]][[nn]][[ep]][de],
+		},
+		{
+
+			mc[[1]]["Vsav"][[type]][[nn]][[ep]][de],
+			Re[mc[[1]]["Elpup"][[type]][[nn]][[ep]][de,0][[1]]],
+			Re[mc[[1]]["Elpup"][[type]][[nn]][[ep]][de,0][[3]]/2],
+			Min[mc[[1]]["exres"][[type]][[ep]],mc[[1]]["Eck"][[type]][[ep]][de,0]]-Re[mc[[1]]["Elpup"][[type]][[nn]][[ep]][de,0][[1]]]
+		},
+		{
+			mc[[1]]["TcKavVs"][[type]][[nn]][[ep]][QConc[conc*10^14], de],
+			mc[[1]]["CritnKavVs"][[type]][[nn]][[ep]][t,de]
+		},
+		QuantityMagnitude[mc[[1]]["Vsav"][[type]][[nn]][[ep]][de]] > QuantityMagnitude[Abs[HB*(mc[[1]]["gamcav"][[type]][[nn]][[ep]][de] - QFreq[gamex*(10^13)])]/2,"Millielectronvolts"],
+		t < QuantityMagnitude[mc[[1]]["TcKavVs"][[type]][[nn]][[ep]][QConc[conc*10^14], de], "Kelvins"] && t < QuantityMagnitude[Re[mc[[1]]["ElpupVs"][[type]][[nn]][[ep]][QFreq[gamex*(10^13)], de, 0][[3]]]/(2*KB), "Kelvins"],
+		QuantityMagnitude[mc[[1]]["TcKavVs"][[type]][[nn]][[ep]][QConc[conc*10^14], de],"Kelvins"] < t < QuantityMagnitude[Re[mc[[1]]["ElpupVs"][[type]][[nn]][[ep]][QFreq[gamex*(10^13)], de, 0][[3]]]/(2*KB), "Kelvins"],
+		t > QuantityMagnitude[Re[mc[[1]]["ElpupVs"][[type]][[nn]][[ep]][QFreq[gamex*(10^13)], de, 0][[3]]]/(2*KB), "Kelvins"]
+		}
+	},
+	{mc, {{simc, 1}, {gemc, 2}, {snmc, 3}, {ssmc, 4}, {bsmc, 5}}},
+	{type, 2},
+	{nn, 10},
+	{ep,mc[[1]]["NNEtr"][[type]],mc[[1]]["Emax"]},
+	{gamex, 5},
+	{de, -0.1, 0.1, 0.01},
+	{conc, 1, 100},
+	{t, 150, 350}
+	]
+]//AbsoluteTiming
 Quit[]
 EOF
 
@@ -64,7 +76,7 @@ cat <<EOF > submit_mathematica.pbs
 
 
 #You can set your job name here:
-#PBS -N "BFTORP"
+#PBS -N "rawRP"
 
 #DO NOT CHANGE THE NODE NUMBER:
 #PBS -l nodes=node27:ppn=1
