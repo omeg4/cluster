@@ -294,7 +294,7 @@ MCall[epscav_, n1_, n2_, r1_, r2_, prc_, genname_] := Module[
 	   		UnitConvert[((1 - Sqrt[r2])/Sqrt[r2])*(CC/(2*Sqrt[epscav]*(Lc[epscav, m][Ephotpct[prc, type, ep][de]] + Ldbr[epscav, n1, n2][Ephotpct[prc, type, ep][0]]))),"Seconds"^-1]
 		],
    ONgamcav = Function[{type, ep, m, de},
-			UnitConvert[(1/2*(((1 - Sqrt[r1])/Sqrt[r1]) + ((1 - Sqrt[r2])/Sqrt[r2])))*(CC/(Sqrt[epscav]*(Lc[epscav, m][Ephotpct[prc, type, ep][de]] + Ldbr[epscav, n1, n2][Ephotpct[prc, type, ep][0]]))),"Seconds"^-1]
+			UnitConvert[(1/2*(((1 - Sqrt[r1])/Sqrt[r1]) + ((1 - Sqrt[r2])/Sqrt[r2])))*(CC/(Sqrt[epscav]*(Lc[epscav, m][Ephotpct[prc, type, ep][de]] + (1/2)*Ldbr[epscav, n1, n2][Ephotpct[prc, type, ep][0]]))),"Seconds"^-1]
 		],
    MOV = Function[{type, ep, m, nx, de},
 			Sqrt[nx*UnitConvert[((1 + Sqrt[r1])/Sqrt[r1])*((4*Pi*KK*(EE^2)*(Quantity[prc[[1]][[3]],"Meters"/"Seconds"]^2))/(Sqrt[epscav*prc[[1]][[6]]]*Exres[prc, type, ep]*(Lc[epscav, m][Ephotpct[prc, type, ep][de]] + Ldbr[epscav, n1, n2][Ephotpct[prc, type, ep][0]])))*(FPr0[prc, type, 1, ep, 1, 0]^2), "Seconds"^-2]]
@@ -303,10 +303,10 @@ MCall[epscav_, n1_, n2_, r1_, r2_, prc_, genname_] := Module[
 			Sqrt[nx*UnitConvert[((1 + Sqrt[r1])/Sqrt[r1])* ((4*Pi*KK*(EE^2)*(Quantity[prc[[1]][[3]],"Meters"/"Seconds"]^2))/(Sqrt[epscav*prc[[1]][[6]]]*Exres[prc, type, ep]*(Lc[epscav, m][Ephotpct[prc, type, ep][de]] + 2*Ldbr[epscav, n1, n2][Ephotpct[prc, type, ep][0]])))*(FPr0[prc, type, 1, ep, 1, 0]^2), "Seconds"^-2]]
 		],
    OOV = Function[{type, ep, m, nx, de},
-			Sqrt[nx*UnitConvert[((1 + Sqrt[r2])/Sqrt[r2])* ((4*Pi*KK*(EE^2)*(Quantity[prc[[1]][[3]], "Meters"/"Seconds"]^2))/(Sqrt[epscav*prc[[1]][[6]]]*Exres[prc, type, ep]*(Lc[epscav, m][Ephotpct[prc, type, ep][de]] + Ldbr[epscav, n1, n2][Ephotpct[prc, type, ep][0]])))*(FPr0[prc, type, 1, ep, 1, 0]^2), "Seconds"^-2]]
+			Sqrt[nx*UnitConvert[((1 + Sqrt[r2])/Sqrt[r2])* ((4*Pi*KK*(EE^2)*(Quantity[prc[[1]][[3]], "Meters"/"Seconds"]^2))/(Sqrt[epscav*prc[[1]][[6]]]*Exres[prc, type, ep]*(2*(Lc[epscav, m][Ephotpct[prc, type, ep][de]] + Ldbr[epscav, n1, n2][Ephotpct[prc, type, ep][0]]))))*(FPr0[prc, type, 1, ep, 1, 0]^2), "Seconds"^-2]]
 		],
    ONV = Function[{type, ep, m, nx, de},
-			Sqrt[nx*UnitConvert[((1 + Sqrt[(4*r1*r2)/((Sqrt[r1] + Sqrt[r2])^2)])/Sqrt[(4*r1*r2)/((Sqrt[r1] + Sqrt[r2])^2)])* ((4*Pi*KK*(EE^2)*(Quantity[prc[[1]][[3]], "Meters"/"Seconds"]^2))/(Sqrt[epscav*prc[[1]][[6]]]*Exres[prc, type, ep]*(Lc[epscav, m][Ephotpct[prc, type, ep][de]] + Ldbr[epscav, n1, n2][Ephotpct[prc, type, ep][0]])))*(FPr0[prc, type, 1, ep, 1, 0]^2), "Seconds"^-2]]
+			Sqrt[nx*UnitConvert[((1 + Sqrt[(4*r1*r2)/((Sqrt[r1] + Sqrt[r2])^2)])/Sqrt[(4*r1*r2)/((Sqrt[r1] + Sqrt[r2])^2)])* ((4*Pi*KK*(EE^2)*(Quantity[prc[[1]][[3]], "Meters"/"Seconds"]^2))/(Sqrt[epscav*prc[[1]][[6]]]*Exres[prc, type, ep]*(Lc[epscav, m][Ephotpct[prc, type, ep][de]] + (1/2)*Ldbr[epscav, n1, n2][Ephotpct[prc, type, ep][0]])))*(FPr0[prc, type, 1, ep, 1, 0]^2), "Seconds"^-2]]
 		],
    U0 = Function[{type, ep}, 6*(Abs@FPev[prc, type, 1, ep, 1, 0])*(FPbohrad[prc, type, 1, ep, 1, 0]^2)],
    HXsq = Function[{V, type, ep, m, nx, de, k},
