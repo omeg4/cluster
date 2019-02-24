@@ -71,7 +71,7 @@ ProcessPhos[data_]:=Module[
 			NIntegrate[
 				(efs[[i]]/.{\[Xi]->ArcTan[x],\[Psi]->ArcTan[y]})^2,
 				{x,-s,s},{y,-s,s},
-				MinRecursion->20,MaxRecursion->200,WorkingPrecision->100
+				MinRecursion->20,MaxRecursion->200,WorkingPrecision->100,PrecisionGoal->5,AccuracyGoal->5
 			],
 		{i,Length[efs]}
 	];

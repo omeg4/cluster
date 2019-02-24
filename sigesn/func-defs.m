@@ -14,7 +14,7 @@ KK=1/(4*Pi*Quantity["ElectricConstant"]);
 EE=Quantity["ElementaryCharge"];
 KB=Quantity["BoltzmannConstant"];
 
-configs={"mono","open"};
+configs={"2dbr","1dbr"};
 methods={"old","new"};
 
 QConc[conc_]:=Quantity[conc,"Meters"^-2]
@@ -140,6 +140,54 @@ i++
 i
 ]
 
+gridWheaders[data_, rowheads_, columnheads_, gropts : OptionsPattern[]] := Grid[
+  Join[
+   {PadLeft[rowheads, Length[rowheads] + 1, " "]} // Transpose,
+   Join[
+    {columnheads},
+    data
+    ],
+   2
+   ],
+  Dividers -> {{False, True}, {False, True}},
+  ItemStyle -> Directive[FontSize -> 20, Black, FontFamily -> "Arial"],
+  Evaluate@FilterRules[{gropts}, Options[Grid]]
+  ]
+
+nestedgridWheaders[
+  data_, {innerrow_, innercolumn_, 
+   innergropts : OptionsPattern[]}, {outerrow_, outercolumn_, 
+   outergropts : OptionsPattern[]}] := Grid[
+  Join[
+   {PadLeft[outerrow, Length[outerrow] + 1, " "]} // Transpose,
+   Join[
+    {outercolumn},
+    Map[
+     Grid[
+       Join[
+        {PadLeft[innerrow, Length[innerrow] + 1, " "]} // Transpose,
+        Join[
+         {innercolumn},
+         #
+         ],
+        2
+        ],
+       Dividers -> {{False, True}, {False, True}},
+       ItemStyle -> 
+        Directive[FontSize -> 20, Black, FontFamily -> "Arial"],
+       Evaluate@FilterRules[{innergropts}, Options[Grid]]
+       ] &,
+     data,
+     {2}
+     ]
+    ],
+   2
+   ],
+  Dividers -> {{False, True}, {False, True}},
+  ItemStyle -> Directive[FontSize -> 20, Black, FontFamily -> "Arial"],
+  Evaluate@FilterRules[{outergropts}, Options[Grid]]
+  ]
+
 nsoleffeps[prc_,t_,ep_]:=NSolve[-FPev[prc,t,1,ep,1,0]==(2*(Quantity["Coulomb Constant"]*Quantity["ElementaryCharge"]^2)^2*FPmu[prc,t,ep])/((Quantity["ReducedPlanckConstant"]^2)*(\[Epsilon]^2))&&\[Epsilon]>0,\[Epsilon]][[1]][[1]]//Last
 
 newlines5={
@@ -248,7 +296,7 @@ Cs[Ueff_,npol_,Mlp_]:=UnitConvert[Sqrt[Ueff*npol/Mlp],"Meters"/"Seconds"]
 
 Tcpol[npol_,cs_,Mp_,s_]:=Module[{Tc0=1/KB*((Pi*HB^2*npol*cs^4*Mp)/(6*s*Zeta[3]))^(1/3)},{((1+Sqrt[32/27 ((Mp*KB*Tc0)/(Pi*HB^2*npol))^3+1])^(1/3)-(Sqrt[32/27 ((Mp*KB*Tc0)/(Pi*HB^2*npol))^3+1]-1)^(1/3)) Tc0/2^(1/3),Tc0}//UnitSimplify]
 
-Tcpol2[npol_,cs_,Mp_,s_]:=Module[{Tc0=1/KB*((2*Pi*HB^2*npol*cs^4*Mp)/(3*s*Zeta[3]))^(1/3)},{((1+Sqrt[32/27 ((Mp*KB*Tc0)/(Pi*HB^2*npol))^3+1])^(1/3)-(Sqrt[32/27 ((Mp*KB*Tc0)/(Pi*HB^2*npol))^3+1]-1)^(1/3)) Tc0/2^(1/3),Tc0}//UnitSimplify]
+Tcpol2[npol_,cs_,Mp_,s_]:=Module[{Tc0=1/KB*((2*Pi*HB^2*npol*cs^4*Mp)/(3*s*Zeta[3]))^(1/3)},((1+Sqrt[32/27 ((Mp*KB*Tc0)/(Pi*HB^2*npol))^3+1])^(1/3)-(Sqrt[32/27 ((Mp*KB*Tc0)/(Pi*HB^2*npol))^3+1]-1)^(1/3)) Tc0/2^(1/3)//UnitSimplify]
 
 critdensfromT[tc_,cs_,mp_,s_]:=(Quantity[FindRoot[QuantityMagnitude@Tcpol2[na,cs,mp,s]==tc,{na,10^11}][[1]]//Last,"Meters"^-2])
 
@@ -272,7 +320,7 @@ tc0[mlp_,nlp_,ueff_]:=nlp/KB ((2*Pi*(HB^2)*(ueff^2))/(3*Zeta[3]*mlp))^(1/3)
 
 ncrit[mlp_,ueff_,t_]:=(KB*t)*((3*Zeta[3]*mlp)/(2*Pi*(HB^2)*(ueff^2)))^(1/3)
 
-MCall[epscav_, n1_, n2_, r1_, r2_, prc_, genname_] := Module[
+MCall[epscav_, n1_, n2_, r1_, r2_, prc_, genname_,filename_] := Module[
   {
    exrestab = Table[
      Exres[prc, type, ep],
@@ -282,46 +330,20 @@ MCall[epscav_, n1_, n2_, r1_, r2_, prc_, genname_] := Module[
    Mph = Function[{type, ep, de},
      Ephotpct[prc, type, ep][de]*epscav/(CC^2)],
    Reff = (4*r1*r2)/((Sqrt[r1] + Sqrt[r2])^2),
-   Leff1 = Function[{type, ep, m, de}, UnitConvert[Lc[epscav, m][Ephotpct[prc, type, ep][de]] + Ldbr[epscav, n1, n2][Ephotpct[prc, type, ep][0]],"Micrometers"]],
-   Leff2 = Function[{type, ep, m, de}, UnitConvert[Lc[epscav, m][Ephotpct[prc, type, ep][de]] + 2*Ldbr[epscav, n1, n2][Ephotpct[prc, type, ep][0]],"Micrometers"]],
-   MOgamcav = Function[{type, ep, m, de},
-			UnitConvert[((1 - Sqrt[r1])/Sqrt[r1])*(CC/(Sqrt[epscav]*(Lc[epscav, m][Ephotpct[prc, type, ep][de]] + Ldbr[epscav, n1, n2][Ephotpct[prc, type, ep][0]]))),"Seconds"^-1]
-		],
-   MNgamcav = Function[{type, ep, m, de},
-			UnitConvert[((1 - Sqrt[r1])/Sqrt[r1])*(CC/(Sqrt[epscav]*(Lc[epscav, m][Ephotpct[prc, type, ep][de]] + 2*Ldbr[epscav, n1, n2][Ephotpct[prc, type, ep][0]]))),"Seconds"^-1]
-		],
-   OOgamcav = Function[{type, ep, m, de},
-	   		UnitConvert[((1 - Sqrt[r2])/Sqrt[r2])*(CC/(2*Sqrt[epscav]*(Lc[epscav, m][Ephotpct[prc, type, ep][de]] + Ldbr[epscav, n1, n2][Ephotpct[prc, type, ep][0]]))),"Seconds"^-1]
-		],
-   ONgamcav = Function[{type, ep, m, de},
-			UnitConvert[(1/2*(((1 - Sqrt[r1])/Sqrt[r1]) + ((1 - Sqrt[r2])/Sqrt[r2])))*(CC/(Sqrt[epscav]*(Lc[epscav, m][Ephotpct[prc, type, ep][de]] + (1/2)*Ldbr[epscav, n1, n2][Ephotpct[prc, type, ep][0]]))),"Seconds"^-1]
-		],
-   MOV = Function[{type, ep, m, nx, de},
-			Sqrt[nx*UnitConvert[((1 + Sqrt[r1])/Sqrt[r1])*((4*Pi*KK*(EE^2)*(Quantity[prc[[1]][[3]],"Meters"/"Seconds"]^2))/(Sqrt[epscav*prc[[1]][[6]]]*Exres[prc, type, ep]*(Lc[epscav, m][Ephotpct[prc, type, ep][de]] + Ldbr[epscav, n1, n2][Ephotpct[prc, type, ep][0]])))*(FPr0[prc, type, 1, ep, 1, 0]^2), "Seconds"^-2]]
-		],
-   MNV = Function[{type, ep, m, nx, de},
-			Sqrt[nx*UnitConvert[((1 + Sqrt[r1])/Sqrt[r1])* ((4*Pi*KK*(EE^2)*(Quantity[prc[[1]][[3]],"Meters"/"Seconds"]^2))/(Sqrt[epscav*prc[[1]][[6]]]*Exres[prc, type, ep]*(Lc[epscav, m][Ephotpct[prc, type, ep][de]] + 2*Ldbr[epscav, n1, n2][Ephotpct[prc, type, ep][0]])))*(FPr0[prc, type, 1, ep, 1, 0]^2), "Seconds"^-2]]
-		],
-   OOV = Function[{type, ep, m, nx, de},
-			Sqrt[nx*UnitConvert[((1 + Sqrt[r2])/Sqrt[r2])* ((4*Pi*KK*(EE^2)*(Quantity[prc[[1]][[3]], "Meters"/"Seconds"]^2))/(Sqrt[epscav*prc[[1]][[6]]]*Exres[prc, type, ep]*(2*(Lc[epscav, m][Ephotpct[prc, type, ep][de]] + Ldbr[epscav, n1, n2][Ephotpct[prc, type, ep][0]]))))*(FPr0[prc, type, 1, ep, 1, 0]^2), "Seconds"^-2]]
-		],
-   ONV = Function[{type, ep, m, nx, de},
-			Sqrt[nx*UnitConvert[((1 + Sqrt[(4*r1*r2)/((Sqrt[r1] + Sqrt[r2])^2)])/Sqrt[(4*r1*r2)/((Sqrt[r1] + Sqrt[r2])^2)])* ((4*Pi*KK*(EE^2)*(Quantity[prc[[1]][[3]], "Meters"/"Seconds"]^2))/(Sqrt[epscav*prc[[1]][[6]]]*Exres[prc, type, ep]*(Lc[epscav, m][Ephotpct[prc, type, ep][de]] + (1/2)*Ldbr[epscav, n1, n2][Ephotpct[prc, type, ep][0]])))*(FPr0[prc, type, 1, ep, 1, 0]^2), "Seconds"^-2]]
-		],
    U0 = Function[{type, ep}, 6*(Abs@FPev[prc, type, 1, ep, 1, 0])*(FPbohrad[prc, type, 1, ep, 1, 0]^2)],
    HXsq = Function[{V, type, ep, m, nx, de, k},
 		HopXsq[
-			Exres[prc, type, ep],
-			Ephotpct[prc, type, ep][de],
+			Exk[ prc,type,ep ][ k ],
+			Eck[ epscav ][ Ephotpct[ prc, type, ep ][ de ] ][ k ],
 			V[type, ep, m, nx, de]
 		]
 	],
    HCsq = Function[{V, type, ep, m, nx, de, k},
-     HopCsq[
-      Exres[prc, type, ep],
-      Ephotpct[prc, type, ep][de],
-      V[type, ep, m, nx, de]
-      ]
+		 HopCsq[
+			Exk[ prc,type,ep ][ k ],
+			Eck[ epscav ][ Ephotpct[ prc, type, ep ][ de ] ][ k ],
+			V[type, ep, m, nx, de]
+		]
      ],
    MLP = Function[{V, type, ep, m, nx, de, k},
 		(
@@ -329,452 +351,225 @@ MCall[epscav_, n1_, n2_, r1_, r2_, prc_, genname_] := Module[
 			(HopCsq[Exres[prc, type, ep], Ephotpct[prc, type, ep][de], V[type, ep, m, nx, de]]/(Ephotpct[prc, type, ep][de]*epscav/(CC^2)))
 		)^(-1))
 	]
-   },
-  Association[
-   "inps" -> Association["epscav" -> epscav, "n1" -> n1, "n2" -> n2, "r1"-> r1, "r2"-> r2, "reff"-> Reff, "genname" -> genname],
-   "genname" -> ToString@genname,
-   "prc" -> prc,
-   "NNEtr" -> Function[{t}, NoNegEtr[prc, t]],
-   "Emax" -> FPEdim[prc],
-   "exres" -> Function[{type, ep}, Exres[prc, type, ep]],
-   "lc" -> Function[{type, ep, m, de}, Lc[epscav, m][Ephotpct[prc, type, ep][de]]],
-   "ldbr" -> Function[{type, ep}, Ldbr[epscav, n1, n2][Ephotpct[prc, type, ep][0]]],
-   "dbrband" -> Function[{type, ep},
-	   With[
-		{
-			ec = Exres[prc, type, ep],
-   			bw = Exres[prc, type, ep]*(4/Pi)*ArcSin[(n2 - n1)/(n1 + n2)]
-		},
-			UnitConvert[{ec, ec + (bw/2), ec - (bw/2)}, "Millielectronvolts"]
-      ]
-     ],
-   "reff" -> Reff,
-   "mph" -> Mph,
-   "mex" -> Mex,
-   "Exk" -> Function[{type, ep, k}, UnitConvert[Exres[prc, type, ep] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mex[type, ep]),"Millielectronvolts"]],
-   "Eck" -> Function[{type, ep, de, k}, UnitConvert[Ephotpct[prc, type, ep][de] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mph[type, ep, de]),"Millielectronvolts"]],
-   "mono" -> Association[
-     "confname" -> StringJoin[genname,", 2 DBR"],
-     "old" -> Association[
-       "methname" -> "2 DBR, Old",
-	   "fullname" -> genname <> ": 2 DBR: Old",
-       "leff" -> Function[{type, ep, m, de}, Leff1[type, ep, m, de]],
-       "gamcav" -> Function[{type, ep, m, de}, MOgamcav[type, ep, m, de]],
-       "V" -> Function[{type, ep, m, nx, de}, MOV[type, ep, m, nx, de]],
-       "HX" -> Function[{type, ep, m, nx, de, k}, HXsq[MOV, type, ep, m, nx, de, k]],
-       "HC" -> Function[{type, ep, m, nx, de, k}, HCsq[MOV, type, ep, m, nx, de, k]],
-       "mlp" -> Function[{type, ep, m, nx, de, k}, (HXsq[MOV, type, ep, m, nx, de, k]/Mex[type, ep] + HCsq[MOV, type, ep, m, nx, de, k]/Mph[type, ep, de])^(-1)],
-	   "mlpfcheck" -> Function[{type, ep, m, nx, de, k}, MLP[MOV, type, ep, m, nx, de, k]],
-       "mup" -> Function[{type, ep, m, nx, de, k}, (HCsq[MOV, type, ep, m, nx, de, k]/Mex[type, ep] + HXsq[MOV, type, ep, m, nx, de, k]/Mph[type, ep, de])^(-1)],
-       "Elp" -> Function[{type, ep, m, nx, gamex, de, k},
-         Elp[
-          Exres[prc, type, ep] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mex[type, ep]),
-          Ephotpct[prc, type, ep][de] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mph[type, ep, de]),
-          gamex,
-          MOgamcav[type, ep, m, de],
-          MOV[type, ep, m, nx, de]
-          ]
-         ],
-       "Eup" -> Function[{type, ep, m, nx, gamex, de, k},
-         Eup[
-          Exres[prc, type, ep] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mex[type, ep]),
-          Ephotpct[prc, type, ep][de] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mph[type, ep, de]),
-          gamex,
-          MOgamcav[type, ep, m, de],
-          MOV[type, ep, m, nx, de]
-          ]
-         ],
-       "Elpup" -> Function[{type, ep, m, nx, gamex, de, k},
-         Eup[
-           Exres[prc, type, ep] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mex[type, ep]),
-           Ephotpct[prc, type, ep][de] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mph[type, ep, de]),
-           gamex,
-           MOgamcav[type, ep, m, de],
-           MOV[type, ep, m, nx, de]
-        ] - Elp[
-           Exres[prc, type, ep] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mex[type, ep]),
-           Ephotpct[prc, type, ep][de] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mph[type, ep, de]),
-           gamex,
-           MOgamcav[type, ep, m, de],
-           MOV[type, ep, m, nx, de]
-           ]
-         ],
-       "gamlp" -> Function[{type, ep, m, nx, gamex, de, k},
-         (HXsq[MOV, type, ep, m, nx, de, k]*
-            gamex) + (HCsq[MOV, type, ep, m, nx, de, k]*
-            MOgamcav[type, ep, m, de])
-         ],
-       "gamup" -> Function[{type, ep, m, nx, gamex, de, k},
-         (HCsq[MOV, type, ep, m, nx, de, k]*gamex) + (HXsq[MOV, type, ep, m, nx, de, k]*MOgamcav[type, ep, m, de])
-         ],
-       "Ueff" -> Function[{type, ep, m, nx, de}, U0[type, ep]*(HXsq[MOV, type, ep, m, nx, de, 0]^2)],
-       "cs" -> Function[{type, ep, m, nx, npol, de},
-         Sqrt[
-          U0[type, ep]*(HXsq[MOV, type, ep, m, nx, de, 0]^2)*
-           npol/(MLP[MOV, type, ep, m, nx, de, 0])]],
-       "tc0" -> Function[{type, ep, m, nx, npol, de}
-         tc0[
-          MLP[MOV, type, ep, m, nx, de, 0],
-          npol,
-          U0[type, ep]*(HXsq[MOV, type, ep, m, nx, de, 0]^2)
-          ]
-         ],
-       "ncrit" -> Function[{type, ep, m, nx, t, de},
-         ncrit[
-          MLP[MOV, type, ep, m, nx, de, 0],
-          U0[type, ep]*(HXsq[MOV, type, ep, m, nx, de, 0]^2),
-          t
-          ]
-         ],
-       "tcbkt" -> Function[{type, ep, m, nx, npol, de},
-         Tcpostsolve[
-          MLP[MOV, type, ep, m, nx, de, 0],
-          npol,
-          U0[type, ep]*(HXsq[MOV, type, ep, m, nx, de, 0]^2)
-          ]
-         ],
-       "tcmax" -> Function[{t, ep, m, nx, conc},
-         Module[{max},
-          max = FindMaximum[
-            QuantityMagnitude[
-             (Tcpol2[
-                conc,
-                Sqrt[U0[t, ep]*(HXsq[MOV, t, ep, m, nx, dE, 0]^2)*
-                  conc/(MLP[MOV, t, ep, m, nx, dE, 0])],
-				  MLP[MOV, t, ep, m, nx, dE, 0],
-                1
-                ])[[1]]],
-            {dE, 0.001},
-			AccuracyGoal->4
-            ];
-          {dE /. Last@max, max[[1]]}
-          ]
-         ],
-		 "SCstart"->Function[{t,m,nx,gamex},
-			Module[{j=1},
-				While[
-					QuantityMagnitude[MOV[t,j,m,nx,0,0]] < QuantityMagnitude[Abs[(MOgamcav[t,j,m,0]-gamex)/2]],
-					j++;
-					If[j==29,Break[]]
-				];
-				j
-			 ]
-       ]
-	],
-     "new" -> Association[
-       "methname" -> "2 DBR, New",
-	   "fullname" -> genname <> ": 2 DBR: New",
-       "leff" -> Function[{type, ep, m, de}, Leff2[type, ep, m, de]],
-       "gamcav" -> Function[{type, ep, m, de}, MNgamcav[type, ep, m, de]],
-       "V" -> Function[{type, ep, m, nx, de}, MNV[type, ep, m, nx, de]],
-       "HX" -> Function[{type, ep, m, nx, de, k}, HXsq[MNV, type, ep, m, nx, de, k]],
-       "HC" -> Function[{type, ep, m, nx, de, k}, HCsq[MNV, type, ep, m, nx, de, k]],
-       "mlp" -> Function[{type, ep, m, nx, de, k}, (HXsq[MNV, type, ep, m, nx, de, k]/Mex[type, ep] + HCsq[MNV, type, ep, m, nx, de, k]/Mph[type, ep, de])^(-1)],
-	   "mlpfcheck" -> Function[{type, ep, m, nx, de, k}, MLP[MNV, type, ep, m, nx, de, k]],
-       "mup" -> Function[{type, ep, m, nx, de, k}, (HCsq[MNV, type, ep, m, nx, de, k]/Mex[type, ep] + HXsq[MNV, type, ep, m, nx, de, k]/Mph[type, ep, de])^(-1)],
-       "Elp" -> Function[{type, ep, m, nx, gamex, de, k},
-         Elp[
-          Exres[prc, type, ep] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mex[type, ep]),
-          Ephotpct[prc, type, ep][de] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mph[type, ep, de]),
-          gamex,
-          MNgamcav[type, ep, m, de],
-          MNV[type, ep, m, nx, de]
-          ]
-         ],
-       "Eup" -> Function[{type, ep, m, nx, gamex, de, k},
-         Eup[
-          Exres[prc, type, ep] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mex[type, ep]),Ephotpct[prc, type, ep][de] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mph[type, ep, de]),
-          gamex,
-          MNgamcav[type, ep, m, de],
-          MNV[type, ep, m, nx, de]
-          ]
-         ],
-       "Elpup" -> Function[{type, ep, m, nx, gamex, de, k},
-         Eup[
-           Exres[prc, type, ep] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mex[type, ep]),
-           Ephotpct[prc, type, ep][de] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mph[type, ep, de]),
-           gamex,
-           MNgamcav[type, ep, m, de],
-           MNV[type, ep, m, nx, de]
-	   ] - Elp[
-           Exres[prc, type, ep] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mex[type, ep]),
-           Ephotpct[prc, type, ep][de] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mph[type, ep, de]),
-           gamex,
-           MNgamcav[type, ep, m, de],
-           MNV[type, ep, m, nx, de]
-           ]
-         ],
-       "gamlp" -> Function[{type, ep, m, nx, gamex, de, k},
-         (HXsq[MNV, type, ep, m, nx, de, k]*
-            gamex) + (HCsq[MNV, type, ep, m, nx, de, k]*
-            MNgamcav[type, ep, m, de])
-         ],
-       "gamup" -> Function[{type, ep, m, nx, gamex, de, k},
-         (HCsq[MNV, type, ep, m, nx, de, k]*
-            gamex) + (HXsq[MNV, type, ep, m, nx, de, k]*
-            MNgamcav[type, ep, m, de])
-         ],
-       "Ueff" -> Function[{type, ep, m, nx, de}, U0[type, ep]*(HXsq[MNV, type, ep, m, nx, de, 0]^2)],
-       "cs" -> Function[{type, ep, m, nx, npol, de}, Sqrt[U0[type, ep]*(HXsq[MNV, type, ep, m, nx, de, 0]^2)*npol/(MLP[MNV, type, ep, m, nx, de, 0])]],
-       "tc0" -> Function[{type, ep, m, nx, npol, de},
-         tc0[
-          MLP[MNV, type, ep, m, nx, de, 0],
-          npol,
-          U0[type, ep]*(HXsq[MNV, type, ep, m, nx, de, 0]^2)
-          ]
-         ],
-       "ncrit" -> Function[{type, ep, m, nx, t, de},
-         ncrit[
-          MLP[MNV, type, ep, m, nx, de, 0],
-          U0[type, ep]*(HXsq[MNV, type, ep, m, nx, de, 0]^2),
-          t
-          ]
-         ],
-       "tcbkt" -> Function[{type, ep, m, nx, npol, de},
-         Tcpostsolve[
-          MLP[MNV, type, ep, m, nx, de, 0],
-          npol,
-          U0[type, ep]*(HXsq[MNV, type, ep, m, nx, de, 0]^2)
-          ]
-         ],
-       "tcmax" -> Function[{t, ep, m, nx, conc},
-         Module[{max},
-          max = FindMaximum[
-            QuantityMagnitude[
-             (Tcpol2[
-                conc,
-                Sqrt[U0[t, ep]*(HXsq[MNV, t, ep, m, nx, dE, 0]^2)*conc/(MLP[MNV, t, ep, m, nx, dE, 0])],
-                MLP[MNV, t, ep, m, nx, dE, 0],
-                1
-                ])[[1]]],
-            {dE, 0.01},
-			AccuracyGoal->4
-            ];
-          {dE /. Last@max, max[[1]]}
-          ]
-         ],
-		 "SCstart"->Function[{t,m,nx,gamex},
-			Module[{j=1},
-				While[
-					QuantityMagnitude[MNV[t,j,m,nx,0,0]] < QuantityMagnitude[Abs[(MNgamcav[t,j,m,0]-gamex)/2]],
-					j++;
-					If[j==29,Break[]]
-					];
-				j
+  },
+	Join[
+		Association[
+			"inps" -> Association["epscav" -> epscav, "n1" -> n1, "n2" -> n2, "r1"-> r1, "r2"-> r2, "reff"-> Reff, "genname" -> genname],
+			"genname" -> ToString@genname,
+			"filename" -> ToString@filename,
+			"prc" -> prc,
+			"NNEtr" -> Function[{t}, NoNegEtr[prc, t]],
+			"Emax" -> FPEdim[prc],
+			"exres" -> Function[{type, ep}, Exres[prc, type, ep]],
+			"lc" -> Function[{type, ep, m, de}, Lc[epscav, m][Ephotpct[prc, type, ep][de]]],
+			"ldbr" -> Function[{type, ep}, Ldbr[epscav, n1, n2][Ephotpct[prc, type, ep][0]]],
+			"dbrband" -> Function[{type, ep},
+				With[
+					{
+						ec = Exres[prc, type, ep],
+						bw = Exres[prc, type, ep]*(4/Pi)*ArcSin[(n2 - n1)/(n1 + n2)]
+					},
+				UnitConvert[{ec, ec + (bw/2), ec - (bw/2)}, "Millielectronvolts"]
 				]
-       ]
-     ]
-	 ],
-   "open" -> Association[
-     "confname" -> StringJoin[genname, ", 1 DBR"],
-     "old" -> Association[
-       "methname" -> "1 DBR, Old",
-	   "fullname" -> genname <> ": 1 DBR: Old",
-       "leff" -> Function[{type, ep, m, de}, Leff1[type, ep, m, de]],
-       "gamcav" -> Function[{type, ep, m, de}, OOgamcav[type, ep, m, de]],
-       "V" -> Function[{type, ep, m, nx, de}, OOV[type, ep, m, nx, de]],
-       "HX" -> Function[{type, ep, m, nx, de, k}, HXsq[OOV, type, ep, m, nx, de, k]],
-       "HC" -> Function[{type, ep, m, nx, de, k}, HCsq[OOV, type, ep, m, nx, de, k]],
-       "mlp" -> Function[{type, ep, m, nx, de, k}, (HXsq[OOV, type, ep, m, nx, de, k]/Mex[type, ep] + HCsq[OOV, type, ep, m, nx, de, k]/Mph[type, ep, de])^(-1)],
-	   "mlpfcheck" -> Function[{type, ep, m, nx, de, k}, MLP[OOV, type, ep, m, nx, de, k]],
-       "mup" -> Function[{type, ep, m, nx, de, k}, (HCsq[OOV, type, ep, m, nx, de, k]/Mex[type, ep] + HXsq[OOV, type, ep, m, nx, de, k]/Mph[type, ep, de])^(-1)],
-       "Elp" -> Function[{type, ep, m, nx, gamex, de, k},
-         Elp[
-          Exres[prc, type, ep] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mex[type, ep]),
-          Ephotpct[prc, type, ep][de] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mph[type, ep, de]),
-          gamex,
-          OOgamcav[type, ep, m, de],
-          OOV[type, ep, m, nx, de]
-          ]
-         ],
-       "Eup" -> Function[{type, ep, m, nx, gamex, de, k},
-         Eup[
-          Exres[prc, type, ep] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mex[type, ep]),
-          Ephotpct[prc, type, ep][de] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mph[type, ep, de]),
-          gamex,
-          OOgamcav[type, ep, m, de],
-          OOV[type, ep, m, nx, de]
-          ]
-         ],
-       "Elpup" -> Function[{type, ep, m, nx, gamex, de, k},
-         Eup[
-           Exres[prc, type, ep] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mex[type, ep]),
-           Ephotpct[prc, type, ep][de] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mph[type, ep, de]),
-           gamex,
-           OOgamcav[type, ep, m, de],
-           OOV[type, ep, m, nx, de]
-           ] - Elp[
-           Exres[prc, type, ep] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mex[type, ep]),
-           Ephotpct[prc, type, ep][de] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mph[type, ep, de]),
-           gamex,
-           OOgamcav[type, ep, m, de],
-           OOV[type, ep, m, nx, de]
-           ]
-         ],
-       "gamlp" -> Function[{type, ep, m, nx, gamex, de, k},
-         (HXsq[OOV, type, ep, m, nx, de, k]*
-            gamex) + (HCsq[OOV, type, ep, m, nx, de, k]*
-            OOgamcav[type, ep, m, de])
-         ],
-       "gamup" -> Function[{type, ep, m, nx, gamex, de, k},
-         (HCsq[OOV, type, ep, m, nx, de, k]*
-            gamex) + (HXsq[OOV, type, ep, m, nx, de, k]*
-            OOgamcav[type, ep, m, de])
-         ],
-       "Ueff" -> Function[{type, ep, m, nx, de}, U0[type, ep]*(HXsq[OOV, type, ep, m, nx, de, 0]^2)],
-       "cs" -> Function[{type, ep, m, nx, npol, de}, Sqrt[U0[type, ep]*(HXsq[OOV, type, ep, m, nx, de, 0]^2)*npol/(MLP[OOV, type, ep, m, nx, de, 0])]],
-       "tc0" -> Function[{type, ep, m, nx, npol, de},
-         tc0[
-          MLP[OOV, type, ep, m, nx, de, 0],
-          npol,
-          U0[type, ep]*(HXsq[OOV, type, ep, m, nx, de, 0]^2)
-          ]
-         ],
-       "ncrit" -> Function[{type, ep, m, nx, t, de},
-         ncrit[
-          MLP[OOV, type, ep, m, nx, de, 0],
-          U0[type, ep]*(HXsq[OOV, type, ep, m, nx, de, 0]^2),
-          t
-          ]
-         ],
-       "tcbkt" -> Function[{type, ep, m, nx, npol, de},
-         Tcpostsolve[
-          MLP[OOV, type, ep, m, nx, de, 0],
-          npol,
-          U0[type, ep]*(HXsq[OOV, type, ep, m, nx, de, 0]^2)
-          ]
-         ],
-       "tcmax" -> Function[{t, ep, m, nx, conc},
-         Module[{max},
-          max = FindMaximum[
-            QuantityMagnitude[
-             (Tcpol2[
-                conc,
-                Sqrt[U0[t, ep]*(HXsq[OOV, t, ep, m, nx, dE, 0]^2)*conc/(MLP[OOV, t, ep, m, nx, dE, 0])],
-                MLP[OOV, t, ep, m, nx, dE, 0],
-                1
-                ])[[1]]],
-            {dE, 0.01},
-			AccuracyGoal->4
-            ];
-          {dE /. Last@max, max[[1]]}
-          ]
-         ],
-		 "SCstart"->Function[{t,m,nx,gamex},
-			Module[{j=1},
-				While[
-					QuantityMagnitude[OOV[t,j,m,nx,0,0]] < QuantityMagnitude[Abs[(OOgamcav[t,j,m,0]-gamex)/2]],
-					j++;
-					If[j==29,Break[]]
-				];
-				j
-			]
-		]
-       ],
-     "new" -> Association[
-       "methname" -> "1 DBR, New",
-	   "fullname" -> genname <> ": 1 DBR: New",
-       "leff" -> Function[{type, ep, m, de}, Leff1[type, ep, m, de]],
-       "gamcav" -> Function[{type, ep, m, de}, ONgamcav[type, ep, m, de]],
-       "V" -> Function[{type, ep, m, nx, de}, ONV[type, ep, m, nx, de]],
-       "HX" -> Function[{type, ep, m, nx, de, k}, HXsq[ONV, type, ep, m, nx, de, k]],
-       "HC" -> Function[{type, ep, m, nx, de, k}, HCsq[ONV, type, ep, m, nx, de, k]],
-       "mlp" -> Function[{type, ep, m, nx, de, k}, (HXsq[ONV, type, ep, m, nx, de, k]/Mex[type, ep] + HCsq[ONV, type, ep, m, nx, de, k]/Mph[type, ep, de])^(-1)],
-	   "mlpfcheck" -> Function[{type, ep, m, nx, de, k}, MLP[ONV, type, ep, m, nx, de, k]],
-       "mup" -> Function[{type, ep, m, nx, de, k}, (HCsq[ONV, type, ep, m, nx, de, k]/Mex[type, ep] + HXsq[ONV, type, ep, m, nx, de, k]/Mph[type, ep, de])^(-1)],
-       "Elp" -> Function[{type, ep, m, nx, gamex, de, k},
-         Elp[
-          Exres[prc, type, ep] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mex[type, ep]),
-          Ephotpct[prc, type, ep][de] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mph[type, ep, de]),
-          gamex,
-          ONgamcav[type, ep, m, de],
-          ONV[type, ep, m, nx, de]
-          ]
-         ],
-       "Eup" -> Function[{type, ep, m, nx, gamex, de, k},
-         Eup[
-          Exres[prc, type, ep] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mex[type, ep]),
-          Ephotpct[prc, type, ep][de] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mph[type, ep, de]),
-          gamex,
-          ONgamcav[type, ep, m, de],
-          ONV[type, ep, m, nx, de]
-          ]
-         ],
-       "Elpup" -> Function[{type, ep, m, nx, gamex, de, k},
-         Eup[
-           Exres[prc, type, ep] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mex[type, ep]),
-           Ephotpct[prc, type, ep][de] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mph[type, ep, de]),
-           gamex,
-           ONgamcav[type, ep, m, nx, de],
-           ONV[type, ep, m, nx, de]
-           ] - Elp[
-           Exres[prc, type, ep] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mex[type, ep]),
-           Ephotpct[prc, type, ep][de] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mph[type, ep, de]),
-           gamex,
-           ONgamcav[type, ep, m, de],
-           ONV[type, ep, m, nx, de]
-           ]
-         ],
-       "gamlp" -> Function[{type, ep, m, nx, gamex, de, k},
-         (HXsq[ONV, type, ep, m, nx, de, k]*
-            gamex) + (HCsq[ONV, type, ep, m, nx, de, k]*
-            ONgamcav[type, ep, m, de])
-         ],
-       "gamup" -> Function[{type, ep, m, nx, gamex, de, k},
-         (HCsq[ONV, type, ep, m, nx, de, k]*
-            gamex) + (HXsq[ONV, type, ep, m, nx, de, k]*
-            ONgamcav[type, ep, m, de])
-         ],
-       "Ueff" -> Function[{type, ep, m, nx, de}, U0[type, ep]*(HXsq[ONV, type, ep, m, nx, de, 0]^2)],
-       "cs" -> Function[{type, ep, m, nx, npol, de}, Sqrt[U0[type, ep]*(HXsq[ONV, type, ep, m, nx, de, 0]^2)*npol/(MLP[ONV, type, ep, m, nx, de, 0])]],
-       "tc0" -> Function[{type, ep, m, nx, npol, de},
-         tc0[
-          MLP[ONV, type, ep, m, nx, de, 0],
-          npol,
-          U0[type, ep]*(HXsq[ONV, type, ep, m, nx, de, 0]^2)
-          ]
-         ],
-       "ncrit" -> Function[{type, ep, m, nx, t, de},
-         ncrit[
-          MLP[ONV, type, ep, m, nx, de, 0],
-          U0[type, ep]*(HXsq[ONV, type, ep, m, nx, de, 0]^2),
-          t
-          ]
-         ],
-       "tcbkt" -> Function[{type, ep, m, nx, npol, de},
-         Tcpostsolve[
-          MLP[ONV, type, ep, m, nx, de, 0],
-          npol,
-          U0[type, ep]*(HXsq[ONV, type, ep, m, nx, de, 0]^2)
-          ]
-         ],
-       "tcmax" -> Function[{t, ep, m, nx, conc},
-         Module[{max},
-          max = FindMaximum[
-            QuantityMagnitude[
-             (Tcpol2[
-                conc,
-                Sqrt[U0[t, ep]*(HXsq[ONV, t, ep, m, nx, dE, 0]^2)*conc/(MLP[ONV, t, ep, m, nx, dE, 0])],
-                MLP[ONV, t, ep, m, nx, dE, 0],
-                1
-                ])[[1]]],
-            {dE, 0.01},
-			AccuracyGoal->4
-            ];
-          {dE /. Last@max, max[[1]]}
-          ]
-         ],
-		 "SCstart"->Function[{t,m,nx,gamex},
-			Module[{j=1},
-				While[
-					QuantityMagnitude[ONV[t,j,m,nx,0,0]] < QuantityMagnitude[Abs[(ONgamcav[t,j,m,0]-gamex)/2]],
-					j++;
-					If[j==29,Break[]]
-				];
-				j
+			],
+			"reff" -> Reff,
+			"mph" -> Mph,
+			"mex" -> Mex,
+			"Exk" -> Function[{type, ep, k}, UnitConvert[Exres[prc, type, ep] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mex[type, ep]),"Millielectronvolts"]],
+			"Eck" -> Function[{type, ep, de, k}, UnitConvert[Ephotpct[prc, type, ep][de] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mph[type, ep, de]),"Millielectronvolts"]]
+		],
+		Map[
+			Association[
+				"confname" -> #["mname"],
+				"shortname" -> #["sname"],
+				"leff" -> #["leff"],
+				"gamcav" -> #["g"],
+				"V" -> #["v"],
+				"HX" -> Function[{type, ep, m, nx, de, k}, HXsq[#["v"], type, ep, m, nx, de, k]],
+				"HC" -> Function[{type, ep, m, nx, de, k}, HCsq[#["v"], type, ep, m, nx, de, k]],
+				"mlp" -> Function[{type, ep, m, nx, de, k}, (HXsq[#["v"], type, ep, m, nx, de, k]/Mex[type, ep] + HCsq[#["v"], type, ep, m, nx, de, k]/Mph[type, ep, de])^(-1)],
+				"mlpfcheck" -> Function[{type, ep, m, nx, de, k}, MLP[#["v"], type, ep, m, nx, de, k]],
+				"mup" -> Function[{type, ep, m, nx, de, k}, (HCsq[#["v"], type, ep, m, nx, de, k]/Mex[type, ep] + HXsq[#["v"], type, ep, m, nx, de, k]/Mph[type, ep, de])^(-1)],
+				"Elp" -> Function[{type, ep, m, nx, gamex, de, k},
+					Elp[
+						Exres[prc, type, ep] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mex[type, ep]),
+						Ephotpct[prc, type, ep][de] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mph[type, ep, de]),
+						gamex,
+						#["g"][type, ep, m, de],
+						#["v"][type, ep, m, nx, de]
+					]
+				],
+				"Eup" -> Function[{type, ep, m, nx, gamex, de, k},
+					Eup[
+						Exres[prc, type, ep] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mex[type, ep]),
+						Ephotpct[prc, type, ep][de] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mph[type, ep, de]),
+						gamex,
+						#["g"][type, ep, m, de],
+						#["v"][type, ep, m, nx, de]
+					]
+				],
+				"Elpup" -> Function[{type, ep, m, nx, gamex, de, k},
+					Eup[
+						Exres[prc, type, ep] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mex[type, ep]),
+						Ephotpct[prc, type, ep][de] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mph[type, ep, de]),
+						gamex,
+						#["g"][type, ep, m, de],
+						#["v"][type, ep, m, nx, de]
+						] -
+					Elp[
+						Exres[prc, type, ep] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mex[type, ep]),
+						Ephotpct[prc, type, ep][de] + ((HB^2)*Quantity[k, "Micrometers"^-1]^2)/(2*Mph[type, ep, de]),
+						gamex,
+						#["g"][type, ep, m, de],
+						#["v"][type, ep, m, nx, de]
+					]
+				],
+				"Eblp"->Function[{type, ep, m, nx, gamex, de, k},
+					Min[ Exk[prc, type, ep][k], Eck[ epscav ][ Ephotpct[prc, type, ep][de] ][ k ] ]- Re[Elp[
+							 Exk[ prc, type, ep ][ k ],
+							 Eck[ epscav ][ Ephotpct[prc, type, ep][de] ][ k ],
+							 gamex,
+							 #["g"][type, ep, m, de],
+							 #["v"][type, ep, m, nx, de]
+							 ]]
+				],
+				"Ebup"->Function[{type, ep, m, nx, gamex, de, k},
+					Re[Eup[
+							 Exk[ prc, type, ep ][ k ],
+							 Eck[ epscav ][ Ephotpct[prc, type, ep][de] ][ k ],
+							 gamex,
+							 #["g"][type, ep, m, de],
+							 #["v"][type, ep, m, nx, de]
+							 ]] - Max[ Exk[prc, type, ep][k], Eck[ epscav ][ Ephotpct[prc, type, ep][de] ][ k ] ]
+				],
+				"gamlp" -> Function[{type, ep, m, nx, gamex, de, k},
+					(HXsq[#["v"], type, ep, m, nx, de, k]*gamex) + (HCsq[#["v"], type, ep, m, nx, de, k]*#["g"][type, ep, m, de])
+				],
+				"gamup" -> Function[{type, ep, m, nx, gamex, de, k},
+					(HCsq[#["v"], type, ep, m, nx, de, k]*gamex) + (HXsq[#["v"], type, ep, m, nx, de, k]*#["g"][type, ep, m, de])
+				],
+				"Ueff" -> Function[{type, ep, m, nx, de}, U0[type, ep]*(HXsq[#["v"], type, ep, m, nx, de, 0]^2)],
+				"cs" -> Function[{type, ep, m, nx, npol, de},
+					Sqrt[
+						U0[type, ep]*(HXsq[#["v"], type, ep, m, nx, de, 0]^2)*
+							 npol/(MLP[#["v"], type, ep, m, nx, de, 0])
+					]
+				],
+				"tc0" -> Function[{type, ep, m, nx, npol, de},
+					UnitConvert[tc0[
+						MLP[#["v"], type, ep, m, nx, de, 0],
+						npol,
+						U0[type, ep]*(HXsq[#["v"], type, ep, m, nx, de, 0]^2)
+					],"Kelvins"]
+				],
+				"ncrit0" -> Function[{type, ep, m, nx, t, de},
+					UnitConvert[ncrit[
+						MLP[#["v"], type, ep, m, nx, de, 0],
+						U0[type, ep]*(HXsq[#["v"], type, ep, m, nx, de, 0]^2),
+						Quantity[t,"Kelvins"]
+						],"Meters"^-2]
+				],
+				"tcbkt" -> Function[{type, ep, m, nx, npol, de},
+					Tcpostsolve[
+						MLP[#["v"], type, ep, m, nx, de, 0],
+						npol,
+						U0[type, ep]*(HXsq[#["v"], type, ep, m, nx, de, 0]^2)
+					]
+				],
+				"ncritbkt" -> Function[{type, ep, m, nx, t, de},
+					Quantity[
+						N[
+							FindRoot[
+								SetPrecision[
+									QuantityMagnitude[
+										Tcpostsolve[(* mlp, nlp, ueff *)
+											MLP[#["v"], type, ep, m, nx, de, 0],
+											QConc[nlp],
+											U0[type, ep]*(HXsq[#["v"], type, ep, m, nx, de, 0]^2)
+										]
+									]==300,
+									15
+								],
+								{nlp,10^11},AccuracyGoal->4,PrecisionGoal->4,WorkingPrecision->15
+							][[1]]//Last,
+							5
+						],
+						"Meters"^-2
+					]
+				],
+				"tcmax" -> Function[{t, ep, m, nx, conc},
+					Module[{max},
+						max = FindMaximum[
+							QuantityMagnitude[
+								Tcpol2[
+									conc,
+									Sqrt[U0[t, ep]*(HXsq[#["v"], t, ep, m, nx, dE, 0]^2)*
+										conc/(MLP[#["v"], t, ep, m, nx, dE, 0])],
+									MLP[#["v"], t, ep, m, nx, dE, 0],
+									1
+								]
+							],
+							{dE, 0.001, 0, 1},
+							AccuracyGoal->4
+						];
+						{dE /. Last@max, max[[1]]}
+					]
+				],
+				"SCstart"->Function[{t,m,nx,gamex,de},
+					Module[{j=1},
+						While[
+							QuantityMagnitude[#["v"][t,j,m,nx,de]] < QuantityMagnitude[Abs[(#["g"][t,j,m,de]-gamex)/2]],
+							j++;
+							If[j==29,Break[]]
+						];
+						j
+					]
+				],
+				"RTstab"->Function[{t,m,nx,gamex,de}, (* get the lowest Eperp where LP are stable at RT *)
+					Module[{j=1},
+						While[
+							QuantityMagnitude[#["v"][t,j,m,nx,de]] < QuantityMagnitude[Abs[(#["g"][t,j,m,de]-gamex)/2]],
+							j++;
+							If[j==29,Break[]]
+						];
+						j
+					]
 				]
-			]
+			]&,
+			Association[
+				"2dbr"->Association[
+						"leff"->Function[{type,ep,m,de},(Lc[epscav][ Ephotpct[prc, type, ep][de] ] + 2*Ldbr[epscav, n1, n2][ Ephotpct[prc, type, ep][0] ]) ],
+						"v"->Function[{type, ep, m, nx, de},
+							Sqrt[nx*UnitConvert[((1 + Sqrt[r1])/Sqrt[r1])* ((4*Pi*KK*(EE^2)*(Quantity[prc[[1]][[3]],"Meters"/"Seconds"]^2))/(Sqrt[epscav*prc[[1]][[6]]]*Exres[prc, type, ep]*(Lc[epscav, m][Ephotpct[prc, type, ep][de]] + 2*Ldbr[epscav, n1, n2][Ephotpct[prc, type, ep][0]])))*(FPr0[prc, type, 1, ep, 1, 0]^2), "Seconds"^-2]]
+						],
+						"g"->Function[{type, ep, m, de},
+							UnitConvert[((1 - Sqrt[r1])/Sqrt[r1])*(CC/(Sqrt[epscav]*(Lc[epscav, m][Ephotpct[prc, type, ep][de]] + 2*Ldbr[epscav, n1, n2][Ephotpct[prc, type, ep][0]]))),"Seconds"^-1]
+						],
+						"mname"->"2 DBR",
+						"sname"->"2D"
+				],
+				"1dbr"->Association[
+						"leff"->Function[{type,ep,m,de},(Lc[epscav][ Ephotpct[prc, type, ep][de] ] + Ldbr[epscav, n1, n2][ Ephotpct[prc, type, ep][0] ]) ],
+						"v"->Function[{type, ep, m, nx, de},
+							Sqrt[nx*UnitConvert[((1 + Sqrt[Reff])/Sqrt[Reff])* ((4*Pi*KK*(EE^2)*(Quantity[prc[[1]][[3]], "Meters"/"Seconds"]^2))/(Sqrt[epscav*prc[[1]][[6]]]*Exres[prc, type, ep]*(Lc[epscav, m][Ephotpct[prc, type, ep][de]] + Ldbr[epscav, n1, n2][Ephotpct[prc, type, ep][0]])))*(FPr0[prc, type, 1, ep, 1, 0]^2), "Seconds"^-2]]
+						],
+						"g"->Function[{type, ep, m, de},
+							UnitConvert[((1 - Sqrt[Reff])/Sqrt[Reff])*(CC/(Sqrt[epscav]*(Lc[epscav, m][Ephotpct[prc, type, ep][de]] + Ldbr[epscav, n1, n2][Ephotpct[prc, type, ep][0]]))),"Seconds"^-1]
+						],
+						"mname"->"1 DBR",
+						"sname"->"1D"
+				]
+			],
+			{1}
 		]
-   ]
-   ]
+	]
 ]
+
+Clear[mcs,simc,gemc,snmc,ssmc,bsmc];
+mcs={
+	simc=MCall[1,1.45,2.05,0.985,0.95,fssiprc,"FS Si","fssi-"],
+	gemc=MCall[1,1.45,2.05,0.985,0.95,fsgeprc,"FS Ge","fsge-"],
+	snmc=MCall[1,1.45,2.05,0.985,0.95,fssnprc,"FS Sn","fssn-"],
+	ssmc=MCall[1,1.45,2.05,0.985,0.95,shprc,"Type I","t1si-"],
+	bsmc=MCall[1,1.45,2.05,0.985,0.95,bhprc,"Type II","t2si-"]
+};
