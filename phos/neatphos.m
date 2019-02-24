@@ -89,60 +89,6 @@ makeproc[eps_:(10^-3),nmax_:10,mutab_:mus,ntab_:Table[i,{i,0,10}],kaptab_:{1,4.8
 		dpmeth=Function[{rare, th}, (rare[[ 3, 1 ]]*Cos[th]^2 + rare[[ 3, 2 ]]*Sin[th]^2)^2],
 		etrfunc=Function[{rare, ni, nf}, rare[[ 2, nf ]] - rare[[ 2, ni ]] ]
 	},
-	(* Need to re-write this whole section, running into RAM issues!
-	{
-		rawRKD=Flatten[ParallelTable[
-			CompPhos2[{mutab[[mui,1]],mutab[[mui,2]],-1,VKeld,kaptab[[ki]]},eps,nmax],
-			{mui,mun},{ki,kn}
-		],{{2},{1}}],
-		rawCD=Flatten[ParallelTable[
-			CompPhos2[{mutab[[mui,1]],mutab[[mui,2]],-1,VCoul,kaptab[[ki]]},eps,nmax],
-			{mui,mun},{ki,kn}
-		],{{2},{1}}],
-		rawRKI=ParallelTable[
-			CompPhos2[{mutab[[mui,1]],mutab[[mui,2]],ntab[[ni]],VKeld,4.89},eps,nmax],
-			{ni,nn},{mui,mun}
-		],
-		rawCI=ParallelTable[
-			CompPhos2[{mutab[[mui,1]],mutab[[mui,2]],ntab[[ni]],VCoul,4.89},eps,nmax],
-			{ni,nn},{mui,mun}
-		]
-	};
-	{
-		dpmeRKD=ParallelTable[
-			xysubNInt[
-				rawRKD[[ki,mui,2,2,1]],
-				rawRKD[[ki,mui,2,2,i]],
-				#
-			]&/@{x,y},
-			{mui,mun},{ki,kn}
-		],
-		dpmeCD=ParallelTable[
-			xysubNInt[
-				rawCD[[ki,mui,2,2,1]],
-				rawCD[[ki,mui,2,2,i]],
-				#
-			]&/@{x,y},
-			{mui,mun},{ki,kn}
-		],
-		dpmeRKI=ParallelTable[
-			xysubNInt[
-				rawRKI[[ni,mui,2,2,1]],
-				rawRKI[[ni,mui,2,2,i]],
-				#
-			]&/@{x,y},
-			{ni,nn},{mui,mun}
-		],
-		dpmeCI=ParallelTable[
-			xysubNInt[
-				rawCI[[ni,mui,2,2,1]],
-				rawCI[[ni,mui,2,2,i]],
-				#
-			]&/@{x,y},
-			{ni,nn},{mui,mun}
-		]
-	};
-	*)
 	DRare=Module[
 		{
 			raw
