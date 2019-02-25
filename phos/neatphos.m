@@ -34,7 +34,7 @@ VKho[kappa_][d_,chi_][x_,y_]:=-Pi/(4*kappa*((2*Pi*chi/(2*kappa))^2)*d)*(StruveH[
 hoCpsi[m_,eps_,d_][n_][x_]:=With[{a=Sqrt[1/Sqrt[(2*m*(1/(2*eps*d^3)))]]},Sqrt[1/(Sqrt[Pi]*a)]*1/Sqrt[(2^n)*Factorial[n]]*Exp[-(x^2)/(2*(a^2))]*HermiteH[n,x/a]]
 hoCen[mx_,my_,eps_,d_][n_,m_]:=With[{gamma=1/(2*eps*d^3),v0=(1/(eps*d))},Sqrt[2*gamma/mx]*(n+1/2)+Sqrt[2*gamma/my]*(m+1/2)-v0]
 
-(* Quick function that returns 0 for direct ("dee" = -1 for direct) but Nhbn*lbn + lphos if "dee" >= 0 *)
+(* Quick function that returns 0 for direct ("d" = -1 for direct) but Nhbn*lbn + lphos if "d" >= 0 *)
 rightd[d_]:=If[d==-1,0,d*lBN + lphos]
 
 CompPhos2[{mx_,my_,nhbn_,pot_,kappa_},eps_,nmax_]:=Module[
@@ -78,65 +78,85 @@ NormalizeEF[EF_,s_] := Module[
   EF/Sqrt[norm]
 ]
 
+xysubNInt[efi_,eff_,op_,s_]:=Chop[N[NIntegrate[
+	Conjugate[eff]*op*efi,
+	{x,-s,s},{y,-s,s},
+	MinRecursion->20,MaxRecusion->200,WorkingPrecision->100,AccuracyGoal->6,PrecisionGoal->6
+	]^2]]
+
 makeproc[eps_:(10^-3),nmax_:10,mutab_:mus,ntab_:Table[i,{i,0,10}],kaptab_:{1,4.89}]:=Module[
 	{
 		mun=Dimensions[mutab][[1]],
 		nn=Length[ntab],
 		kn=Length[kaptab],
-		DRare,IRare,
+		DRare,IRare,DRtime,IRtime,
 		s = 1/eps,
-		muth=Function[{rare, mui, th},	rare[[ 1, 1, 1 ]]*Cos[th]^2 + rare[[ 1, 1, 2 ]]*Sin[th]^2],
-		dpmeth=Function[{rare, th}, (rare[[ 3, 1 ]]*Cos[th]^2 + rare[[ 3, 2 ]]*Sin[th]^2)^2],
+		muth=Function[{rare, th},	rare[[ 1, 1, 1 ]]*Cos[th]^2 + rare[[ 1, 1, 2 ]]*Sin[th]^2],
+		dpmeth=Function[{rare, i, th}, (rare[[ 3, i ]]*Cos[th]^2 + rare[[ 4, i ]]*Sin[th]^2)^2],
 		etrfunc=Function[{rare, ni, nf}, rare[[ 2, nf ]] - rare[[ 2, ni ]] ]
 	},
-	DRare=Module[
+	DRtime=AbsoluteTiming[DRare=Module[
 		{
 			raw
 		},
-		Flatten[ParallelTable[
+		Flatten[ParallelTable[Quiet[
 			raw=CompPhos2[{mutab[[ mui, 1 ]], mutab[[ mui, 2 ]], -1, pot, kaptab[[ki]]}, eps, nmax];
 			{
 				raw[[1]],
 				raw[[2,1]],
 				Table[xysubNInt[ raw[[ 2, 2, 1 ]], raw[[ 2, 2, i ]], x ], {i, nmax}],
 				Table[xysubNInt[ raw[[ 2, 2, 1 ]], raw[[ 2, 2, i ]], y ], {i, nmax}],
-				Table[xysubNInt[ raw[[ 2, 2, i ]], raw[[ 2, 2, j ]], 1 ], {i, nmax}, {j, i, nmax}]
-			},
+				Table[xysubNInt[ raw[[ 2, 2, i ]], raw[[ 2, 2, j ]], 1 ], {i, nmax}, {j, i, nmax}],
+				Dimensions[raw]
+			}],
 			{mui, mun}, {pot, {VKeld, VCoul}}, {ki, 2}
 		],{{2},{3},{1}}]
-	];
-	IRare=Module[
+	]];
+	IRtime=AbsoluteTiming[IRare=Module[
 		{
 			raw
 		},
-		Flatten[ParallelTable[
+		Flatten[ParallelTable[Quiet[
 			raw=CompPhos2[{mutab[[ mui, 1 ]], mutab[[ mui, 2 ]], ntab[[ni]], pot, 4.89}, eps, nmax];
 			{
 				raw[[1]],
 				raw[[2,1]],
 				Table[xysubNInt[ raw[[ 2, 2, 1 ]], raw[[ 2, 2, i ]], x ], {i, nmax}],
 				Table[xysubNInt[ raw[[ 2, 2, 1 ]], raw[[ 2, 2, i ]], y ], {i, nmax}],
-				Table[xysubNInt[ raw[[ 2, 2, i ]], raw[[ 2, 2, j ]], 1 ], {i, nmax}, {j, i, nmax}]
-			},
+				Table[xysubNInt[ raw[[ 2, 2, i ]], raw[[ 2, 2, j ]], 1 ], {i, nmax}, {j, i, nmax}],
+				Dimensions[raw]
+			}],
 			{ni, nn}, {mui, mun}, {pot, {VKeld, VCoul}}
 		],{{3},{1},{2}}]
-	];
+	]];
+	(*
 	Join[
 		Association[
 			"lbn"->UnitConvert[Quantity[lBN,"BohrRadius"],"Nanometers"],
 			"lphos"->UnitConvert[Quantity[lphos,"BohrRadius"],"Nanometers"],
-			"chi2d"->Quantity[0.41,"Nanometers"]
+			"chi2d"->Quantity[0.41,"Nanometers"],
+			"pdims"->{
+				ToString@StringForm["Nmu = ``",mun],
+				ToString@StringForm["Nkappa = ``",kn],
+				ToString@StringForm["Nhbn = ``",nn],
+				ToString@StringForm["Nmax = ``",nmax]
+			},
+			"stats"->{
+				ToString@StringForm["DRtime = ``", DRtime],
+				ToString@StringForm["IRtime = ``", IRtime]
+			}
 		],
 		Map[
 			Association[
-				"evi"->Function[{korn,mui,i},
-					#["rare"][[ korn, mui, 2, i ]]
-				],
+				"evi"->#["rare"][[ korn, mui, 2, i ]],
 				"etr"->Function[{korn,mui,i,j},
 					etrfunc[ #["rare"][[ korn, mui ]], i, j]
 				],
+				"norm"->Function[{korn, mui},
+					#["rare"][[ korn, mui, 5 ]]
+				],
 				"f0th"->Function[{korn,mui,j,theta},
-					2 * muth[ mui, theta ] * dpmeth[ #["rare"][[ korn, mui ]], theta ] * UnitConvert[etrfunc[ #["rare"][[ korn, mui ]], 1, j],"Hartrees"]
+					2 * muth[ #["rare"], mui, theta ] * dpmeth[ #["rare"][[ korn, mui ]], theta ] * UnitConvert[etrfunc[ #["rare"][[ korn, mui ]], 1, j],"Hartrees"]
 				]
 			]&,
 			Association[
@@ -153,11 +173,43 @@ makeproc[eps_:(10^-3),nmax_:10,mutab_:mus,ntab_:Table[i,{i,0,10}],kaptab_:{1,4.8
 						"rare"->DRare[[2]]
 					],
 					"I"->Association[
-						"rare"->IRare[[2]],
+						"rare"->IRare[[2]]
 					]
 				]
 			], (* outer association with "C"/"K" and "D"/"I" ends here *)
 			{2}
 		] (* map ends here *)
 	] (* join ends here *)
+	*)
+	(* Going to re-think how I process and present the data. I don't think I want to do any calculations live, just precalculate a big ol' table *)
+	Join[
+		Association[ (* First level: generic stats and parameters *)
+			"lbn" -> UnitConvert[Quantity[lBN,"BohrRadius"],"Nanometers"],
+			"lphos" -> UnitConvert[Quantity[lphos, "BohrRadius"], "Nanometers"],
+			"chi2d" -> Quantity[0.41, "Nanometers"],
+			"dims" -> {
+				ToString@StringForm["Nmu = ``", mun],
+				ToString@StringForm["Nkappa = ``", kn],
+				ToString@StringForm["Nhbn = ``", nn],
+				ToString@StringForm["Nmax = ``", nmax],
+			},
+			"stats" -> {
+				ToString@StringForm["DRtime = ``", DRtime],
+				ToString@StringForm["IRtime = ``", IRtime]
+			}
+		],
+		Map[
+			<|#["korn"]->
+				<|Table[korn->
+					<|"mu"->
+						<|Table[mu->
+							"\[mu]x" -> #["rare"][korn, mu, 1, 1, 1],
+							"\[mu]y" -> #["rare"][korn, mu, 1, 1, 2],
+							"evs" -> #["rare"][korn, mu, 2],
+							"etr" -> Table[ etrfunc[ #["rare"][korn, mu], i, j ], {i, nmax}, {j, i, nmax}],
+							"f0th" -> Table[
+								2 * muth[ #["rare"][korn, mu], j, 
+							],
+							"norm" -> #["rare"][korn, mu, 5]
+	]
 ] (* function (Module) ends here *)
