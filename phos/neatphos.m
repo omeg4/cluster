@@ -51,22 +51,30 @@ CompPhos2[{mx_,my_,nhbn_,pot_,kappa_},eps_,nmax_]:=Module[
 	},
 	s=1/eps;
 	tds=- (1/2) * ( (1/mx)*D[f[x,y],{x,2},{y,0}] + (1/my)*D[f[x,y],{x,0},{y,2}]) + pot[kappa][d,chi][x,y] * f[x,y] + shift*f[x,y];
-	tdstrans=Simplify[tds/.{f->(u[ArcTan[#1],ArcTan[#2]]&)}/.{x->(Tan[\[Xi]]),y->(Tan[\[Psi]])},{(Pi/2)>\[Xi]>-(Pi/2),(Pi/2)>\[Psi]>-(Pi/2)}];
+	tdstrans=Simplify[tds /. {
+			f -> (u[ArcTan[#1],ArcTan[#2]]&)
+		} /. {
+			x -> (Tan[\[Xi]]),
+			y->(Tan[\[Psi]])
+		} , {
+			(Pi/2)>\[Xi]>-(Pi/2),
+			(Pi/2)>\[Psi]>-(Pi/2)
+		}];
 	{ev, ef} = NDEigensystem[
 			{
 				tdstrans,
 				DirichletCondition[u[\[Xi],\[Psi]]==0,Abs[\[Xi]]==(Pi/2-eps)||Abs[\[Psi]]==(Pi/2-eps)]
 			},
-			u[\[Xi],\[Psi]],
-			{\[Xi],\[Psi]}\[Element]Rectangle[{-Pi/2+eps,-Pi/2+eps},{Pi/2-eps,Pi/2-eps}],
+			u[ \[Xi], \[Psi]],
+			{\[Xi], \[Psi]} \[Element] Rectangle[{-Pi/2+eps,-Pi/2+eps},{Pi/2-eps,Pi/2-eps}],
 			nmax,
 			Method->{"SpatialDiscretization"->{"FiniteElement",{"MeshOptions"->{"MaxCellMeasure"->eps}}},"Eigensystem"->{"Arnoldi","MaxIterations"->10^7}}
 	];
 	{
-		{{mx,my},{nhbn,d},pot,kappa,chi,eps},
+		{{mx, my}, {nhbn, d}, pot, kappa, chi, eps},
 		{
-		UnitConvert[Quantity[ev - shift,"Hartrees"],"Millielectronvolts"],
-		NormalizeEF[(#/.{\[Xi]->ArcTan[x],\[Psi]->ArcTan[y]}),s]&/@ef
+			UnitConvert[Quantity[ev - shift,"Hartrees"],"Millielectronvolts"],
+			NormalizeEF[(#/.{\[Xi]->ArcTan[x],\[Psi]->ArcTan[y]}),s]&/@ef
 		}
 	}
 ]
@@ -80,8 +88,8 @@ NormalizeEF[EF_,s_] := Module[
 
 xysubNInt[efi_,eff_,op_,s_]:=Chop[N[NIntegrate[
 	Conjugate[eff]*op*efi,
-	{x,-s,s},{y,-s,s},
-	MinRecursion->20,MaxRecusion->200,WorkingPrecision->100,AccuracyGoal->6,PrecisionGoal->6
+	{x,-s,s}, {y,-s,s},
+	MinRecursion -> 5, MaxRecursion -> 20
 	]^2]]
 
 makeproc[eps_:(10^-3),nmax_:10,mutab_:mus,ntab_:Table[i,{i,0,10}],kaptab_:{1,4.89}]:=Module[
@@ -95,41 +103,74 @@ makeproc[eps_:(10^-3),nmax_:10,mutab_:mus,ntab_:Table[i,{i,0,10}],kaptab_:{1,4.8
 		dpmeth=Function[{rare, i, th}, (rare[[ 3, i ]]*Cos[th]^2 + rare[[ 4, i ]]*Sin[th]^2)^2],
 		etrfunc=Function[{rare, ni, nf}, rare[[ 2, nf ]] - rare[[ 2, ni ]] ]
 	},
-	DRtime=AbsoluteTiming[DRare=Module[
+	(*
+	DRtime=AbsoluteTiming[ DRare = Flatten[ Table[ Module[
 		{
 			raw
 		},
-		Flatten[ParallelTable[Quiet[
-			raw=CompPhos2[{mutab[[ mui, 1 ]], mutab[[ mui, 2 ]], -1, pot, kaptab[[ki]]}, eps, nmax];
-			{
-				raw[[1]],
-				raw[[2,1]],
-				Table[xysubNInt[ raw[[ 2, 2, 1 ]], raw[[ 2, 2, i ]], x ], {i, nmax}],
-				Table[xysubNInt[ raw[[ 2, 2, 1 ]], raw[[ 2, 2, i ]], y ], {i, nmax}],
-				Table[xysubNInt[ raw[[ 2, 2, i ]], raw[[ 2, 2, j ]], 1 ], {i, nmax}, {j, i, nmax}],
-				Dimensions[raw]
-			}],
-			{mui, mun}, {pot, {VKeld, VCoul}}, {ki, 2}
-		],{{2},{3},{1}}]
-	]][[1]];
-	IRtime=AbsoluteTiming[IRare=Module[
-		{
-			raw
-		},
-		Flatten[ParallelTable[Quiet[
-			raw=CompPhos2[{mutab[[ mui, 1 ]], mutab[[ mui, 2 ]], ntab[[ni]], pot, 4.89}, eps, nmax];
-			{
-				raw[[1]],
-				raw[[2,1]],
-				Table[xysubNInt[ raw[[ 2, 2, 1 ]], raw[[ 2, 2, i ]], x ], {i, nmax}],
-				Table[xysubNInt[ raw[[ 2, 2, 1 ]], raw[[ 2, 2, i ]], y ], {i, nmax}],
-				Table[xysubNInt[ raw[[ 2, 2, i ]], raw[[ 2, 2, j ]], 1 ], {i, nmax}, {j, i, nmax}],
-				Dimensions[raw]
-			}],
-			{ni, nn}, {mui, mun}, {pot, {VKeld, VCoul}}
-		],{{3},{1},{2}}]
-	]][[1]];
-	Join[
+		raw = CompPhos2[{mutab[[ mui, 1 ]], mutab[[ mui, 2 ]], -1, pot, kaptab[[ki]]}, eps, nmax];
+		Parallelize[{
+			raw[[1]],
+			raw[[2,1]],
+			Table[xysubNInt[ raw[[ 2, 2, 1 ]], raw[[ 2, 2, i ]], x, s ], {i, nmax}],
+			Table[xysubNInt[ raw[[ 2, 2, 1 ]], raw[[ 2, 2, i ]], y, s ], {i, nmax}],
+			Table[xysubNInt[ raw[[ 2, 2, i ]], raw[[ 2, 2, j ]], 1, s ], {i, nmax}, {j, i, nmax}],
+			Dimensions[raw]
+		}]
+	],
+	{mui, mun}, {pot, {VKeld, VCoul}}, {ki, 2}
+	],
+	{{2},{3},{1}}
+	]
+	][[1]];
+	*)
+	DRtime = AbsoluteTiming[
+		DRare = Flatten[
+			Table[
+				Module[
+					{
+						raw
+					},
+					raw=CompPhos2[{mutab[[ mui, 1 ]], mutab[[ mui, 2 ]], 1, pot, kaptab[[ki]]}, eps, nmax];
+					Parallelize[{
+						raw[[1]],
+						raw[[2,1]],
+						Table[xysubNInt[ raw[[ 2, 2, 1 ]], raw[[ 2, 2, i ]], x, s ], {i, nmax}],
+						Table[xysubNInt[ raw[[ 2, 2, 1 ]], raw[[ 2, 2, i ]], y, s ], {i, nmax}],
+						Table[xysubNInt[ raw[[ 2, 2, i ]], raw[[ 2, 2, j ]], 1, s ], {i, nmax}, {j, i, nmax}],
+						Dimensions[raw]
+						}
+					]
+				],
+				{mui, mun}, {pot, {VKeld, VCoul}}, {ki, 2}
+			],
+			{{2},{3},{1}}
+		]
+	][[1]];
+	IRtime = AbsoluteTiming[
+		IRare = Flatten[
+			Table[
+				Module[
+					{
+						raw
+					},
+					raw=CompPhos2[{mutab[[ mui, 1 ]], mutab[[ mui, 2 ]], ntab[[ni]], pot, 4.89}, eps, nmax];
+					Parallelize[{
+						raw[[1]],
+						raw[[2,1]],
+						Table[xysubNInt[ raw[[ 2, 2, 1 ]], raw[[ 2, 2, i ]], x, s ], {i, nmax}],
+						Table[xysubNInt[ raw[[ 2, 2, 1 ]], raw[[ 2, 2, i ]], y, s ], {i, nmax}],
+						Table[xysubNInt[ raw[[ 2, 2, i ]], raw[[ 2, 2, j ]], 1, s ], {i, nmax}, {j, i, nmax}],
+						Dimensions[raw]
+						}
+					]
+				],
+				{ni, nn}, {mui, mun}, {pot, {VKeld, VCoul}}
+			],
+			{{3},{1},{2}}
+		]
+	][[1]];
+	assoctime = AbsoluteTiming[ assoc = Join[
 		Association[ (* First level: generic stats and parameters *)
 			"lbn" -> UnitConvert[Quantity[lBN,"BohrRadius"],"Nanometers"],
 			"lphos" -> UnitConvert[Quantity[lphos, "BohrRadius"], "Nanometers"],
@@ -165,20 +206,20 @@ makeproc[eps_:(10^-3),nmax_:10,mutab_:mus,ntab_:Table[i,{i,0,10}],kaptab_:{1,4.8
 					|>,
 					{mu,mun}
 				]|>,
-			#["korniter"]
+			{korn, korniter}
 			]|>&,
 			<|
 				"K" -> <|
 					"D" -> <|
 						"rare" -> DRare[[1]],
 						"korn" -> ToString[k],
-						"korniter" -> {korn, kn},
+						"korniter" -> kn,
 						"kornkey" -> {"FS", "Enc"}
 					|>,
 					"I" -> <|
 						"rare" -> IRare[[1]],
 						"korn" -> "Nhbn",
-						"korniter" -> {korn, nn},
+						"korniter" -> nn,
 						"kornkey" -> Table[ToString@StringForm["n``", n], {n, nn}]
 					|>
 				|>,
@@ -186,18 +227,19 @@ makeproc[eps_:(10^-3),nmax_:10,mutab_:mus,ntab_:Table[i,{i,0,10}],kaptab_:{1,4.8
 					"D" -> <|
 						"rare" -> DRare[[2]],
 						"korn" -> ToString[k],
-						"korniter" -> {korn, kn},
+						"korniter" -> kn,
 						"kornkey" -> {"FS", "Enc"}
 					|>,
 					"I" -> <|
 						"rare" -> IRare[[2]],
 						"korn" -> "Nhbn",
-						"korniter" -> {korn, nn},
+						"korniter" -> nn,
 						"kornkey" -> Table[ToString@StringForm["n``", n], {n, nn}]
 					|>
 				|>
 			|>,
 			{2}
 		]
-	]
+	]][[1]];
+	assoc
 ] (* function (Module) ends here *)
