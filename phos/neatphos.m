@@ -111,7 +111,7 @@ makeproc[eps_:(10^-3),nmax_:10,mutab_:mus,ntab_:Table[i,{i,0,10}],kaptab_:{1,4.8
 			}],
 			{mui, mun}, {pot, {VKeld, VCoul}}, {ki, 2}
 		],{{2},{3},{1}}]
-	]];
+	]][[1]];
 	IRtime=AbsoluteTiming[IRare=Module[
 		{
 			raw
@@ -128,60 +128,7 @@ makeproc[eps_:(10^-3),nmax_:10,mutab_:mus,ntab_:Table[i,{i,0,10}],kaptab_:{1,4.8
 			}],
 			{ni, nn}, {mui, mun}, {pot, {VKeld, VCoul}}
 		],{{3},{1},{2}}]
-	]];
-	(*
-	Join[
-		Association[
-			"lbn"->UnitConvert[Quantity[lBN,"BohrRadius"],"Nanometers"],
-			"lphos"->UnitConvert[Quantity[lphos,"BohrRadius"],"Nanometers"],
-			"chi2d"->Quantity[0.41,"Nanometers"],
-			"pdims"->{
-				ToString@StringForm["Nmu = ``",mun],
-				ToString@StringForm["Nkappa = ``",kn],
-				ToString@StringForm["Nhbn = ``",nn],
-				ToString@StringForm["Nmax = ``",nmax]
-			},
-			"stats"->{
-				ToString@StringForm["DRtime = ``", DRtime],
-				ToString@StringForm["IRtime = ``", IRtime]
-			}
-		],
-		Map[
-			Association[
-				"evi"->#["rare"][[ korn, mui, 2, i ]],
-				"etr"->Function[{korn,mui,i,j},
-					etrfunc[ #["rare"][[ korn, mui ]], i, j]
-				],
-				"norm"->Function[{korn, mui},
-					#["rare"][[ korn, mui, 5 ]]
-				],
-				"f0th"->Function[{korn,mui,j,theta},
-					2 * muth[ #["rare"], mui, theta ] * dpmeth[ #["rare"][[ korn, mui ]], theta ] * UnitConvert[etrfunc[ #["rare"][[ korn, mui ]], 1, j],"Hartrees"]
-				]
-			]&,
-			Association[
-				"K"->Association[
-					"D"->Association[
-						"rare"->DRare[[1]]
-					],
-					"I"->Association[
-						"rare"->IRare[[1]]
-					]
-				],
-				"C"->Association[
-					"D"->Association[
-						"rare"->DRare[[2]]
-					],
-					"I"->Association[
-						"rare"->IRare[[2]]
-					]
-				]
-			], (* outer association with "C"/"K" and "D"/"I" ends here *)
-			{2}
-		] (* map ends here *)
-	] (* join ends here *)
-	*)
-	(* Going to re-think how I process and present the data. I don't think I want to do any calculations live, just precalculate a big ol' table *)
+	]][[1]];
 	Join[
 		Association[ (* First level: generic stats and parameters *)
 			"lbn" -> UnitConvert[Quantity[lBN,"BohrRadius"],"Nanometers"],
@@ -191,7 +138,7 @@ makeproc[eps_:(10^-3),nmax_:10,mutab_:mus,ntab_:Table[i,{i,0,10}],kaptab_:{1,4.8
 				ToString@StringForm["Nmu = ``", mun],
 				ToString@StringForm["Nkappa = ``", kn],
 				ToString@StringForm["Nhbn = ``", nn],
-				ToString@StringForm["Nmax = ``", nmax],
+				ToString@StringForm["Nmax = ``", nmax]
 			},
 			"stats" -> {
 				ToString@StringForm["DRtime = ``", DRtime],
@@ -199,17 +146,58 @@ makeproc[eps_:(10^-3),nmax_:10,mutab_:mus,ntab_:Table[i,{i,0,10}],kaptab_:{1,4.8
 			}
 		],
 		Map[
-			<|#["korn"]->
-				<|Table[korn->
-					<|"mu"->
-						<|Table[mu->
-							"\[mu]x" -> #["rare"][korn, mu, 1, 1, 1],
-							"\[mu]y" -> #["rare"][korn, mu, 1, 1, 2],
-							"evs" -> #["rare"][korn, mu, 2],
-							"etr" -> Table[ etrfunc[ #["rare"][korn, mu], i, j ], {i, nmax}, {j, i, nmax}],
-							"f0th" -> Table[
-								2 * muth[ #["rare"][korn, mu], j, 
-							],
-							"norm" -> #["rare"][korn, mu, 5]
+			<|Table[ #["kornkey"][[korn]] ->
+				<|Table[ ToString@StringForm["mu``",mu] ->
+					<|
+						"mux" -> #["rare"][korn, mu, 1, 1, 1],
+						"muy" -> #["rare"][korn, mu, 1, 1, 2],
+						"muth" -> Interpolation[ Table[ muth[ #["rare"][korn, mu], th ], {th, 0, Pi, Pi/20} ] ],
+						"evs" -> #["rare"][korn, mu, 2],
+						"etr" -> Table[ etrfunc[ #["rare"][korn, mu], i, j ], {i, nmax}, {j, i, nmax}],
+						"f0th" -> Table[
+								Interpolation[Table[
+									2 * muth[ #["rare"][korn, mu], th ] * dpmeth[ #["rare"][korn, mu], j, th ] * etrfunc[ #["rare"][korn, mu], 1, j ],
+									{th, 0, Pi, Pi/20}
+								]],
+							{j,nmax}
+						],
+						"norm" -> #["rare"][korn, mu, 5]
+					|>,
+					{mu,mun}
+				]|>,
+			#["korniter"]
+			]|>&,
+			<|
+				"K" -> <|
+					"D" -> <|
+						"rare" -> DRare[[1]],
+						"korn" -> ToString[k],
+						"korniter" -> {korn, kn},
+						"kornkey" -> {"FS", "Enc"}
+					|>,
+					"I" -> <|
+						"rare" -> IRare[[1]],
+						"korn" -> "Nhbn",
+						"korniter" -> {korn, nn},
+						"kornkey" -> Table[ToString@StringForm["n``", n], {n, nn}]
+					|>
+				|>,
+				"C" -> <|
+					"D" -> <|
+						"rare" -> DRare[[2]],
+						"korn" -> ToString[k],
+						"korniter" -> {korn, kn},
+						"kornkey" -> {"FS", "Enc"}
+					|>,
+					"I" -> <|
+						"rare" -> IRare[[2]],
+						"korn" -> "Nhbn",
+						"korniter" -> {korn, nn},
+						"kornkey" -> Table[ToString@StringForm["n``", n], {n, nn}]
+					|>
+				|>
+			|>,
+			{2}
+		]
 	]
 ] (* function (Module) ends here *)
