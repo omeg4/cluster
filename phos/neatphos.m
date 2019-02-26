@@ -119,8 +119,8 @@ makeproc[eps_:(10^-3),nmax_:10,mutab_:mus,ntab_:Table[i,{i,0,10}],kaptab_:{1,4.8
 					{
 						raw
 					},
-					raw=CompPhos2[{mutab[[ mui, 1 ]], mutab[[ mui, 2 ]], 1, pot, kaptab[[ki]]}, eps, nmax];
-					{
+					raw=CompPhos2[{mutab[[ mui, 1 ]], mutab[[ mui, 2 ]], -1, pot, kaptab[[ki]]}, eps, nmax];
+					Parallelize@{
 						raw[[1]],
 						raw[[2, 1]],
 						Table[xysubNInt[ raw[[ 2, 2, i ]], raw[[ 2, 2, j ]], x, s ], {i, nmax}, {j, i, nmax}],
@@ -142,7 +142,7 @@ makeproc[eps_:(10^-3),nmax_:10,mutab_:mus,ntab_:Table[i,{i,0,10}],kaptab_:{1,4.8
 						raw
 					},
 					raw=CompPhos2[{mutab[[ mui, 1 ]], mutab[[ mui, 2 ]], ntab[[ni]], pot, 4.89}, eps, nmax];
-					{
+					Parallelize@{
 						raw[[1]],
 						raw[[2, 1]],
 						Table[xysubNInt[ raw[[ 2, 2, i ]], raw[[ 2, 2, j ]], x, s ], {i, nmax}, {j, i, nmax}],
@@ -201,8 +201,8 @@ makeproc[eps_:(10^-3),nmax_:10,mutab_:mus,ntab_:Table[i,{i,0,10}],kaptab_:{1,4.8
 									{th, 0, 2 * Pi, Pi/100}
 								]
 							],
-							{i, nmax}, {j, i, nmax}
-						]
+							{i, nmax}, {j, 1, nmax - i + 1}
+						],
 						"f0th" -> Table[
 							Interpolation[
 								Table[
@@ -213,7 +213,7 @@ makeproc[eps_:(10^-3),nmax_:10,mutab_:mus,ntab_:Table[i,{i,0,10}],kaptab_:{1,4.8
 									{th, 0, 2 * Pi, Pi/100}
 								]
 							],
-							{i, nmax}, {j, i, nmax}
+							{i, nmax}, {j, 1, nmax - i + 1}
 						],
 						"norm" -> #["rare"] [[korn, mu, 5]]
 					|>,

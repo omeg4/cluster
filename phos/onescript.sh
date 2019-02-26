@@ -32,8 +32,8 @@ echo $(pwd)
 export fullpath=$(pwd)
 
 cat <<EOF > funccall.m
-SetDirectory["$(pwd)"]
-time = AbsoluteTiming[ result = makeproc[] ] [[1]];
+SetDirectory["$(pwd)"];
+time = AbsoluteTiming[ result = makeproc[]; ] [[1]];
 Export["assoc.m", result];
 Export["totaltime.txt", time];
 Quit[]
