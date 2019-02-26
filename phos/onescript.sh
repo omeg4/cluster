@@ -32,45 +32,46 @@ echo $(pwd)
 export fullpath=$(pwd)
 
 cat <<EOF > funccall.m
-	SetDirectory["$(pwd)"]
-	result = makeproc[];
-	Export["assoc.m", result];
-	Quit[]
+SetDirectory["$(pwd)"]
+time = AbsoluteTiming[ result = makeproc[] ] [[1]];
+Export["assoc.m", result];
+Export["totaltime.txt", time];
+Quit[]
 EOF
 
 cat ~/cluster/phos/neatphos.m funccall.m > test.m
 
 cat <<EOF > submit_mathematica.pbs
-	#!/bin/sh
+#!/bin/sh
 
-	#Important: do not remove "#" symbol before PBS, keep it like that: "#PBS"
+#Important: do not remove "#" symbol before PBS, keep it like that: "#PBS"
 
 
-	#You can set your job name here:
-	#PBS -N $jobby
+#You can set your job name here:
+#PBS -N $jobby
 
-	#DO NOT CHANGE THE NODE NUMBER:
-	#PBS -l nodes=node27:ppn=1
+#DO NOT CHANGE THE NODE NUMBER:
+#PBS -l nodes=node27:ppn=1
 
-	#Combine output and error files:
-	#PBS -j oe
+#Combine output and error files:
+#PBS -j oe
 
-	#If you want specific log filename, use the following line:
-	#PBS -o pbs.log
+#If you want specific log filename, use the following line:
+#PBS -o pbs.log
 
-	export PBS_O_WORKDIR=$(pwd)
-	echo \$PBS_O_WORKDIR
+export PBS_O_WORKDIR=$(pwd)
+echo \$PBS_O_WORKDIR
 
-	echo "Starting Mathematica job"
+echo "Starting Mathematica job"
 
-	cd \$PBS_O_WORKDIR
+cd \$PBS_O_WORKDIR
 
-	#Submit mathematica job
-	#NOTE: Your test.m file SHOULD include the command "Quit[]" as the last command in the file
+#Submit mathematica job
+#NOTE: Your test.m file SHOULD include the command "Quit[]" as the last command in the file
 
-	math -script \$PBS_O_WORKDIR/test.m
+math -script \$PBS_O_WORKDIR/test.m
 
-	echo "Job finished"
+echo "Job finished"
 EOF
 
 qsub submit_mathematica.pbs
