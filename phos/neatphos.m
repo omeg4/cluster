@@ -108,7 +108,7 @@ makeproc[eps_:(10^-3),nmax_:10,mutab_:mus,ntab_:Table[i,{i,0,10}],kaptab_:{1,4.8
 		DRare,IRare,DRtime,IRtime,
 		s = 1/eps,
 		muth=Function[{rare, th},	rare[[ 1, 1, 1 ]]*Cos[th]^2 + rare[[ 1, 1, 2 ]]*Sin[th]^2],
-		dpmeth=Function[{rare, i, th}, (rare[[ 3, i ]]*Cos[th]^2 + rare[[ 4, i ]]*Sin[th]^2)^2],
+		dpmeth=Function[{rare, i, j, th}, (rare[[ 3, i, j ]]*Cos[th]^2 + rare[[ 4, i, j ]]*Sin[th]^2)^2],
 		etrfunc=Function[{rare, ni, nf}, rare[[ 2, nf ]] - rare[[ 2, ni ]] ]
 	},
 	DRtime = AbsoluteTiming[
@@ -119,15 +119,14 @@ makeproc[eps_:(10^-3),nmax_:10,mutab_:mus,ntab_:Table[i,{i,0,10}],kaptab_:{1,4.8
 						raw
 					},
 					raw=CompPhos2[{mutab[[ mui, 1 ]], mutab[[ mui, 2 ]], 1, pot, kaptab[[ki]]}, eps, nmax];
-					Parallelize[{
+					{
 						raw[[1]],
 						raw[[2, 1]],
-						Table[xysubNInt[ raw[[ 2, 2, 1 ]], raw[[ 2, 2, i ]], x, s ], {i, nmax}],
-						Table[xysubNInt[ raw[[ 2, 2, 1 ]], raw[[ 2, 2, i ]], y, s ], {i, nmax}],
+						Table[xysubNInt[ raw[[ 2, 2, i ]], raw[[ 2, 2, j ]], x, s ], {i, nmax}, {j, i, nmax}],
+						Table[xysubNInt[ raw[[ 2, 2, i ]], raw[[ 2, 2, j ]], y, s ], {i, nmax}, {j, i, nmax}],
 						Table[xysubNInt[ raw[[ 2, 2, i ]], raw[[ 2, 2, j ]], 1, s ], {i, nmax}, {j, i, nmax}],
 						Dimensions[raw]
-						}
-					]
+					}
 				],
 				{mui, mun}, {pot, {VKeld, VCoul}}, {ki, 2}
 			],
@@ -142,15 +141,14 @@ makeproc[eps_:(10^-3),nmax_:10,mutab_:mus,ntab_:Table[i,{i,0,10}],kaptab_:{1,4.8
 						raw
 					},
 					raw=CompPhos2[{mutab[[ mui, 1 ]], mutab[[ mui, 2 ]], ntab[[ni]], pot, 4.89}, eps, nmax];
-					Parallelize[{
+					{
 						raw[[1]],
 						raw[[2, 1]],
-						Table[xysubNInt[ raw[[ 2, 2, 1 ]], raw[[ 2, 2, i ]], x, s ], {i, nmax}],
-						Table[xysubNInt[ raw[[ 2, 2, 1 ]], raw[[ 2, 2, i ]], y, s ], {i, nmax}],
+						Table[xysubNInt[ raw[[ 2, 2, i ]], raw[[ 2, 2, j ]], x, s ], {i, nmax}, {j, i, nmax}],
+						Table[xysubNInt[ raw[[ 2, 2, i ]], raw[[ 2, 2, j ]], y, s ], {i, nmax}, {j, i, nmax}],
 						Table[xysubNInt[ raw[[ 2, 2, i ]], raw[[ 2, 2, j ]], 1, s ], {i, nmax}, {j, i, nmax}],
 						Dimensions[raw]
-						}
-					]
+					}
 				],
 				{ni, nn}, {mui, mun}, {pot, {VKeld, VCoul}}
 			],
@@ -179,18 +177,32 @@ makeproc[eps_:(10^-3),nmax_:10,mutab_:mus,ntab_:Table[i,{i,0,10}],kaptab_:{1,4.8
 					<|
 						"mux" -> #["rare"] [[korn, mu, 1, 1, 1]],
 						"muy" -> #["rare"] [[korn, mu, 1, 1, 2]],
-						"muth" -> Interpolation[ Table[ muth[ #["rare"] [[korn, mu]], th ], {th, 0, Pi, Pi/20} ] ],
+						"muth" -> Interpolation[ { th, Table[ muth[ #["rare"] [[korn, mu]], th ] }, {th, 0, 2 * Pi, Pi/100} ] ],
 						"evs" -> #["rare"] [[ korn, mu, 2 ]],
 						"etr" -> Table[ etrfunc[ #["rare"] [[korn, mu]], i, j ], {i, nmax}, {j, i, nmax}],
-						"f0th" -> Table[
-								Interpolation[Table[
+						"dpmeth" -> Table[
+							Interpolation[
+								Table[
 									{
 										th,
-										2 * muth[ #["rare"] [[korn, mu]], th ] * dpmeth[ #["rare"] [[korn, mu]], j, th ] * etrfunc[ #["rare"] [[korn, mu]], 1, j ]
+										dpmeth[ #["rare"] [[korn, mu]], i, j, th ]
 									},
-									{th, 0, Pi, Pi/20}
-								]],
-							{j,nmax}
+									{th, 0, 2 * Pi, Pi/100}
+								]
+							],
+							{i, nmax}, {j, i, nmax}
+						]
+						"f0th" -> Table[
+							Interpolation[
+								Table[
+									{
+										th,
+										2 * muth[ #["rare"] [[korn, mu]], th ] * dpmeth[ #["rare"] [[korn, mu]], i, j, th ] * QuantityMagnitude[etrfunc[ #["rare"] [[korn, mu]], i, j ], "Hartrees"]
+									},
+									{th, 0, 2 * Pi, Pi/100}
+								]
+							],
+							{i, nmax}, {j, i, nmax}
 						],
 						"norm" -> #["rare"] [[korn, mu, 5]]
 					|>,
