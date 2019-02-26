@@ -1,13 +1,21 @@
 (* Set up conversion factors and general constants *)
-e = 1
-H2J = 4.35974417 * (10^-18)
-T2S = 2.41884326505 * (10^-17)
-B2nm = 0.052917721092
-H2eV = 27.21138602
-na = (5 * 10^15) * (10^-18)
-damp = (10^13) * (T2S)
-lBN = (1 / B2nm) * 0.333
-lphos = (1 / B2nm) * 0.85
+e = 1;
+H2J = 4.35974417 * (10^-18);
+T2S = 2.41884326505 * (10^-17);
+B2nm = 0.052917721092;
+qbhr = Quantity["BohrRadius"];
+qnm = Quantity["Nanometers"];
+qmev = Quantity["Millielectronvolts"];
+qev = Quantity["Electronvolts"];
+qhart = Quantity["Hartrees"];
+HH = Quantity["PlanckConstant"];
+HB = Quantity["ReducedPlanckConstant"]
+CC = Quantity["SpeedOfLight"];
+H2eV = 27.21138602;
+na = (5 * 10^15) * (10^-18);
+damp = (10^13) * (T2S);
+lBN = (1 / B2nm) * 0.333;
+lphos = (1 / B2nm) * 0.85;
 
 
 (* Set up phosphorene parameters *)
@@ -86,15 +94,15 @@ NormalizeEF[EF_,s_] := Module[
   EF/Sqrt[norm]
 ]
 
-xysubNInt[efi_,eff_,op_,s_]:=Chop[N[NIntegrate[
+xysubNInt[efi_,eff_,op_,s_]:=Chop[N[Quiet[NIntegrate[
 	Conjugate[eff]*op*efi,
 	{x,-s,s}, {y,-s,s},
 	MinRecursion -> 5, MaxRecursion -> 20
-	]^2]]
+	],{NIntegrate::slwcon,NIntegrate::eincr,General::stop}]^2]]
 
 makeproc[eps_:(10^-3),nmax_:10,mutab_:mus,ntab_:Table[i,{i,0,10}],kaptab_:{1,4.89}]:=Module[
 	{
-		mun=Dimensions[mutab][[1]],
+		mun=Dimensions[mutab] [[1]],
 		nn=Length[ntab],
 		kn=Length[kaptab],
 		DRare,IRare,DRtime,IRtime,
@@ -103,27 +111,6 @@ makeproc[eps_:(10^-3),nmax_:10,mutab_:mus,ntab_:Table[i,{i,0,10}],kaptab_:{1,4.8
 		dpmeth=Function[{rare, i, th}, (rare[[ 3, i ]]*Cos[th]^2 + rare[[ 4, i ]]*Sin[th]^2)^2],
 		etrfunc=Function[{rare, ni, nf}, rare[[ 2, nf ]] - rare[[ 2, ni ]] ]
 	},
-	(*
-	DRtime=AbsoluteTiming[ DRare = Flatten[ Table[ Module[
-		{
-			raw
-		},
-		raw = CompPhos2[{mutab[[ mui, 1 ]], mutab[[ mui, 2 ]], -1, pot, kaptab[[ki]]}, eps, nmax];
-		Parallelize[{
-			raw[[1]],
-			raw[[2,1]],
-			Table[xysubNInt[ raw[[ 2, 2, 1 ]], raw[[ 2, 2, i ]], x, s ], {i, nmax}],
-			Table[xysubNInt[ raw[[ 2, 2, 1 ]], raw[[ 2, 2, i ]], y, s ], {i, nmax}],
-			Table[xysubNInt[ raw[[ 2, 2, i ]], raw[[ 2, 2, j ]], 1, s ], {i, nmax}, {j, i, nmax}],
-			Dimensions[raw]
-		}]
-	],
-	{mui, mun}, {pot, {VKeld, VCoul}}, {ki, 2}
-	],
-	{{2},{3},{1}}
-	]
-	][[1]];
-	*)
 	DRtime = AbsoluteTiming[
 		DRare = Flatten[
 			Table[
@@ -134,7 +121,7 @@ makeproc[eps_:(10^-3),nmax_:10,mutab_:mus,ntab_:Table[i,{i,0,10}],kaptab_:{1,4.8
 					raw=CompPhos2[{mutab[[ mui, 1 ]], mutab[[ mui, 2 ]], 1, pot, kaptab[[ki]]}, eps, nmax];
 					Parallelize[{
 						raw[[1]],
-						raw[[2,1]],
+						raw[[2, 1]],
 						Table[xysubNInt[ raw[[ 2, 2, 1 ]], raw[[ 2, 2, i ]], x, s ], {i, nmax}],
 						Table[xysubNInt[ raw[[ 2, 2, 1 ]], raw[[ 2, 2, i ]], y, s ], {i, nmax}],
 						Table[xysubNInt[ raw[[ 2, 2, i ]], raw[[ 2, 2, j ]], 1, s ], {i, nmax}, {j, i, nmax}],
@@ -146,7 +133,7 @@ makeproc[eps_:(10^-3),nmax_:10,mutab_:mus,ntab_:Table[i,{i,0,10}],kaptab_:{1,4.8
 			],
 			{{2},{3},{1}}
 		]
-	][[1]];
+	] [[1]];
 	IRtime = AbsoluteTiming[
 		IRare = Flatten[
 			Table[
@@ -157,7 +144,7 @@ makeproc[eps_:(10^-3),nmax_:10,mutab_:mus,ntab_:Table[i,{i,0,10}],kaptab_:{1,4.8
 					raw=CompPhos2[{mutab[[ mui, 1 ]], mutab[[ mui, 2 ]], ntab[[ni]], pot, 4.89}, eps, nmax];
 					Parallelize[{
 						raw[[1]],
-						raw[[2,1]],
+						raw[[2, 1]],
 						Table[xysubNInt[ raw[[ 2, 2, 1 ]], raw[[ 2, 2, i ]], x, s ], {i, nmax}],
 						Table[xysubNInt[ raw[[ 2, 2, 1 ]], raw[[ 2, 2, i ]], y, s ], {i, nmax}],
 						Table[xysubNInt[ raw[[ 2, 2, i ]], raw[[ 2, 2, j ]], 1, s ], {i, nmax}, {j, i, nmax}],
@@ -169,7 +156,7 @@ makeproc[eps_:(10^-3),nmax_:10,mutab_:mus,ntab_:Table[i,{i,0,10}],kaptab_:{1,4.8
 			],
 			{{3},{1},{2}}
 		]
-	][[1]];
+	] [[1]];
 	assoctime = AbsoluteTiming[ assoc = Join[
 		Association[ (* First level: generic stats and parameters *)
 			"lbn" -> UnitConvert[Quantity[lBN,"BohrRadius"],"Nanometers"],
@@ -187,26 +174,29 @@ makeproc[eps_:(10^-3),nmax_:10,mutab_:mus,ntab_:Table[i,{i,0,10}],kaptab_:{1,4.8
 			}
 		],
 		Map[
-			<|Table[ #["kornkey"][[korn]] ->
+			<|Table[ #["kornkey"] [[korn]] ->
 				<|Table[ ToString@StringForm["mu``",mu] ->
 					<|
-						"mux" -> #["rare"][korn, mu, 1, 1, 1],
-						"muy" -> #["rare"][korn, mu, 1, 1, 2],
-						"muth" -> Interpolation[ Table[ muth[ #["rare"][korn, mu], th ], {th, 0, Pi, Pi/20} ] ],
-						"evs" -> #["rare"][korn, mu, 2],
-						"etr" -> Table[ etrfunc[ #["rare"][korn, mu], i, j ], {i, nmax}, {j, i, nmax}],
+						"mux" -> #["rare"] [[korn, mu, 1, 1, 1]],
+						"muy" -> #["rare"] [[korn, mu, 1, 1, 2]],
+						"muth" -> Interpolation[ Table[ muth[ #["rare"] [[korn, mu]], th ], {th, 0, Pi, Pi/20} ] ],
+						"evs" -> #["rare"] [[ korn, mu, 2 ]],
+						"etr" -> Table[ etrfunc[ #["rare"] [[korn, mu]], i, j ], {i, nmax}, {j, i, nmax}],
 						"f0th" -> Table[
 								Interpolation[Table[
-									2 * muth[ #["rare"][korn, mu], th ] * dpmeth[ #["rare"][korn, mu], j, th ] * etrfunc[ #["rare"][korn, mu], 1, j ],
+									{
+										th,
+										2 * muth[ #["rare"] [[korn, mu]], th ] * dpmeth[ #["rare"] [[korn, mu]], j, th ] * etrfunc[ #["rare"] [[korn, mu]], 1, j ]
+									},
 									{th, 0, Pi, Pi/20}
 								]],
 							{j,nmax}
 						],
-						"norm" -> #["rare"][korn, mu, 5]
+						"norm" -> #["rare"] [[korn, mu, 5]]
 					|>,
 					{mu,mun}
 				]|>,
-			{korn, korniter}
+			{korn, #["korniter"]}
 			]|>&,
 			<|
 				"K" -> <|
@@ -240,6 +230,7 @@ makeproc[eps_:(10^-3),nmax_:10,mutab_:mus,ntab_:Table[i,{i,0,10}],kaptab_:{1,4.8
 			|>,
 			{2}
 		]
-	]][[1]];
+	]] [[1]];
+	assoc["stats"] = Append[ assoc["stats"], ToString@StringForm[ "assoctime = ``", assoctime ] ];
 	assoc
 ] (* function (Module) ends here *)

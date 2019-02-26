@@ -5,75 +5,74 @@
 ### Part 1: read series of inputs for parameters and run appropriate jobs
 # What we want to do here is eliminate the need for a separate "joblist.txt" file and just keep everything in one place
 
-while IFS='' read -r line || [[ -n "$line" ]]; do
-	cd ~/cluster/phos/results
-	IFS="|" read -r -a element <<< $line
-	export startdate=$(date -I)
-	export jobby=${element[0]}
-	export kappa=${element[1]}
-	export di=${element[2]}
-	export df=${element[3]}
-	export pot=${element[4]}
-	export eps=${element[5]}
-	export nmax=10
+# while IFS='' read -r line || [[ -n "$line" ]]; do
+#     cd ~/cluster/phos/results
+#     IFS="|" read -r -a element <<< $line
+#     export startdate=$(date -I)
+#     export jobby=${element[0]}
+#     export kappa=${element[1]}
+#     export di=${element[2]}
+#     export df=${element[3]}
+#     export pot=${element[4]}
+#     export eps=${element[5]}
+#     export nmax=10
+cd ~/cluster/phos/results/
 
-	export projdir="$jobby-$startdate"
+export jobby=$1
+export startdate=$(date -I)
 
-	mkdir $projdir
-	cd $projdir
+export projdir="$jobby-$startdate"
 
-	echo $(pwd)
+echo $projdir
+mkdir $projdir
+cd $projdir
 
-	export fullpath=$(pwd)
+echo $(pwd)
 
-	cat <<EOF > funccall.m
-SetDirectory["$(pwd)"]
-kappa = $kappa;
-Export["inps.txt",{$jobby,mus,chiphos,kappa,{$di,$df},$pot,$eps}];
-result=Table[
-	CompPhos[$nmax,{mus[[i]][[1]],mus[[i]][[2]],chiphos,kappa},nhbn,$pot,$eps],
-	{i,1},{nhbn,$di,$df}
-	];
-Export["suite.m",result];
-Export["proc.m",ProcessPhosInd[result]];
-Quit[]
+export fullpath=$(pwd)
+
+cat <<EOF > funccall.m
+	SetDirectory["$(pwd)"]
+	result = makeproc[];
+	Export["assoc.m", result];
+	Quit[]
 EOF
 
-	cat ../../mmaconsts.m ../../phosconsts.m ../../phosfuncs.m funccall.m > test.m
+cat ~/cluster/phos/neatphos.m funccall.m > test.m
 
-	cat <<EOF > submit_mathematica.pbs
-#!/bin/sh
+cat <<EOF > submit_mathematica.pbs
+	#!/bin/sh
 
-#Important: do not remove "#" symbol before PBS, keep it like that: "#PBS"
+	#Important: do not remove "#" symbol before PBS, keep it like that: "#PBS"
 
 
-#You can set your job name here:
-#PBS -N $jobby
+	#You can set your job name here:
+	#PBS -N $jobby
 
-#DO NOT CHANGE THE NODE NUMBER:
-#PBS -l nodes=node27:ppn=1
+	#DO NOT CHANGE THE NODE NUMBER:
+	#PBS -l nodes=node27:ppn=1
 
-#Combine output and error files:
-#PBS -j oe
+	#Combine output and error files:
+	#PBS -j oe
 
-#If you want specific log filename, use the following line:
-#PBS -o pbs.log
+	#If you want specific log filename, use the following line:
+	#PBS -o pbs.log
 
-export PBS_O_WORKDIR=$(pwd)
-echo \$PBS_O_WORKDIR
+	export PBS_O_WORKDIR=$(pwd)
+	echo \$PBS_O_WORKDIR
 
-echo "Starting Mathematica job"
+	echo "Starting Mathematica job"
 
-cd \$PBS_O_WORKDIR
+	cd \$PBS_O_WORKDIR
 
-#Submit mathematica job
-#NOTE: Your test.m file SHOULD include the command "Quit[]" as the last command in the file
+	#Submit mathematica job
+	#NOTE: Your test.m file SHOULD include the command "Quit[]" as the last command in the file
 
-math -script \$PBS_O_WORKDIR/test.m
+	math -script \$PBS_O_WORKDIR/test.m
 
-echo "Job finished"
+	echo "Job finished"
 EOF
 
-	qsub submit_mathematica.pbs
+qsub submit_mathematica.pbs
 
-done < "$1"
+# done < "$1"
