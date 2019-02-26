@@ -98,7 +98,8 @@ xysubNInt[efi_,eff_,op_,s_]:=Chop[N[Quiet[NIntegrate[
 	Conjugate[eff]*op*efi,
 	{x,-s,s}, {y,-s,s},
 	MinRecursion -> 5, MaxRecursion -> 20
-	],{NIntegrate::slwcon,NIntegrate::eincr,General::stop}]^2]]
+	],{NIntegrate::slwcon,NIntegrate::eincr,General::stop}]^2]
+]
 
 makeproc[eps_:(10^-3),nmax_:10,mutab_:mus,ntab_:Table[i,{i,0,10}],kaptab_:{1,4.89}]:=Module[
 	{
@@ -119,7 +120,7 @@ makeproc[eps_:(10^-3),nmax_:10,mutab_:mus,ntab_:Table[i,{i,0,10}],kaptab_:{1,4.8
 						raw
 					},
 					raw=CompPhos2[{mutab[[ mui, 1 ]], mutab[[ mui, 2 ]], 1, pot, kaptab[[ki]]}, eps, nmax];
-					Parallelize@{
+					{
 						raw[[1]],
 						raw[[2, 1]],
 						Table[xysubNInt[ raw[[ 2, 2, i ]], raw[[ 2, 2, j ]], x, s ], {i, nmax}, {j, i, nmax}],
@@ -141,7 +142,7 @@ makeproc[eps_:(10^-3),nmax_:10,mutab_:mus,ntab_:Table[i,{i,0,10}],kaptab_:{1,4.8
 						raw
 					},
 					raw=CompPhos2[{mutab[[ mui, 1 ]], mutab[[ mui, 2 ]], ntab[[ni]], pot, 4.89}, eps, nmax];
-					Parallelize@{
+					{
 						raw[[1]],
 						raw[[2, 1]],
 						Table[xysubNInt[ raw[[ 2, 2, i ]], raw[[ 2, 2, j ]], x, s ], {i, nmax}, {j, i, nmax}],
