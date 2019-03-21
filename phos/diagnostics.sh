@@ -2,7 +2,7 @@
 #
 # Diagnostic submit
 
-export DIR=~/cluster/phos/results/0321-diagnostic
+export DIR=~/cluster/phos/results/0321-short-diagnostic
 mkdir $DIR
 
 cat <<EOF > end.m
@@ -20,7 +20,7 @@ cat <<EOF > submit_mathematica.pbs
 
 
 #You can set your job name here:
-#PBS -N "diagnostic"
+#PBS -N "short-diagnostic"
 
 #DO NOT CHANGE THE NODE NUMBER:
 #PBS -l nodes=node27:ppn=1
