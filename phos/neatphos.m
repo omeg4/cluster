@@ -82,14 +82,23 @@ CompPhos2[{mx_,my_,nhbn_,pot_,kappa_},eps_,nmax_]:=Module[
 		{{mx, my}, {nhbn, d}, pot, kappa, chi, eps},
 		{
 			UnitConvert[Quantity[ev - shift,"Hartrees"],"Millielectronvolts"],
-			NormalizeEF[(#/.{\[Xi]->ArcTan[x],\[Psi]->ArcTan[y]}),s]&/@ef
+			(* NormalizeEF[(#/.{\[Xi]->ArcTan[x],\[Psi]->ArcTan[y]}),s]&/@ef*)
+			(# / Sqrt[ xysubNInt[ #, #, 1, s] ])&/@(ef/.{\[Xi]->ArcTan[x],\[Psi]->ArcTan[y]})
 		}
 	}
 ]
 
+(* freezing this equation because i want to test something re: conjugates *)
+(* NormalizeEF[EF_,s_] := Module[*)
+(*   {norm},*)
+(*   norm = Quiet[NIntegrate[(EF)^2,{x,-s,s},{y,-s,s}, MinRecursion -> 5,*)
+(*     MaxRecursion -> 20],{NIntegrate::slwcon,NIntegrate::eincr,General::stop}];*)
+(*   EF/Sqrt[norm]*)
+(* ]*)
+
 NormalizeEF[EF_,s_] := Module[
   {norm},
-  norm = Quiet[NIntegrate[(EF)^2,{x,-s,s},{y,-s,s}, MinRecursion -> 5,
+  norm = Quiet[NIntegrate[Conjugate[EF]*EF,{x,-s,s},{y,-s,s}, MinRecursion -> 5,
     MaxRecursion -> 20],{NIntegrate::slwcon,NIntegrate::eincr,General::stop}];
   EF/Sqrt[norm]
 ]
@@ -98,9 +107,10 @@ xysubNInt[efi_,eff_,op_,s_]:=Chop[N[Quiet[NIntegrate[
 	Conjugate[eff]*op*efi,
 	{x,-s,s}, {y,-s,s},
 	MinRecursion -> 5, MaxRecursion -> 20
-	],{NIntegrate::slwcon,NIntegrate::eincr,General::stop}]^2]
+	],{NIntegrate::slwcon,NIntegrate::eincr,General::stop}]]
 ]
 
+(* {{{ *)
 makeproc[eps_:(10^-3),nmax_:10,mutab_:mus,ntab_:Table[i,{i,0,10}],kaptab_:{1,4.89}]:=Module[
 	{
 		mun=Dimensions[mutab] [[1]],
@@ -257,3 +267,252 @@ makeproc[eps_:(10^-3),nmax_:10,mutab_:mus,ntab_:Table[i,{i,0,10}],kaptab_:{1,4.8
 	assoc["stats"] = Append[ assoc["stats"], ToString@StringForm[ "assoctime = ``", assoctime ] ];
 	assoc
 ] (* function (Module) ends here *)
+(* }}} *)
+
+(* functions with options *)
+
+CompPhos2opts[{mx_,my_,nhbn_,pot_,kappa_},eps_,nmax_,wp_,ndeopts:OptionsPattern[],niopts:OptionsPattern[]]:=Module[
+	{
+		chi = chiphos,
+		rho = chiphos/kappa,
+		shift = 10,
+		d = rightd[nhbn],
+		s=1/eps,
+		ev,
+		ef,
+		norms,
+		tds,
+		tdstrans,
+		stranseps=SetPrecision[(Pi/2)-eps, wp]
+	},
+	tds=(-(1/2) * (
+			(1/mx)*D[f[x,y],{x,2},{y,0}] +
+			(1/my)*D[f[x,y],{x,0},{y,2}]
+		) +
+		pot[kappa][d,chi][x,y] * f[x,y] +
+		shift*f[x,y]
+	);
+	tdstrans=Simplify[tds /. {
+			f -> (u[ArcTan[#1],ArcTan[#2]]&)
+		} /. {
+			x -> (Tan[\[Xi]]),
+			y->(Tan[\[Psi]])
+		} , {
+			(Pi/2)>\[Xi]>-(Pi/2),
+			(Pi/2)>\[Psi]>-(Pi/2)
+		}];
+	ndetime = AbsoluteTiming[{ev, ef} = NDEigensystem[
+			{(* N[tdstrans,wprec],*)
+				tdstrans,
+				DirichletCondition[u[\[Xi],\[Psi]]==0,Abs[\[Xi]]==(stranseps)||Abs[\[Psi]]==(stranseps)]
+			},
+			u[ \[Xi], \[Psi]],
+			{\[Xi], \[Psi]} \[Element] Rectangle[{-stranseps,-stranseps},{stranseps,stranseps}],
+			nmax,
+			(* Method->{"SpatialDiscretization"->{"FiniteElement",{"MeshOptions"->{"MaxCellMeasure"->eps}}},"Eigensystem"->{"Arnoldi","MaxIterations"->10^7}}*)
+			Evaluate@FilterRules[{ndeopts},Options[NDEigensystem]]
+		]
+	][[1]];
+	{
+		{{mx, my}, {nhbn, d}, pot, kappa, chi, eps, ndetime},
+		{
+			UnitConvert[Quantity[ev - shift,"Hartrees"],"Millielectronvolts"],
+			Head[#]&/@ef
+		}
+	}
+]
+
+xysubNIntopts[efi_,eff_,op_,s_,nopts:OptionsPattern[]]:=Chop[
+	N[
+		Quiet[
+			NIntegrate[
+				Conjugate[eff]*op*efi,
+				{x,-s,s}, {y,-s,s},
+				Evaluate@FilterRules[{nopts},Options[NIntegrate]]
+			],
+		{NIntegrate::slwcon,NIntegrate::eincr,General::stop}]
+	]
+]
+
+headNInt[efi_, eff_, op_, s_, niopts:OptionsPattern[]]:=NIntegrate[
+	Conjugate[ eff[ ArcTan[x], ArcTan[y] ] ] * op * efi[ ArcTan[x], ArcTan[y] ],
+	{x,-s,s},{y,-s,s},
+	Evaluate@FilterRules[ {niopts}, Options[ NIntegrate ] ]
+]
+
+(* FUNCTION FOR GETTING METHODS AND OPTIONS *)
+ getList[name_String] := Module[{options, idx}, options = Names[name <> "`*"];
+   options = ToExpression /@ options;
+   options = {#, Options[#]} & /@ options;
+   idx = Range[Length[options]];
+   options = {#[[1]], TableForm[#[[2]]]} & /@ options;
+   options = Insert[options[[#]], #, 1] & /@ idx;
+   options = Insert[options, {"#", "Option", "Options to this option"}, 1]
+];
+
+(*
+	USE IT LIKE THIS
+
+	Grid[getList["NIntegrate"], Frame -> All, Alignment -> Left, FrameStyle -> Directive[Thickness[.005], Gray]]
+
+*)
+
+(* This function only searches for Method options *)
+getList2[name_String] := Module[{options, idx,z1,z2},
+   options = Names[name <> "`*"];
+   options = ToExpression /@ options;
+   options = Flatten[Last@Reap@Do[z1 = Options[options[[i]]];
+        If[z1 != {},
+         z2 = Cases[z1, Rule["Method", x_] :> Method -> x];
+         If[Length[z2] != 0 , Sow[{options[[i]], z2}]]
+         ],
+        {i, Length[options]}
+        ], 1];
+   (* rest for formatting*)
+   idx = Range[Length[options]];
+   options = {#[[1]], TableForm[#[[2]]]} & /@ options;
+   options = Insert[options[[#]], #, 1] & /@ idx;
+   options = Insert[options, {"#", "Option", "Options to this option"}, 1]
+];
+
+(*
+	USAGE
+
+	r = getList2["NDSolve"];
+	Grid[r, Frame -> All, Alignment -> Left]
+
+*)
+
+(* New Series of functions *)
+ndef[nmax_,mx_,my_,pot_,kappa_,chi_,d_,eps_,maxi_,vn_]:=Module[
+	{
+		tds,
+		tdstrans,
+		shift=10,
+		stranseps=N[(Pi/2)-$MachineEpsilon],
+		evs,efs
+	},
+	tds = (-(1/2)*((1/mx)*D[f[x, y], {x, 2}, {y, 0}] + (1/my)* D[f[x, y], {x, 0}, {y, 2}]) + pot[kappa][d, chi][x, y]*f[x, y] + shift*f[x, y]);
+	tdstrans = Simplify[tds /. {f -> (u[ArcTan[#1], ArcTan[#2]] &)} /. {x -> (Tan[\[Xi]]), y -> (Tan[\[Psi]])}, {(Pi/2) > \[Xi] > -(Pi/2), (Pi/2) > \[Psi] > -(Pi/2)}];
+	EvaluationData[
+		{evs,efs}=NDEigensystem[
+    	{
+				tdstrans,
+				DirichletCondition[u[\[Xi], \[Psi]] == 0,Abs[\[Xi]] == (stranseps) || Abs[\[Psi]] == (stranseps)]
+			},
+     u[\[Xi], \[Psi]],
+     {\[Xi], \[Psi]} \[Element] Rectangle[{-stranseps, -stranseps}, {stranseps, stranseps}],
+     nmax,
+		 Method->{"SpatialDiscretization"->{"FiniteElement",{"MeshOptions"->{"MaxCellMeasure"->eps}}},"Eigensystem"->{"Arnoldi","MaxIterations"->maxi},"VectorNormalization"->vn}
+		];
+		{
+			evs-shift,
+			Head/@efs
+		}
+	]
+]
+
+ndefmep[nmax_,mx_,my_,pot_,kappa_,chi_,d_,eps_,maxi_,vn_]:=Module[
+	{
+		tds,
+		tdstrans,
+		shift=10,
+		stranseps=N[(Pi/2)-$MachineEpsilon],
+		evs,efs
+	},
+	tds = (-(1/2)*((1/mx)*D[f[x, y], {x, 2}, {y, 0}] + (1/my)* D[f[x, y], {x, 0}, {y, 2}]) + pot[kappa][d, chi][x, y]*f[x, y] + shift*f[x, y]);
+	tdstrans = Simplify[tds /. {f -> (u[ArcTan[#1], ArcTan[#2]] &)} /. {x -> (Tan[\[Xi]]), y -> (Tan[\[Psi]])}, {(Pi/2) > \[Xi] > -(Pi/2), (Pi/2) > \[Psi] > -(Pi/2)}];
+	EvaluationData[
+		{evs,efs}=NDEigensystem[
+    	{
+				tdstrans,
+				DirichletCondition[u[\[Xi], \[Psi]] == 0,Abs[\[Xi]] == (stranseps) || Abs[\[Psi]] == (stranseps)]
+			},
+     u[\[Xi], \[Psi]],
+     {\[Xi], \[Psi]} \[Element] Rectangle[{-stranseps, -stranseps}, {stranseps, stranseps}],
+     nmax,
+		 Method->{"SpatialDiscretization"->{"FiniteElement",{"MeshOptions"->{"MaxCellMeasure"->eps}}},"Eigensystem"->{"Arnoldi","MaxIterations"->maxi},"VectorNormalization"->vn}
+		];
+		{
+			evs-shift,
+			Head/@efs
+		}
+	]
+]
+
+normraw[ef_,s_,opts:OptionsPattern[]]:=Module[
+	{nevadata, norm, normef},
+	nevadata=EvaluationData[
+		norm=NIntegrate[
+			Conjugate[ ef[ ArcTan[x], ArcTan[y] ] ] * ef[ ArcTan[x], ArcTan[y] ],
+			{x,-s,s},{y,-s,s},
+			Evaluate@FilterRules[{opts},Options[NIntegrate]]
+		]
+	];
+	normef=Function[{x, y}, ef[ ArcTan[x], ArcTan[y] ] / Sqrt[ norm ]];
+	{
+		normef,
+		nevadata
+	}
+]
+
+apnint[ef1_, ef2_, s_, op_, opts:OptionsPattern[]]:=EvaluationData[
+	NIntegrate[
+		Conjugate[ ef1[ x, y ] ] * op * ef2[ x, y ],
+		{x,-s,s},{y,-s,s},
+		Evaluate@FilterRules[{opts},Options[NIntegrate]]
+	]
+]
+
+triassnint[ efs_, s_, op_, opts:OptionsPattern[]]:=Association[
+	Table[
+		$Messages={};
+		ToString@StringForm["i``",i]->Association[
+			Table[
+				ToString@StringForm["j``",j]->apnint[
+					efs[[ j ]], efs[[ i ]], s, op, opts
+				],
+				{j,i,Length@efs}
+			]
+		],
+		{i,Length@efs}
+	]
+]
+
+(* rewrite again *)
+(* start with "modified eval data" function *)
+med[f_]:=({#["Result"],#}&[KeyTake[EvaluationData[f],{"Result","AbsoluteTiming","MessagesText","Timing"}]])
+med[f_,x___]:=({#["Result"],#}&[KeyTake[EvaluationData[f[x]],{"Result","AbsoluteTiming","MessagesText","Timing"}]])
+
+
+ndes[nmax_, mx_, my_, pot_, kappa_, chi_, d_, eps_, maxi_, vn_]:=Module[
+	{
+		tds,
+		tdstrans,
+		shift=10,
+		stranseps=N[(Pi/2)-$MachineEpsilon],
+		evs,efs
+	},
+	tds = (-(1/2)*((1/mx)*D[f[x, y], {x, 2}, {y, 0}] + (1/my)* D[f[x, y], {x, 0}, {y, 2}]) + pot[kappa][d, chi][x, y]*f[x, y] + shift*f[x, y]);
+	tdstrans = Simplify[tds /. {f -> (u[ArcTan[#1], ArcTan[#2]] &)} /. {x -> (Tan[\[Xi]]), y -> (Tan[\[Psi]])}, {(Pi/2) > \[Xi] > -(Pi/2), (Pi/2) > \[Psi] > -(Pi/2)}];
+	{evs,efs}=NDEigensystem[
+	{
+			tdstrans,
+			DirichletCondition[u[\[Xi], \[Psi]] == 0,Abs[\[Xi]] == (stranseps) || Abs[\[Psi]] == (stranseps)]
+		},
+ u[\[Xi], \[Psi]],
+ {\[Xi], \[Psi]} \[Element] Rectangle[{-stranseps, -stranseps}, {stranseps, stranseps}],
+ nmax,
+	 Method->{"SpatialDiscretization"->{"FiniteElement",{"MeshOptions"->{"MaxCellMeasure"->eps}}},"Eigensystem"->{"Arnoldi","MaxIterations"->maxi},"VectorNormalization"->vn}
+	];
+	{
+		evs-shift,
+		Head/@efs
+	}
+]
+
+ning[ef1_, ef2_, op_, s_]:=NIntegrate[
+	Conjugate[ ef1 ] * op * ef2,
+	{x,-s,s},{y,-s,s},
+	Method->"LocalAdaptive"
+]
