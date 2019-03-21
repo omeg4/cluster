@@ -46,3 +46,4 @@ math -script \$PBS_O_WORKDIR/test.m
 echo "Job finished"
 EOF
 
+qsub submit_mathematica.pbs
