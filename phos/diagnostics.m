@@ -4,13 +4,13 @@ Table[
 	Module[
 		{
 			imax=10, mx=mus[[1,1]], my=mus[[1,2]], pot=VKeld, chi=chiphos, d=0, eps=(eeps * 10^-5), maxi=(maxii*10^9), vn=None,
-			rev,ref,ndestats
+			rev,ref,ndestats,bigintout
 		},
 		(* Make NDEigensystem *)
 		{{rev,ref},ndestats}=med[Unevaluated[ndes[nmax, mx, my, pot, chi, d, eps, maxi, vn]]];
-		Export[ToString@StringForm["0321-ndeout-eps`1`_maxi`2`.m",eeps,maxii],{{eps,maxi,vn},{rev, ref},ndestats}];
+		Export[ToString@StringForm["0321-ndeout-2-eps`1`_maxi`2`.m",eeps,maxii],{{eps,maxi,vn},{rev, ref},ndestats}];
 		(* Now for this NDE we want to test different NIntegrate approaches *)
-		Table[
+		bigintout=Table[
 			Module[
 				{
 					s=(10^ess),
@@ -59,11 +59,13 @@ Table[
 					{normst, oncst, foxst, foyst},
 					{normtime, onctime, foxtime, foytime}
 				};
-				Export[ToString@StringForm["0321-intout-nde_eps`1`_maxi`2`-nint_mei`3`_minr`4`_maxr`5`_s`6`.m",eeps,maxii,mei,minr,maxr,ess],intout];
+				Export[ToString@StringForm["0321-intout-2-nde_eps`1`_maxi`2`-nint_mei`3`_minr`4`_maxr`5`_s`6`.m",eeps,maxii,mei,minr,maxr,ess],intout];
 				intout
 			],
-			{mei,{Automatic,N[10^5]}},{minr,{Automatic,N[5],N[10]}},{maxr,{N[200],N[500],N[1000]}},{ess,3,7}
-		]
+			{mei,{Automatic}},{minr,{Automatic}},{maxr,{N[10000]}},{ess,{6}}
+		];
+		Export[ToString@StringForm["0321-bigintout-2-nde_eps`1`_maxi`2`.m",eeps,maxii],bigintout];
+		bigintout
 	],
-	{eeps,5,1,-1},{maxii,{1,1000}}
+	{eeps,5,1,-1},{maxii,{1000}}
 ];
