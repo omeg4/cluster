@@ -55,6 +55,7 @@ Table[
 				{i,imax},{j,i,imax}],{{3}}]];
 				intout={
 					{eps, maxi, vn, mei, minr, maxr, s},
+					{nef},
 					{norm, onc, fox, foy},
 					{normst, oncst, foxst, foyst},
 					{normtime, onctime, foxtime, foytime}
