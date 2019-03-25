@@ -20,7 +20,7 @@ cat <<EOF > submit_mathematica.pbs
 
 
 #You can set your job name here:
-#PBS -N "shorter diag"
+#PBS -N "shorter-diag"
 
 #DO NOT CHANGE THE NODE NUMBER:
 #PBS -l nodes=node27:ppn=1
