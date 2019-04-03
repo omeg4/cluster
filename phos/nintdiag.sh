@@ -2,7 +2,7 @@
 #
 # Diagnostic submit
 
-export DIR=~/cluster/phos/results/nintdiag
+export DIR=~/cluster/phos/results/nintdiag2
 mkdir $DIR
 
 cat <<EOF > end.m
@@ -20,7 +20,7 @@ cat <<EOF > submit_mathematica.pbs
 
 
 #You can set your job name here:
-#PBS -N "nint-diag"
+#PBS -N "nint-diag2"
 
 #DO NOT CHANGE THE NODE NUMBER:
 #PBS -l nodes=node27:ppn=1
