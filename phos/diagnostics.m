@@ -11,5 +11,5 @@ Table[
 		Export[ToString@StringForm["0403-ndeout-eps`1`.m",eeps],{{eps,maxi,vn},{rev, ref}}];
 		Export[ToString@StringForm["0403-ndestats-eps`1`.m",eeps],ndestats];
 	],
-	{eeps,{10,9,8,7,6,5,4,3,2,1}}
+	{eeps,{8,7,6,5,4,3,2,1}}
 ];
