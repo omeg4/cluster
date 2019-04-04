@@ -42,7 +42,7 @@ Table[
 							Conjugate[nef[[ j ]][ x, y ] ] * x * nef[[ i ]][ x, y ],
 			{x,-s,s},{y,-s,s},
 			Method->{"GlobalAdaptive","MaxErrorIncreases"->mei},MinRecursion->minr,MaxRecursion->maxr
-					])],
+					]^2)],
 			{i,imax},{j,i,imax}],{{3}}]];
 			(* f0y table *)
 			{foytime,{foy, foyst}}=AbsoluteTiming[Flatten[ParallelTable[
@@ -50,7 +50,7 @@ Table[
 							Conjugate[nef[[ j ]][ x, y ] ] * y * nef[[ i ]][ x, y ],
 			{x,-s,s},{y,-s,s},
 			Method->{"GlobalAdaptive","MaxErrorIncreases"->mei},MinRecursion->minr,MaxRecursion->maxr
-					])],
+					]^2)],
 			{i,imax},{j,i,imax}],{{3}}]];
 			intout={
 				{eps, maxi, vn, mei, minr, maxr, s},
