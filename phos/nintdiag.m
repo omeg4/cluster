@@ -4,6 +4,8 @@ SetDirectory["$(pwd)"];
 mx = mus[[1,1]];
 my = mus[[1,2]];
 
+ToString[(StringForm["Script starting on `1`/`2` at `3`h-`4`m", #[[2]], #[[3]], #[[4]], #[[5]]] &[DateList[]])] >>> mylog.txt;
+
 Table[
 	{ndeopts,{rev,ref},ndestats}=Import[ToString@StringForm["nde`1`.m",]];
 	ToString[(StringForm["Import complete on `1`/`2` at `3`h-`4`m", #[[2]], #[[3]], #[[4]], #[[5]]] &[DateList[]])] >>> mylog.txt;
@@ -69,4 +71,4 @@ Table[
 		{ess,{7,6,8}},{minr,{20,50,100}}
 	],
 	{eeps,{9,10}}
-]
+];
