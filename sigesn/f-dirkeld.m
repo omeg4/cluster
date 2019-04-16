@@ -46,9 +46,13 @@ DirKeld[maxm_, matpars_, ingap_, Eperp_, kappa_, pm1_] := With[
    Do[
     ev = {};
     {ev, ef} = 
-     NDEigensystem[{radial\[Xi]Keld[mind] + shift \[Psi][\[Xi]], 
-       DirichletCondition[\[Psi][\[Xi]] == 0, \[Xi] == 
-         Pi/2]}, \[Psi][\[Xi]], {\[Xi], 0, Pi/2}, mmax - mind + 1, 
+     NDEigensystem[
+			{
+			 radial\[Xi]Keld[mind] + shift \[Psi][\[Xi]],
+       DirichletCondition[\[Psi][\[Xi]] == 0, \[Xi] == Pi/2]
+			},
+			\[Psi][\[Xi]],
+			{\[Xi], 0, Pi/2}, mmax - mind + 1,
       Method -> {"SpatialDiscretization" -> {"FiniteElement", \
 {"MeshOptions" -> {"MaxCellMeasure" -> maxcell}}}, 
         "Eigensystem" -> {"Arnoldi", MaxIterations -> maxiter}}];

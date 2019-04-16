@@ -481,8 +481,8 @@ triassnint[ efs_, s_, op_, opts:OptionsPattern[]]:=Association[
 
 (* rewrite again *)
 (* start with "modified eval data" function *)
-med[f_]:=({#["Result"],#}&[KeyTake[EvaluationData[f],{"Result","AbsoluteTiming","MessagesText","Timing"}]])
-med[f_,x___]:=({#["Result"],#}&[KeyTake[EvaluationData[f[x]],{"Result","AbsoluteTiming","MessagesText","Timing"}]])
+med[f_]:=({#["Result"],KeyTake[#,{"AbsoluteTiming","MessagesText","Timing"}]}&[KeyTake[EvaluationData[f],{"Result","AbsoluteTiming","MessagesText","Timing"}]])
+med[f_,x___]:=({#["Result"],KeyTake[#,{"AbsoluteTiming","MessagesText","Timing"}]}&[KeyTake[EvaluationData[f[x]],{"Result","AbsoluteTiming","MessagesText","Timing"}]])
 
 
 ndes[nmax_, mx_, my_, pot_, kappa_, chi_, d_, eps_, maxi_, vn_]:=Module[
@@ -496,13 +496,53 @@ ndes[nmax_, mx_, my_, pot_, kappa_, chi_, d_, eps_, maxi_, vn_]:=Module[
 	tds = (-(1/2)*((1/mx)*D[f[x, y], {x, 2}, {y, 0}] + (1/my)* D[f[x, y], {x, 0}, {y, 2}]) + pot[kappa][d, chi][x, y]*f[x, y] + shift*f[x, y]);
 	tdstrans = Simplify[tds /. {f -> (u[ArcTan[#1], ArcTan[#2]] &)} /. {x -> (Tan[\[Xi]]), y -> (Tan[\[Psi]])}, {(Pi/2) > \[Xi] > -(Pi/2), (Pi/2) > \[Psi] > -(Pi/2)}];
 	{evs,efs}=NDEigensystem[
-	{
+		{
 			tdstrans,
 			DirichletCondition[u[\[Xi], \[Psi]] == 0,Abs[\[Xi]] == (stranseps) || Abs[\[Psi]] == (stranseps)]
 		},
- u[\[Xi], \[Psi]],
- {\[Xi], \[Psi]} \[Element] Rectangle[{-stranseps, -stranseps}, {stranseps, stranseps}],
- nmax,
+	 u[\[Xi], \[Psi]],
+	 {\[Xi], \[Psi]} \[Element] Rectangle[{-stranseps, -stranseps}, {stranseps, stranseps}],
+	 nmax,
+	 Method->{"SpatialDiscretization"->{"FiniteElement",{"MeshOptions"->{"MaxCellMeasure"->eps}}},"Eigensystem"->{"Arnoldi","MaxIterations"->maxi},"VectorNormalization"->vn}
+	];
+	{
+		evs-shift,
+		Head/@efs
+	}
+]
+
+ndespolar[nmax_, mx_, my_, pot_, kappa_, chi_, d_, eps_, maxi_, vn_]:=Module[
+	{
+		tdspt,
+		shift=10,
+		pio2 = Pi/2,
+		stranseps=N[(Pi/2)-$MachineEpsilon],
+		evs,efs
+	},
+	tdspt=FullSimplify[
+	 FullSimplify[
+			Simplify[
+				 ((-1/(2*mx))*D[f[x, y], {x, 2}, {y, 0}]) + ((-1/(2*my))*
+						D[f[x, y], {x, 0}, {y, 2}]) + 
+					VKeld[kappa][d, chi][x, y]*f[x, y] + 10*f[x, y]
+					] /. {
+					f -> (u[Sqrt[#1^2 + #2^2], ArcTan[#2/#1]] &)} /. {
+				x -> r*Cos[\[Theta]], y -> r*Sin[\[Theta]]
+				},
+			{-pio2 < \[Theta] < pio2, 0 <= r < Infinity}
+		] /. {u -> (g[ArcTan[#1], #2] &)} /. {r -> Tan[\[Psi]]},
+		{0 <= \[Psi] < Pi/2}
+	];
+	{evs,efs}=NDEigensystem[
+		{
+			tdspt,
+			DirichletCondition[g[\[Psi], \[Theta]] == 0, (\[Psi] == (pio2)) && 0 < \[Theta] <= 2*Pi],
+			(* DirichletCondition[(Cos[\[Psi]]^2)*D[g[\[Psi], \[Theta]],\[Psi]] == 0, (\[Psi] == (pio2)) && 0 < \[Theta] <= 2*Pi],*)
+			PeriodicBoundaryCondition[g[\[Psi],\[Theta]], \[Theta]==0, TranslationTransform[{0,2*Pi}]]
+		},
+	 g[\[Psi], \[Theta]],
+	 {\[Psi], \[Theta]} \[Element] Rectangle[{0, 0}, {pio2, 2*Pi}],
+	 nmax,
 	 Method->{"SpatialDiscretization"->{"FiniteElement",{"MeshOptions"->{"MaxCellMeasure"->eps}}},"Eigensystem"->{"Arnoldi","MaxIterations"->maxi},"VectorNormalization"->vn}
 	];
 	{
@@ -516,3 +556,34 @@ ning[ef1_, ef2_, op_, s_]:=NIntegrate[
 	{x,-s,s},{y,-s,s},
 	Method->"LocalAdaptive"
 ]
+
+nestedgridWheaders[data_,{innerrow_, innercolumn_,innergropts : OptionsPattern[]},{outerrow_, outercolumn_,outergropts : OptionsPattern[]}]:=Grid[
+  Join[
+   {PadLeft[outerrow, Length[outerrow] + 1, " "]} // Transpose,
+   Join[
+    {outercolumn},
+    Map[
+     Grid[
+       Join[
+        {PadLeft[innerrow, Length[innerrow] + 1, " "]} // Transpose,
+        Join[
+         {innercolumn},
+         #
+         ],
+        2
+        ],
+       Dividers -> {{False, True}, {False, True}},
+       ItemStyle -> 
+        Directive[FontSize -> 14, Black, FontFamily -> "Arial"],
+       Evaluate@FilterRules[{innergropts}, Options[Grid]]
+       ] &,
+     data,
+     {2}
+     ]
+    ],
+   2
+   ],
+  Dividers -> {{False, True}, {False, True}},
+  ItemStyle -> Directive[FontSize -> 14, Black, FontFamily -> "Arial"],
+  Evaluate@FilterRules[{outergropts}, Options[Grid]]
+  ]

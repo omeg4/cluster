@@ -4,10 +4,10 @@ SetDirectory["$(pwd)"];
 mx = mus[[1,1]];
 my = mus[[1,2]];
 
-ToString[(StringForm["Script starting on `1`/`2` at `3`h-`4`m", #[[2]], #[[3]], #[[4]], #[[5]]] &[DateList[]])] >>> mylog.txt;
+ToString[(StringForm["Script starting on `1`/`2` at `3`h:`4`m", #[[2]], #[[3]], #[[4]], #[[5]]] &[DateList[]])] >>> mylog.txt;
 
 {ndeopts,{rev,ref},ndestats}=Import["nde9.m"];
-ToString[(StringForm["Import complete on `1`/`2` at `3`h-`4`m", #[[2]], #[[3]], #[[4]], #[[5]]] &[DateList[]])] >>> mylog.txt;
+ToString[(StringForm["Import complete on `1`/`2` at `3`h:`4`m", #[[2]], #[[3]], #[[4]], #[[5]]] &[DateList[]])] >>> mylog.txt;
 Table[
 	Module[
 		{
@@ -28,7 +28,7 @@ Table[
 		Method->{"GlobalAdaptive","MaxErrorIncreases"->mei},MinRecursion->minr,MaxRecursion->maxr
 				]],
 		{i,imax}],{{2}}]];
-		ToString[(StringForm["Norm complete on `1`/`2` at `3`h-`4`m", #[[2]], #[[3]], #[[4]], #[[5]]] &[DateList[]])] >>> mylog.txt;
+		ToString[(StringForm["Norm complete on `1`/`2` at `3`h:`4`m", #[[2]], #[[3]], #[[4]], #[[5]]] &[DateList[]])] >>> mylog.txt;
 		(* Make normed EFs *)
 		nef = Table[ Function[{x,y}, Evaluate[ref[[ i ]][ ArcTan[x], ArcTan[y] ] / Sqrt[ norm[[ i ]] ]] ], {i, imax}];
 		(* Do a norm check *)
@@ -39,7 +39,7 @@ Table[
 		Method->{"GlobalAdaptive","MaxErrorIncreases"->mei},MinRecursion->minr,MaxRecursion->maxr
 				]],
 		{i,imax},{j,i,imax}],{{3}}]];
-		ToString[(StringForm["Norm check complete on `1`/`2` at `3`h-`4`m", #[[2]], #[[3]], #[[4]], #[[5]]] &[DateList[]])] >>> mylog.txt;
+		ToString[(StringForm["Norm check complete on `1`/`2` at `3`h:`4`m", #[[2]], #[[3]], #[[4]], #[[5]]] &[DateList[]])] >>> mylog.txt;
 		(* f0x table *)
 		{foxtime,{fox, foxst}}=AbsoluteTiming[Flatten[Table[
 					med[Unevaluated@(2 * (rev[[j]] - rev[[i]]) * mx * (NIntegrate[
@@ -48,7 +48,7 @@ Table[
 		Method->{"GlobalAdaptive","MaxErrorIncreases"->mei},MinRecursion->minr,MaxRecursion->maxr
 				]^2))],
 		{i,imax},{j,i,imax}],{{3}}]];
-		ToString[(StringForm["fox complete on `1`/`2` at `3`h-`4`m", #[[2]], #[[3]], #[[4]], #[[5]]] &[DateList[]])] >>> mylog.txt;
+		ToString[(StringForm["fox complete on `1`/`2` at `3`h:`4`m", #[[2]], #[[3]], #[[4]], #[[5]]] &[DateList[]])] >>> mylog.txt;
 		(* f0y table *)
 		{foytime,{foy, foyst}}=AbsoluteTiming[Flatten[Table[
 					med[Unevaluated@(2 * (rev[[j]] - rev[[i]]) * my * (NIntegrate[
@@ -57,15 +57,15 @@ Table[
 		Method->{"GlobalAdaptive","MaxErrorIncreases"->mei},MinRecursion->minr,MaxRecursion->maxr
 				]^2))],
 		{i,imax},{j,i,imax}],{{3}}]];
-		ToString[(StringForm["foy complete on `1`/`2` at `3`h-`4`m", #[[2]], #[[3]], #[[4]], #[[5]]] &[DateList[]])] >>> mylog.txt;
+		ToString[(StringForm["foy complete on `1`/`2` at `3`h:`4`m", #[[2]], #[[3]], #[[4]], #[[5]]] &[DateList[]])] >>> mylog.txt;
 		intout={
-			{eps, maxi, vn, mei, minr, maxr, s},
+			{mei, minr, maxr, s},
 			{nef},
 			{norm, onc, fox, foy},
 			{normtime, onctime, foxtime, foytime}
 		};
-		Export[ToString@StringForm["0403-nintdiag2-minr`1`-s`2`",minr,ess],intout];
-		Export[ToString@StringForm["0403-nintstats2-minr`1`-s`2`",minr,ess],{normst, oncst, foxst, foyst}];
+		Export[ToString@StringForm["0403-nintdiag2-minr`1`-s`2`.m",minr,ess],intout];
+		Export[ToString@StringForm["0403-nintstats2-minr`1`-s`2`.m",minr,ess],{normst, oncst, foxst, foyst}];
 	],
 	{ess,{7,6,8}},{minr,{20,50,100}}
 ];
