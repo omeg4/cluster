@@ -7,7 +7,7 @@ Table[
 	Module[
 		{
 			rev,ref,ndestats,nef,norms,normstats,onc,oncstats,fox,foxstats,foy,foystats,
-			nmax,
+			nmax=12,
 			mx=mus[[muind,1]],
 			my=mus[[muind,2]],
 			niopts={Method->"GlobalAdaptive",MinRecursion->1000,MaxRecursion->10^6},
