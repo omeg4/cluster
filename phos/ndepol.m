@@ -1,10 +1,5 @@
 SetDirectory["$(pwd)"]
 
-mx = mus[[1,1]];
-my = mus[[1,2]];
-
-SetDirectory["$(pwd)"]
-
 mx=mus[[1,1]];
 my=mus[[1,2]];
 
