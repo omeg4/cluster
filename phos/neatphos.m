@@ -511,6 +511,37 @@ ndes[nmax_, mx_, my_, pot_, kappa_, chi_, d_, eps_, maxi_, vn_]:=Module[
 	}
 ]
 
+ndesscale[nmax_, mx_, my_, pot_, kappa_, chi_, d_, eps_, c_, maxi_, vn_]:=Module[
+	{
+		tds,
+		tdstrans,
+		shift=10,
+		stranseps=N[(Pi/2)-$MachineEpsilon],
+		evs,efs
+	},
+	tds = (-(1/2)*((1/mx)*D[f[x, y], {x, 2}, {y, 0}] + (1/my)* D[f[x, y], {x, 0}, {y, 2}]) + pot[kappa][d, chi][x, y]*f[x, y] + shift*f[x, y]);
+	tdstrans = Simplify[tds /. {f -> (u[ArcTan[#1/c], ArcTan[#2/c]] &)} /. {x -> (c*Tan[\[Xi]]), y -> (c*Tan[\[Psi]])}, {(Pi/2) > \[Xi] > -(Pi/2), (Pi/2) > \[Psi] > -(Pi/2)}];
+	{evs,efs}=NDEigensystem[
+		{
+			tdstrans,
+			DirichletCondition[u[\[Xi], \[Psi]] == 0,Abs[\[Xi]] == (stranseps) || Abs[\[Psi]] == (stranseps)]
+		},
+	 u[\[Xi], \[Psi]],
+	 {\[Xi], \[Psi]} \[Element] Rectangle[{-stranseps, -stranseps}, {stranseps, stranseps}],
+	 nmax,
+	 Method->{"SpatialDiscretization"->{"FiniteElement",{"MeshOptions"->{"MaxCellMeasure"->eps}}},"Eigensystem"->{"Arnoldi","MaxIterations"->maxi},"VectorNormalization"->vn}
+	];
+	{
+		evs-shift,
+		Table[
+			Function[{x,y},Evaluate[
+				efs[[i]][ArcTan[x/c],ArcTan[y/c]]
+				]],
+			{i,nmax}
+		]
+	}
+]
+
 ndespolar[nmax_, mx_, my_, pot_, kappa_, chi_, d_, eps_, maxi_, vn_]:=Module[
 	{
 		tdspt,
@@ -586,4 +617,128 @@ nestedgridWheaders[data_,{innerrow_, innercolumn_,innergropts : OptionsPattern[]
   Dividers -> {{False, True}, {False, True}},
   ItemStyle -> Directive[FontSize -> 14, Black, FontFamily -> "Arial"],
   Evaluate@FilterRules[{outergropts}, Options[Grid]]
-  ]
+]
+
+gridWheaders[data_, rowheads_, columnheads_, gropts : OptionsPattern[]] := Grid[
+  Join[
+   {PadLeft[rowheads, Length[rowheads] + 1, " "]} // Transpose,
+   Join[
+    {columnheads},
+    data
+    ],
+   2
+   ],
+  Dividers -> {{False, True}, {False, True}},
+  ItemStyle -> Directive[FontSize -> 20, Black, FontFamily -> "Arial"],
+  Evaluate@FilterRules[{gropts}, Options[Grid]]
+]
+
+
+newvarplt[data_,bounds_,frmlbl_,lgndlbl_,colors_,size_:{1600,900},lblsize_:30,plopts:OptionsPattern[]]:=
+	{
+	Framed@LineLegend[colors,lgndlbl,LegendLayout->{"Row",1},LabelStyle->Directive[lblsize,Black,FontFamily->"Arial"],LegendFunction->"Frame"],
+	Plot[
+		data,
+		bounds,
+		PlotTheme->"Detailed",
+		FrameLabel->frmlbl,
+		GridLinesStyle->Directive[Gray,Thin],
+		LabelStyle->Directive[lblsize,Black,FontFamily->"Arial"],
+		ImageSize->size,
+		AspectRatio->size[[2]]/size[[1]],
+		PlotStyle->colors,
+		PlotLegends->None,
+		Evaluate@FilterRules[{plopts},Options[Plot]]
+	]
+	}
+
+newlineplt[data_,frmlbl_,lgndlbl_,colors_,size_:{1600,900},lblsize_:30,plopts:OptionsPattern[]]:=
+{
+Framed@LineLegend[colors,lgndlbl,LegendLayout->{"Row",1},LabelStyle->Directive[lblsize,Black,FontFamily->"Arial"],LegendFunction->"Frame",LegendMarkerSize->{75,25}],
+ListLinePlot[
+data,
+PlotTheme->"Detailed",
+GridLinesStyle->Directive[Gray,Thin],
+FrameLabel->frmlbl,
+LabelStyle->Directive[lblsize,Black,FontFamily->"Arial"],
+ImageSize->size,
+AspectRatio->size[[2]]/size[[1]],
+PlotStyle->colors,
+Evaluate@FilterRules[{plopts},Options[ListLinePlot]]
+]
+}
+
+newplt[data_,frmlbl_,lgndlbl_,colors_,{markers_,msize_:24,lmsize_:30},size_:{1600,900},lblsize_:30,plopts:OptionsPattern[]]:=
+{
+Framed@PointLegend[colors,lgndlbl,LegendMarkers->Table[Style[ToString@markers[[i]],lmsize],{i,Length[markers]}],LegendMarkerSize->lmsize,LegendLayout->{"Row",1},LabelStyle->Directive[lblsize,Black,FontFamily->"Arial"],LegendFunction->"Frame"],
+ListPlot[
+data,
+PlotTheme->"Detailed",
+GridLinesStyle->Directive[Gray,Thin],
+FrameLabel->frmlbl,
+LabelStyle->Directive[lblsize,Black,FontFamily->"Arial"],
+ImageSize->size,
+AspectRatio->size[[2]]/size[[1]],
+PlotStyle->colors,
+PlotMarkers->Table[{markers[[i]],msize},{i,Length[markers]}],
+Evaluate@FilterRules[{plopts},Options[ListPlot]]
+]
+}
+
+insetvarplt[data_,bounds_,colors_,ipos_,size_:{800,450},lblsize_:24,plopts:OptionsPattern[]]:=
+Inset[
+Framed[
+Plot[
+data,
+bounds,
+PlotTheme->"Detailed",
+GridLinesStyle->Directive[Gray,Thin],
+LabelStyle->Directive[lblsize,Black,FontFamily->"Arial"],
+ImageSize->size,
+AspectRatio->size[[2]]/size[[1]],
+PlotStyle->colors,
+PlotLegends->None,
+Evaluate@FilterRules[{plopts},Options[Plot]]
+],
+Background->White,FrameStyle->None
+],
+Scaled[{ipos[[1]],ipos[[2]]}],Scaled[{ipos[[3]],ipos[[4]]}]
+]
+
+insetlineplt[data_,colors_,ipos_,size_:{800,450},lblsize_:24,plopts:OptionsPattern[]]:=
+Inset[
+Framed[
+ListLinePlot[
+data,
+PlotTheme->"Detailed",
+GridLinesStyle->Directive[Gray,Thin],
+LabelStyle->Directive[lblsize,Black,FontFamily->"Arial"],
+ImageSize->size,
+AspectRatio->size[[2]]/size[[1]],
+PlotStyle->colors,
+Evaluate@FilterRules[{plopts},Options[ListLinePlot]]
+],
+Background->White,FrameStyle->None
+],
+Scaled[{ipos[[1]],ipos[[2]]}],Scaled[{ipos[[3]],ipos[[4]]}]
+]
+
+insetlistplt[data_,colors_,markers_,ipos_,size_:{800,450},lblsize_:24,plopts:OptionsPattern[]]:=
+	Inset[
+		Framed[
+				ListPlot[
+				data,
+				PlotTheme->"Detailed",
+				GridLinesStyle->Directive[Gray,Thin],
+				LabelStyle->Directive[lblsize,Black,FontFamily->"Arial"],
+				ImageSize->size,
+				AspectRatio->size[[2]]/size[[1]],
+				PlotStyle->colors,
+				PlotMarkers->Table[{markers[[i]],lblsize},{i,Length[markers]}],
+				Evaluate@FilterRules[{plopts},Options[ListPlot]]
+			],
+		Background->White,FrameStyle->None
+		],
+	Scaled[{ipos[[1]],ipos[[2]]}],Scaled[{ipos[[3]],ipos[[4]]}]
+]
+
