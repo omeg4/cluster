@@ -1,8 +1,9 @@
 SetDirectory["$(pwd)"];
-day:=DateList[][[3]];
-month:=DateList[][[2]];
-hour:=DateList[][[4]];
-minute:=DateList[][[5]];
+day:=DateList[TimeZone->"America/New_York"][[3]];
+month:=DateList[TimeZone->"America/New_York"][[2]];
+hour:=DateList[TimeZone->"America/New_York"][[4]];
+minute:=DateList[TimeZone->"America/New_York"][[5]];
+gettime:=DateList[TimeZone->"America/New_York"];
 (* This chunk is just re-doing my long Keldysh calculations (need to check that the optical results are the same, otherwise I'm kinda boned *)
 mindmax = 4;
 dindmax = 8;
@@ -10,6 +11,7 @@ Table[
 	Module[
 		{
 			rev,ref,ndestats,nef,norms,normstats,onc,oncstats,fox,foxstats,foy,foystats,
+			starttime,
 			nmax=12,
 			mx=mus[[muind,1]],
 			my=mus[[muind,2]],
@@ -20,7 +22,8 @@ Table[
 			eps=10^-3,
 			c=10,
 			maxiter=10^15
-			},
+		},
+		starttime=gettime;
 		ToString[StringForm["At `3`h`4`m on `5`/`6`, starting calculation for (RK, hbn-enc) mu=`1`, d=`2`",muind,d,hour,minute,month,day]]>>>mylog.txt;
 		(* Solve the schrodinger equation *)
 		{{rev,ref},ndestats}=med[Unevaluated[ndesscale[nmax,mx,my,pot,kappa,chiphos,rightd[d],eps,c,maxiter,None]]];
@@ -93,8 +96,8 @@ Table[
 		{n,nmax},{m,n,nmax}],{{3}}];
 		Export[ToString@StringForm["foy_rk_he_mu`1`_d`2`.m",muind,(d+1)],foy];
 		Export[ToString@StringForm["foystats_rk_he_mu`1`_d`2`.m",muind,(d+1)],foystats];
-		ToString[StringForm["`3`h`4`m on `5`/`6`: back to top of loop",muind,d,hour,minute,month,day]]>>>mylog.txt;
-		ToString[StringForm["--------------------------------------------------------------------------------------------",muind,d,hour,minute,month,day]]>>>mylog.txt;
+		ToString[StringForm["`3`h`4`m on `5`/`6`: loop complete. Total runtime for this leg is `7`",muind,d,hour,minute,month,day,DateDifference[starttime,gettime,{"Hours","Minutes","Seconds"}]]>>>mylog.txt;
+		ToString[StringForm["-------------------------------------------",muind,d,hour,minute,month,day]]>>>mylog.txt;
 	],
 	{muind,mindmax},{d,-1,dindmax}
 ];
@@ -190,8 +193,8 @@ Table[
 		{n,nmax},{m,n,nmax}],{{3}}];
 		Export[ToString@StringForm["foy_rk_`3`_mu`1`_d`2`.m",muind,(d+1),envname],foy];
 		Export[ToString@StringForm["foystats_rk_`3`_mu`1`_d`2`.m",muind,(d+1),envname],foystats];
-		ToString[StringForm["`3`h`4`m on `5`/`6`: back to top of loop",muind,d,hour,minute,month,day]]>>>mylog.txt;
-		ToString[StringForm["--------------------------------------------------------------------------------------------",muind,d,hour,minute,month,day]]>>>mylog.txt;
+		ToString[StringForm["`3`h`4`m on `5`/`6`: loop complete. Total runtime for this leg is `7`",muind,d,hour,minute,month,day,DateDifference[starttime,gettime,{"Hours","Minutes","Seconds"}]]>>>mylog.txt;
+		ToString[StringForm["-------------------------------------------",muind,d,hour,minute,month,day]]>>>mylog.txt;
 	],
 	{muind,mindmax},{kapiter,{{1,ToString["fs"]},{((3.8+1)/2),ToString["ss"]},{((4.89+1)/2),ToString["hs"]}}}
 ];
@@ -285,8 +288,8 @@ Table[
 		{n,nmax},{m,n,nmax}],{{3}}];
 		Export[ToString@StringForm["foy_c_he_mu`1`_d`2`.m",muind,(d+1)],foy];
 		Export[ToString@StringForm["foystats_c_he_mu`1`_d`2`.m",muind,(d+1)],foystats];
-		ToString[StringForm["`3`h`4`m on `5`/`6`: back to top of loop",muind,d,hour,minute,month,day]]>>>mylog.txt;
-		ToString[StringForm["--------------------------------------------------------------------------------------------",muind,d,hour,minute,month,day]]>>>mylog.txt;
+		ToString[StringForm["`3`h`4`m on `5`/`6`: loop complete. Total runtime for this leg is `7`",muind,d,hour,minute,month,day,DateDifference[starttime,gettime,{"Hours","Minutes","Seconds"}]]>>>mylog.txt;
+		ToString[StringForm["-------------------------------------------",muind,d,hour,minute,month,day]]>>>mylog.txt;
 	],
 	{muind,mindmax},{d,-1,dindmax}
 ];
