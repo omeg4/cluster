@@ -17,7 +17,7 @@ Table[
 			pot=VKeld,
 			s=10^4,
 			kappa=4.89,
-			eps=9*10^-4,
+			eps=10^-3,
 			c=10,
 			maxiter=10^15
 			},
