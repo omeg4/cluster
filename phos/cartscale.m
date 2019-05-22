@@ -50,11 +50,12 @@ Table[
 		Export[ToString@StringForm["ndestats_rk_he_mu`1`_d`2`.m",muind,(d+1)],ndestats];
 		(* Calculate the normalization constants *)
 		{norms,normstats}=Flatten[Table[med[Unevaluated[NIntegrate[
-						(Conjugate[#]*#)&[ fixref[[n]][ArcTan[x/c], ArcTan[y/c]] ],
+						Conjugate[fixref[[n]][ArcTan[x/c], ArcTan[y/c]]]*fixref[[n]][ArcTan[x/c], ArcTan[y/c]],
 						{x,-s,s},{y,-s,s},
 						Evaluate@FilterRules[{niopts},Options[NIntegrate]]
 				]]],
 		{n,nmax}],{{2}}];
+		Export[ToString@StringForm["normconsts_rk_he_mu`1`_d`2`.m",muind,(d+1)],norms];
 		ToString[StringForm["At `3`h`4`m on `5`/`6`, norms calc finished for mu=`1`, d=`2`",muind,d,hour,minute,month,day]]>>>mylog.txt;
 		(* Make the normalized EFs *)
 		nef = Table[
