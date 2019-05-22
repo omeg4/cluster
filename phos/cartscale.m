@@ -9,7 +9,7 @@ dindmax = 8;
 Table[
 	Module[
 		{
-			rev,ref,fixref,ndestats,nef,norms,normstats,onc,oncstats,fox,foxstats,foy,foystats,
+			rev,ref,ndestats,nef,norms,normstats,onc,oncstats,fox,foxstats,foy,foystats,
 			nmax=12,
 			mx=mus[[muind,1]],
 			my=mus[[muind,2]],
@@ -25,11 +25,9 @@ Table[
 		(* Solve the schrodinger equation *)
 		{{rev,ref},ndestats}=med[Unevaluated[ndesscale[nmax,mx,my,pot,kappa,chiphos,rightd[d],eps,c,maxiter,None]]];
 		ToString[StringForm["At `3`h`4`m on `5`/`6`, NDE calc finished for mu=`1`, d=`2`",muind,d,hour,minute,month,day]]>>>mylog.txt;
-		(* the ndesscale function outputs the EFs in a weird way, just fix them on the spot *)
-		fixref = Table[ref[[n]]//Head//Head,{n,nmax}];
 		(* save the data *)
 		(* adding a third list element to the "NDE results" where I can store computational parameters *)
-		Export[ToString@StringForm["nderes_rk_he_mu`1`_d`2`.m",muind,(d+1)],{rev,fixref,
+		Export[ToString@StringForm["nderes_rk_he_mu`1`_d`2`.m",muind,(d+1)],{rev,ref,
 				Association[
 					"mu index" -> muind,
 					"d" -> d,
@@ -50,7 +48,7 @@ Table[
 		Export[ToString@StringForm["ndestats_rk_he_mu`1`_d`2`.m",muind,(d+1)],ndestats];
 		(* Calculate the normalization constants *)
 		{norms,normstats}=Flatten[Table[med[Unevaluated[NIntegrate[
-						Conjugate[fixref[[n]][ArcTan[x/c], ArcTan[y/c]]]*fixref[[n]][ArcTan[x/c], ArcTan[y/c]],
+							(Conjugate[#]*#)&[ref[[n]][x,y]],
 						{x,-s,s},{y,-s,s},
 						Evaluate@FilterRules[{niopts},Options[NIntegrate]]
 				]]],
@@ -61,7 +59,7 @@ Table[
 		nef = Table[
 			Function[{x,y},
 				Evaluate[
-					fixref[[ n ]][ ArcTan[x/c], ArcTan[y/c] ] / Sqrt[ norms[[ n ]] ]
+					ref[[ n ]][ x,y ] / Sqrt[ norms[[ n ]] ]
 				]
 			],
 			{n, nmax}
@@ -107,7 +105,7 @@ ToString[StringForm["===========================================================
 Table[
 	Module[
 		{
-			rev,ref,fixref,ndestats,nef,norms,normstats,onc,oncstats,fox,foxstats,foy,foystats,
+			rev,ref,ndestats,nef,norms,normstats,onc,oncstats,fox,foxstats,foy,foystats,
 			d = -1,
 			nmax=12,
 			mx=mus[[muind,1]],
@@ -125,11 +123,9 @@ Table[
 		(* Solve the schrodinger equation *)
 		{{rev,ref},ndestats}=med[Unevaluated[ndesscale[nmax,mx,my,pot,kappa,chiphos,rightd[d],eps,c,maxiter,None]]];
 		ToString[StringForm["At `3`h`4`m on `5`/`6`, NDE calc finished for mu=`1`, d=`2`",muind,d,hour,minute,month,day]]>>>mylog.txt;
-		(* the ndesscale function outputs the EFs in a weird way, just fix them on the spot *)
-		fixref = Table[ref[[n]]//Head//Head,{n,nmax}];
 		(* save the data *)
 		(* adding a third list element to the "NDE results" where I can store computational parameters *)
-		Export[ToString@StringForm["nderes_rk_`3`_mu`1`_d`2`.m",muind,(d+1),envname],{rev,fixref,
+		Export[ToString@StringForm["nderes_rk_`3`_mu`1`_d`2`.m",muind,(d+1),envname],{rev,ref,
 				Association[
 					"mu index" -> muind,
 					"d" -> d,
@@ -150,7 +146,7 @@ Table[
 		Export[ToString@StringForm["ndestats_rk_`3`_mu`1`_d`2`.m",muind,(d+1),envname],ndestats];
 		(* Calculate the normalization constants *)
 		{norms,normstats}=Flatten[Table[med[Unevaluated[NIntegrate[
-						(Conjugate[#]*#)&[ fixref[[n]][ArcTan[x/c], ArcTan[y/c]] ],
+							(Conjugate[#]*#)&[ref[[n]][x,y]],
 						{x,-s,s},{y,-s,s},
 						Evaluate@FilterRules[{niopts},Options[NIntegrate]]
 				]]],
@@ -160,7 +156,7 @@ Table[
 		nef = Table[
 			Function[{x,y},
 				Evaluate[
-					fixref[[ n ]][ ArcTan[x/c], ArcTan[y/c] ] / Sqrt[ norms[[ n ]] ]
+					ref[[ n ]][ x,y ] / Sqrt[ norms[[ n ]] ]
 				]
 			],
 			{n, nmax}
@@ -206,7 +202,7 @@ ToString[StringForm["===========================================================
 Table[
 	Module[
 		{
-			rev,ref,fixref,ndestats,nef,norms,normstats,onc,oncstats,fox,foxstats,foy,foystats,
+			rev,ref,ndestats,nef,norms,normstats,onc,oncstats,fox,foxstats,foy,foystats,
 			nmax=12,
 			mx=mus[[muind,1]],
 			my=mus[[muind,2]],
@@ -222,11 +218,9 @@ Table[
 		(* Solve the schrodinger equation *)
 		{{rev,ref},ndestats}=med[Unevaluated[ndesscale[nmax,mx,my,pot,kappa,chiphos,rightd[d],eps,c,maxiter,None]]];
 		ToString[StringForm["At `3`h`4`m on `5`/`6`, NDE calc finished for mu=`1`, d=`2`",muind,d,hour,minute,month,day]]>>>mylog.txt;
-		(* the ndesscale function outputs the EFs in a weird way, just fix them on the spot *)
-		fixref = Table[ref[[n]]//Head//Head,{n,nmax}];
 		(* save the data *)
 		(* adding a third list element to the "NDE results" where I can store computational parameters *)
-		Export[ToString@StringForm["nderes_c_he_mu`1`_d`2`.m",muind,(d+1)],{rev,fixref,
+		Export[ToString@StringForm["nderes_c_he_mu`1`_d`2`.m",muind,(d+1)],{rev,ref,
 				Association[
 					"mu index" -> muind,
 					"d" -> d,
@@ -247,7 +241,7 @@ Table[
 		Export[ToString@StringForm["ndestats_c_he_mu`1`_d`2`.m",muind,(d+1)],ndestats];
 		(* Calculate the normalization constants *)
 		{norms,normstats}=Flatten[Table[med[Unevaluated[NIntegrate[
-						(Conjugate[#]*#)&[ fixref[[n]][ArcTan[x/c], ArcTan[y/c]] ],
+							(Conjugate[#]*#)&[ref[[n]][x,y]],
 						{x,-s,s},{y,-s,s},
 						Evaluate@FilterRules[{niopts},Options[NIntegrate]]
 				]]],
@@ -257,7 +251,7 @@ Table[
 		nef = Table[
 			Function[{x,y},
 				Evaluate[
-					fixref[[ n ]][ ArcTan[x/c], ArcTan[y/c] ] / Sqrt[ norms[[ n ]] ]
+					ref[[ n ]][ x,y ] / Sqrt[ norms[[ n ]] ]
 				]
 			],
 			{n, nmax}

@@ -534,9 +534,11 @@ ndesscale[nmax_, mx_, my_, pot_, kappa_, chi_, d_, eps_, c_, maxi_, vn_]:=Module
 	{
 		evs-shift,
 		Table[
-			Function[{x,y},Evaluate[
-				efs[[i]][ArcTan[x/c],ArcTan[y/c]]
-				]],
+			Function[{x,y},
+				Evaluate[
+					Head[efs[[i]]][ArcTan[x/c],ArcTan[y/c]]
+				]
+			],
 			{i,nmax}
 		]
 	}
