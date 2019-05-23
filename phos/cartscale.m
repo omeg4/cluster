@@ -110,7 +110,7 @@ Table[
 				},
 				Table[
 					Function[{nx,gamma},Evaluate[UnitConvert[(( Pi*(ee^2) )/( 2 * e0 * Sqrt[kappa] * mu * cc )) * ( ( Quantity[nx,"Meters"^-2] ) / ( l ) ) * f0xy[[ni,nf]]*(2/Quantity[gamma,"Seconds"^-1]),"Meters"^-1]]],
-					{ni,nmax},{nf,1,nmax-ni}
+					{ni,nmax},{nf,1,1+nmax-ni}
 				]
 			],{xory,{{mx,fox},{my,foy}}}
 		];
@@ -125,7 +125,7 @@ Table[
 				},
 				Table[
 					Function[{nx,gamma},Evaluate[1-Exp[-(( Pi*(ee^2) )/( 2 * e0 * Sqrt[kappa] * mu * cc )) * ( ( Quantity[nx,"Meters"^-2] ) ) * f0xy[[ni,nf]] * (2/Quantity[gamma,"Seconds"^-1])]]],
-					{ni,nmax},{nf,1,nmax-ni}
+					{ni,nmax},{nf,1,1+nmax-ni}
 				]
 			],{xory,{{mx,fox},{my,foy}}}
 		];
@@ -235,7 +235,7 @@ Table[
 				},
 				Table[
 					Function[{nx,gamma},Evaluate[UnitConvert[(( Pi*(ee^2) )/( 2 * e0 * Sqrt[kappa] * mu * cc )) * ( ( Quantity[nx,"Meters"^-2] ) / ( l ) ) * f0xy[[ni,nf]]*(2/Quantity[gamma,"Seconds"^-1]),"Meters"^-1]]],
-					{ni,nmax},{nf,1,nmax-ni}
+					{ni,nmax},{nf,1,1+nmax-ni}
 				]
 			],{xory,{{mx,fox},{my,foy}}}
 		];
@@ -250,7 +250,7 @@ Table[
 				},
 				Table[
 					Function[{nx,gamma},Evaluate[1-Exp[-(( Pi*(ee^2) )/( 2 * e0 * Sqrt[kappa] * mu * cc )) * ( ( Quantity[nx,"Meters"^-2] ) ) * f0xy[[ni,nf]] * (2/Quantity[gamma,"Seconds"^-1])]]],
-					{ni,nmax},{nf,1,nmax-ni}
+					{ni,nmax},{nf,1,1+nmax-ni}
 				]
 			],{xory,{{mx,fox},{my,foy}}}
 		];
@@ -358,7 +358,7 @@ Table[
 				},
 				Table[
 					Function[{nx,gamma},Evaluate[UnitConvert[(( Pi*(ee^2) )/( 2 * e0 * Sqrt[kappa] * mu * cc )) * ( ( Quantity[nx,"Meters"^-2] ) / ( l ) ) * f0xy[[ni,nf]]*(2/Quantity[gamma,"Seconds"^-1]),"Meters"^-1]]],
-					{ni,nmax},{nf,1,nmax-ni}
+					{ni,nmax},{nf,1,1+nmax-ni}
 				]
 			],{xory,{{mx,fox},{my,foy}}}
 		];
@@ -373,7 +373,7 @@ Table[
 				},
 				Table[
 					Function[{nx,gamma},Evaluate[1-Exp[-(( Pi*(ee^2) )/( 2 * e0 * Sqrt[kappa] * mu * cc )) * ( ( Quantity[nx,"Meters"^-2] ) ) * f0xy[[ni,nf]] * (2/Quantity[gamma,"Seconds"^-1])]]],
-					{ni,nmax},{nf,1,nmax-ni}
+					{ni,nmax},{nf,1,1+nmax-ni}
 				]
 			],{xory,{{mx,fox},{my,foy}}}
 		];
