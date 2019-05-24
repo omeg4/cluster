@@ -584,6 +584,141 @@ ndespolar[nmax_, mx_, my_, pot_, kappa_, chi_, d_, eps_, maxi_, vn_]:=Module[
 	}
 ]
 
+(* "DEFAULT" NINTEGRATE OPTIONS FOR PHOS PAPER AS OF 5/23 *)
+(* {Method->"GlobalAdaptive",MinRecursion->1000,MaxRecursion->10^6} *)
+
+fulldate:=DateString[{"Month","/","Day"," @ ","Time"," | "}]
+time:=DateString[{"Time"}]
+
+
+phosuite[nmax_, {mus_,munamezz_}, {pot_,potname_}, {kappa_,envname_}, {nhbnmin_,nhbnmax_}, chi_:chiphos, eps_:10^-3, maxi_:10^15, c_:10, s_:10^4]:=Module[
+	{
+		mindmax=Dimensions[mus][[1]],
+		munames=If[Length[munamezz]==Dimensions[mus][[1]],munamezz,Table[i,{i,Dimensions[mus][[1]]}]],
+		niopts={Method->"GlobalAdaptive",MinRecursion->1000,MaxRecursion->10^6},
+	},
+	Table[
+		Module[
+			{
+				rev,ref,ndestats,nef,norms,normstats,onc,oncstats,fox,foxstats,foy,foystats,
+				paramsassoc,alphax,alphay,afax,afay,
+				starttime,
+				mx=mus[[muind,1]],
+				my=mus[[muind,2]]
+			},
+			starttime=DateList[];
+			ToString[StringForm["`1` NDES starting for pot=`2` | env=`3` | mu=`4` | nhbn=`5`",fulldate,potname,envname,muind,nhbn]]>>>mylog.txt;
+			(* Solve the schrodinger equation *)
+			{{rev,ref},ndestats}=med[Unevaluated[ndesscale[nmax,mx,my,pot,kappa,chiphos,rightd[nhbn],eps,c,maxi,None]]];
+			ToString[StringForm["`1` NDES complete for pot=`2` | env=`3` | mu=`4` | nhbn=`5`",fulldate,potname,envname,muind,nhbn]]>>>mylog.txt;
+			(* adding a third list element to the "NDE results" where I can store computational parameters *)
+			paramsassoc=Association[
+				"mu index" -> muind,
+				"nhbn" -> nhbn,
+				"d" -> rightd[nhbn],
+				"mux" -> mx,
+				"muy" -> my,
+				"pot" -> pot,
+				"kappa" -> kappa,
+				"chi" -> chiphos,
+				"nde eps" -> eps,
+				"c rescale" -> c,
+				"maxiter" -> maxiter,
+				"int box s" -> s,
+				"int opts" -> ToString[niopts]
+			];
+			(* save the data *)
+			Export[ToString@StringForm["ndesevs_`1`_`2`_m`3`_d`4`.m",potname,envname,muind,(nhbn+1)],rev];
+			Export[ToString@StringForm["ndesefs_`1`_`2`_m`3`_d`4`.m",potname,envname,muind,(nhbn+1)],ref];
+			Export[ToString@StringForm["ndesprm_`1`_`2`_m`3`_d`4`.m",potname,envname,muind,(nhbn+1)],paramsassoc];
+			Export[ToString@StringForm["ndestat_`1`_`2`_m`3`_d`4`.m",potname,envname,muind,(nhbn+1)],ndestats];
+			ToString[StringForm["`1` NDES saved    for pot=`2` | env=`3` | mu=`4` | nhbn=`5`",fulldate,potname,envname,muind,nhbn]]>>>mylog.txt;
+			(* Calculate the normalization constants *)
+			{norms,normstats}=Flatten[Table[med[Unevaluated[NIntegrate[
+								(Conjugate[#]*#)&[ref[[n]][x,y]],
+							{x,-s,s},{y,-s,s},
+							Evaluate@FilterRules[{niopts},Options[NIntegrate]]
+					]]],
+			{n,nmax}],{{2}}];
+			Export[ToString@StringForm["nrmcnst_`1`_`2`_m`3`_d`4`.m",potname,envname,muind,(nhbn+1)],norms];
+			ToString[StringForm["`1` NORM complete for pot=`2` | env=`3` | mu=`4` | nhbn=`5`",fulldate,potname,envname,muind,nhbn]]>>>mylog.txt;
+			(* Make the normalized EFs *)
+			nef = Table[
+				Function[{x,y},
+					Evaluate[
+						ref[[ n ]][ x,y ] / Sqrt[ norms[[ n ]] ]
+					]
+				],
+				{n, nmax}
+			];
+			(* Save the normalized EFs because why not? *)
+			Export[ToString@StringForm["ndenefs_`1`_`2`_m`3`_d`4`.m",potname,envname,muind,(nhbn+1)],nef];
+			(* check orthonormality *)
+			{onc,oncstats}=Flatten[Table[med[Unevaluated[NIntegrate[
+						Conjugate[ nef[[m]][x,y] ] * nef[[n]][x,y],
+						{x,-s,s},{y,-s,s},
+						Evaluate@FilterRules[{niopts},Options[NIntegrate]]
+					]]],
+			{n,nmax},{m,n,nmax}],{{3}}];
+			Export[ToString@StringForm["onctabl_`1`_`2`_m`3`_d`4`.m",potname,envname,muind,(nhbn+1)],onc];
+			Export[ToString@StringForm["oncstat_`1`_`2`_m`3`_d`4`.m",potname,envname,muind,(nhbn+1)],oncstats];
+			ToString[StringForm["`1` ONCH complete for pot=`2` | env=`3` | mu=`4` | nhbn=`5`",fulldate,potname,envname,muind,nhbn]]>>>mylog.txt;
+			(* Merge fox and foy *)
+			{{fox,foxstats},{foy,foystats}}=Flatten[Table[
+					With[
+						{muxy=xory[[1]],dpmexy=xory[[2]]},
+						med[Unevaluated[2 * muxy * (rev[[m]] - rev[[n]]) * (Abs[NIntegrate[
+										Conjugate[ nef[[m]][x,y] ] * dpmexy * nef[[n]][x,y],
+										{x,-s,s},{y,-s,s},
+										Evaluate@FilterRules[{niopts},Options[NIntegrate]]
+						]]^2)]]
+					],
+			{xory,{{mx,x},{my,y}}},{n,nmax},{m,n,nmax}],{{1},{4}}];
+			Export[ToString@StringForm["foxtabl_`1`_`2`_m`3`_d`4`.m",potname,envname,muind,(nhbn+1)],fox];
+			Export[ToString@StringForm["foxstat_`1`_`2`_m`3`_d`4`.m",potname,envname,muind,(nhbn+1)],foxstats];
+			Export[ToString@StringForm["foytabl_`1`_`2`_m`3`_d`4`.m",potname,envname,muind,(nhbn+1)],foy];
+			Export[ToString@StringForm["foystat_`1`_`2`_m`3`_d`4`.m",potname,envname,muind,(nhbn+1)],foystats];
+			ToString[StringForm["`1` FOXY complete for pot=`2` | env=`3` | mu=`4` | nhbn=`5`",fulldate,potname,envname,muind,nhbn]]>>>mylog.txt;
+			(* Calculate alpha x and y *)
+			{alphax,alphay}=Table[
+				With[
+					{
+						mu=Quantity[xory[[1]],"ElectronMass"],
+						f0xy=xory[[2]],
+						l=If[rightd[nhbn]==0,Quantity[lphos,"BohrRadius"],Quantity[2*lphos,"BohrRadius"]]
+					},
+					Table[
+						Function[{nx,gamma},Evaluate[UnitConvert[(( Pi*(ee^2) )/( 2 * e0 * Sqrt[kappa] * mu * cc )) * ( ( Quantity[nx,"Meters"^-2] ) / ( l ) ) * f0xy[[ni,nf]]*(2/Quantity[gamma,"Seconds"^-1]),"Meters"^-1]]],
+						{ni,nmax},{nf,1,1+nmax-ni}
+					]
+				],{xory,{{mx,fox},{my,foy}}}
+			];
+			Export[ToString@StringForm["alphax_`1`_`2`_m`3`_d`4`.m",potname,envname,muind,(nhbn+1)],alphax];
+			Export[ToString@StringForm["alphay_`1`_`2`_m`3`_d`4`.m",potname,envname,muind,(nhbn+1)],alphay];
+			ToString[StringForm["`1` ALXY complete for pot=`2` | env=`3` | mu=`4` | nhbn=`5`",fulldate,potname,envname,muind,nhbn]]>>>mylog.txt;
+			(* Calculate afac x and y *)
+			{afax,afay}=Table[
+				With[
+					{
+						mu=Quantity[xory[[1]],"ElectronMass"],
+						f0xy=xory[[2]]
+					},
+					Table[
+						Function[{nx,gamma},Evaluate[1-Exp[-(( Pi*(ee^2) )/( 2 * e0 * Sqrt[kappa] * mu * cc )) * ( ( Quantity[nx,"Meters"^-2] ) ) * f0xy[[ni,nf]] * (2/Quantity[gamma,"Seconds"^-1])]]],
+						{ni,nmax},{nf,1,1+nmax-ni}
+					]
+				],{xory,{{mx,fox},{my,foy}}}
+			];
+			Export[ToString@StringForm["absfax_`1`_`2`_m`3`_d`4`.m",potname,envname,muind,(nhbn+1)],afax];
+			Export[ToString@StringForm["absfay_`1`_`2`_m`3`_d`4`.m",potname,envname,muind,(nhbn+1)],afay];
+			ToString[StringForm["`1` AFXY complete for pot=`2` | env=`3` | mu=`4` | nhbn=`5`",fulldate,potname,envname,muind,nhbn]]>>>mylog.txt;
+			ToString[StringForm["`3`h`4`m on `5`/`6`: loop complete. Total runtime for this leg is `7`",muind,nhbn,hour,minute,month,day,DateDifference[starttime,gettime,{"Hours","Minutes","Seconds"}]]]>>>mylog.txt;
+			ToString[StringForm["-------------------------------------------",muind,nhbn,hour,minute,month,day]]>>>mylog.txt;
+		],
+		{muind,mindmax},{nhbn,nhmin,nhmax}
+	]
+]
+
 ning[ef1_, ef2_, op_, s_]:=NIntegrate[
 	Conjugate[ ef1 ] * op * ef2,
 	{x,-s,s},{y,-s,s},
