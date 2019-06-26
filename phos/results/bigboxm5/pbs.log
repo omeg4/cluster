@@ -1,5 +1,0 @@
-/home/mbrunetti/cluster/phos/results/bigboxm5
-Starting Mathematica job
-
-NDEigensystem::femcscd: The PDE is convection dominated and the result may not be stable. Adding artificial diffusion may help.
-Job finished

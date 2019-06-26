@@ -1,4 +1,4 @@
-(* Set up conversion factors and general constants *)
+(* /*{{{*/ Set up conversion factors and general constants *)
 e = 1;
 H2J = 4.35974417 * (10^-18);
 T2S = 2.41884326505 * (10^-17);
@@ -8,17 +8,21 @@ qnm = Quantity["Nanometers"];
 qmev = Quantity["Millielectronvolts"];
 qev = Quantity["Electronvolts"];
 qhart = Quantity["Hartrees"];
+qconc[conc_] := Quantity[#, "Meters"^-2]
+qfreq[freq_] := Quantity[#, "Seconds"^-1]
 HH = Quantity["PlanckConstant"];
 HB = Quantity["ReducedPlanckConstant"]
 CC = Quantity["SpeedOfLight"];
 H2eV = 27.21138602;
+n0 = 10^15;
+gam0 = 10^13;
 na = (5 * 10^15) * (10^-18);
 damp = (10^13) * (T2S);
 lBN = (1 / B2nm) * 0.333;
 lphos = (1 / B2nm) * 0.541;
+(* /*}}}*/*)
 
-
-(* Set up phosphorene parameters *)
+(* /*{{{*/ Set up phosphorene parameters *)
 mey = { 1.2, 1.3, 0.7527, 1.12 };
 mex = { 0.17, 0.1, 0.1990, 0.17 };
 mhy = { 5.0, 2.8, 5.3525, 6.35 };
@@ -33,6 +37,9 @@ mus = Table[
 ];
 chiphos = QuantityMagnitude[Quantity[0.41,"Nanometers"],"BohrRadius"];
 (* rho = 2 * Pi * chiphos / kappa;*)
+(* /*}}}*/*)
+
+tssf[x___]:=ToString@StringForm[x]
 
 (* Define the potentials *)
 VCoul[k_][d_,chi_][x_,y_]:= -1 / (k*Sqrt[x^2 + y^2 + d^2])
@@ -110,7 +117,7 @@ xysubNInt[efi_,eff_,op_,s_]:=Chop[N[Quiet[NIntegrate[
 	],{NIntegrate::slwcon,NIntegrate::eincr,General::stop}]]
 ]
 
-(* {{{ *)
+(* {{{ "makeproc" function [ dep. ] *)
 makeproc[eps_:(10^-3),nmax_:10,mutab_:mus,ntab_:Table[i,{i,0,10}],kaptab_:{1,4.89}]:=Module[
 	{
 		mun=Dimensions[mutab] [[1]],
@@ -271,56 +278,58 @@ makeproc[eps_:(10^-3),nmax_:10,mutab_:mus,ntab_:Table[i,{i,0,10}],kaptab_:{1,4.8
 
 (* functions with options *)
 
+(* {{{ *)
 CompPhos2opts[{mx_,my_,nhbn_,pot_,kappa_},eps_,nmax_,wp_,ndeopts:OptionsPattern[],niopts:OptionsPattern[]]:=Module[
-	{
-		chi = chiphos,
-		rho = chiphos/kappa,
-		shift = 10,
-		d = rightd[nhbn],
-		s=1/eps,
-		ev,
-		ef,
-		norms,
-		tds,
-		tdstrans,
-		stranseps=SetPrecision[(Pi/2)-eps, wp]
-	},
-	tds=(-(1/2) * (
-			(1/mx)*D[f[x,y],{x,2},{y,0}] +
-			(1/my)*D[f[x,y],{x,0},{y,2}]
-		) +
-		pot[kappa][d,chi][x,y] * f[x,y] +
-		shift*f[x,y]
-	);
-	tdstrans=Simplify[tds /. {
-			f -> (u[ArcTan[#1],ArcTan[#2]]&)
-		} /. {
-			x -> (Tan[\[Xi]]),
-			y->(Tan[\[Psi]])
-		} , {
-			(Pi/2)>\[Xi]>-(Pi/2),
-			(Pi/2)>\[Psi]>-(Pi/2)
-		}];
-	ndetime = AbsoluteTiming[{ev, ef} = NDEigensystem[
-			{(* N[tdstrans,wprec],*)
-				tdstrans,
-				DirichletCondition[u[\[Xi],\[Psi]]==0,Abs[\[Xi]]==(stranseps)||Abs[\[Psi]]==(stranseps)]
-			},
-			u[ \[Xi], \[Psi]],
-			{\[Xi], \[Psi]} \[Element] Rectangle[{-stranseps,-stranseps},{stranseps,stranseps}],
-			nmax,
-			(* Method->{"SpatialDiscretization"->{"FiniteElement",{"MeshOptions"->{"MaxCellMeasure"->eps}}},"Eigensystem"->{"Arnoldi","MaxIterations"->10^7}}*)
-			Evaluate@FilterRules[{ndeopts},Options[NDEigensystem]]
-		]
-	][[1]];
-	{
-		{{mx, my}, {nhbn, d}, pot, kappa, chi, eps, ndetime},
 		{
-			UnitConvert[Quantity[ev - shift,"Hartrees"],"Millielectronvolts"],
-			Head[#]&/@ef
-		}
-	}
-]
+				chi = chiphos,
+			rho = chiphos/kappa,
+			shift = 10,
+			d = rightd[nhbn],
+			s=1/eps,
+			ev,
+			ef,
+			norms,
+			tds,
+			tdstrans,
+			stranseps=SetPrecision[(Pi/2)-eps, wp]
+},
+		tds=(-(1/2) * (
+		(1/mx)*D[f[x,y],{x,2},{y,0}] +
+		(1/my)*D[f[x,y],{x,0},{y,2}]
+			) +
+			pot[kappa][d,chi][x,y] * f[x,y] +
+			shift*f[x,y]
+		);
+		tdstrans=Simplify[tds /. {
+		f -> (u[ArcTan[#1],ArcTan[#2]]&)
+		} /. {
+				x -> (Tan[\[Xi]]),
+				y->(Tan[\[Psi]])
+		} , {
+				(Pi/2)>\[Xi]>-(Pi/2),
+				(Pi/2)>\[Psi]>-(Pi/2)
+		}];
+		ndetime = AbsoluteTiming[{ev, ef} = NDEigensystem[
+				{(* N[tdstrans,wprec],*)
+						tdstrans,
+				DirichletCondition[u[\[Xi],\[Psi]]==0,Abs[\[Xi]]==(stranseps)||Abs[\[Psi]]==(stranseps)]
+		},
+				u[ \[Xi], \[Psi]],
+				{\[Xi], \[Psi]} \[Element] Rectangle[{-stranseps,-stranseps},{stranseps,stranseps}],
+				nmax,
+				(* Method->{"SpatialDiscretization"->{"FiniteElement",{"MeshOptions"->{"MaxCellMeasure"->eps}}},"Eigensystem"->{"Arnoldi","MaxIterations"->10^7}}*)
+				Evaluate@FilterRules[{ndeopts},Options[NDEigensystem]]
+				]
+		][[1]];
+		{
+				{{mx, my}, {nhbn, d}, pot, kappa, chi, eps, ndetime},
+			{
+					UnitConvert[Quantity[ev - shift,"Hartrees"],"Millielectronvolts"],
+				Head[#]&/@ef
+				}
+			}
+				]
+(* }}} *)
 
 xysubNIntopts[efi_,eff_,op_,s_,nopts:OptionsPattern[]]:=Chop[
 	N[
@@ -595,7 +604,7 @@ phosuite[nmax_, {mus_,munamezz_}, {pot_,potname_}, {kappa_,envname_}, {nhbnmin_,
 	{
 		mindmax=Dimensions[mus][[1]],
 		munames=If[Length[munamezz]==Dimensions[mus][[1]],munamezz,Table[i,{i,Dimensions[mus][[1]]}]],
-		niopts={Method->"GlobalAdaptive",MinRecursion->1000,MaxRecursion->10^6},
+		niopts={Method->"GlobalAdaptive",MinRecursion->1000,MaxRecursion->10^6}
 	},
 	Table[
 		Module[
