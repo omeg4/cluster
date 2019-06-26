@@ -202,10 +202,10 @@ logblend[f_] := Blend[logblendcols,f]
 (* /*}}}*/*)
 
 dslp[plopts:OptionsPattern[]]:=(Module[{
-	imsi=Merge[{Evaluate@FilterRules[{fplopts},{"is"}],{"is"->{800,450}}},(#[[1]]&)] (* Custom option for ImageSize + AspectRatio *)
-	masi=Values@Evaluate@FilterRules[{fplopts},{"ms"}],{"ms"->24}},(#[[1]]&)](* Custom option for specifying marker size *)
-	lasi=Values@Evaluate@FilterRules[{fplopts},{"ls"}],{"ls"->24}},(#[[1]]&)] (* Custom option for specifying label size *)
-	legopts=Values@Evaluate@FilterRules[{fplopts},{lo}] (* Custom option for PlotLegends option specification. Actually can just put PlotLegends->{} as an option to ListPlot.. duh *)
+	imsi=First@Values@Merge[{Evaluate@FilterRules[{plopts},{"is"}],{"is"->{800,450}}},(#[[1]]&)], (* Custom option for ImageSize + AspectRatio *)
+	masi=First@Values@Merge[{Evaluate@FilterRules[{plopts},{"ms"}],{"ms"->24}},(#[[1]]&)], (* Custom option for specifying marker size *)
+	lasi=First@Values@Merge[{Evaluate@FilterRules[{plopts},{"ls"}],{"ls"->24}},(#[[1]]&)], (* Custom option for specifying label size *)
+	legopts=Values@Evaluate@FilterRules[{plopts},{lo}] (* Custom option for PlotLegends option specification. Actually can just put PlotLegends->{} as an option to ListPlot.. duh *)
 	},
 	ListPlot[
 		#,
@@ -215,7 +215,8 @@ dslp[plopts:OptionsPattern[]]:=(Module[{
 		PlotMarkers->marksize[feriff,masi],
 		GridLinesStyle->{Thin,Gray},
 		LabelStyle->Directive[lasi,Black,FontFamily->"Arial"],
-		IntervalMarkers->"Bands"
+		IntervalMarkers->"Ellipses",
+		IntervalMarkersStyle->Directive[Dashing[None]]
 	]
 ]&)
 
