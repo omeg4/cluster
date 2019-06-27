@@ -58,7 +58,7 @@ combopltexp[filename_, plt_] := {
   Export[dfd <> "phos-leg-" <> filename <> ".pdf", plt[[2, 1]], "PDF"(*,"PreviewFormat"\[Rule]"TIFF"*)]
 }
 showandexp[filename_, plt_] := TableForm@{
-   bgclr[{combopltexp[filename, plt]}, LightRed],
+   bg[{combopltexp[filename, plt]}, LightRed],
    plt
   }
 framegrid[data_] := Grid[data, Frame -> All]
@@ -212,11 +212,12 @@ dslp[plopts:OptionsPattern[]]:=(Module[{
 		PlotTheme->"Detailed",
 		ImageSize->imsi,AspectRatio->(imsi[[2]]/imsi[[1]]),
 		PlotStyle->randash,
-		PlotMarkers->marksize[feriff,masi],
+		PlotMarkers->marksize[feordered,masi],
 		GridLinesStyle->{Thin,Gray},
 		LabelStyle->Directive[lasi,Black,FontFamily->"Arial"],
 		IntervalMarkers->"Ellipses",
-		IntervalMarkersStyle->Directive[Dashing[None]]
+		IntervalMarkersStyle->Directive[Dashing[None]],
+		Evaluate@FilterRules[{plopts},Options[ListPlot]]
 	]
 ]&)
 
