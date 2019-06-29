@@ -205,6 +205,7 @@ dslp[plopts:OptionsPattern[]]:=(Module[{
 	imsi=First@Values@Merge[{Evaluate@FilterRules[{plopts},{"is"}],{"is"->{800,450}}},(#[[1]]&)], (* Custom option for ImageSize + AspectRatio *)
 	masi=First@Values@Merge[{Evaluate@FilterRules[{plopts},{"ms"}],{"ms"->24}},(#[[1]]&)], (* Custom option for specifying marker size *)
 	lasi=First@Values@Merge[{Evaluate@FilterRules[{plopts},{"ls"}],{"ls"->24}},(#[[1]]&)], (* Custom option for specifying label size *)
+	mast=First@Values@Merge[{Evaluate@FilterRules[{plopts},{"mt"}],{"mt"->feordered}},(#[[1]]&)], (* Custom option for Marker types *)
 	legopts=Values@Evaluate@FilterRules[{plopts},{lo}] (* Custom option for PlotLegends option specification. Actually can just put PlotLegends->{} as an option to ListPlot.. duh *)
 	},
 	ListPlot[
@@ -212,7 +213,7 @@ dslp[plopts:OptionsPattern[]]:=(Module[{
 		PlotTheme->"Detailed",
 		ImageSize->imsi,AspectRatio->(imsi[[2]]/imsi[[1]]),
 		PlotStyle->randash,
-		PlotMarkers->marksize[feordered,masi],
+		PlotMarkers->marksize[mast,masi],
 		GridLinesStyle->{Thin,Gray},
 		LabelStyle->Directive[lasi,Black,FontFamily->"Arial"],
 		IntervalMarkers->"Ellipses",
