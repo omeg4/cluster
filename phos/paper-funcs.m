@@ -64,12 +64,13 @@ showandexp[filename_, plt_] := TableForm@{
 framegrid[data_] := Grid[data, Frame -> All]
 (* /*}}}*/*)
 
-(* /*{{{*/ Convert Dataset keys into formatted captions/labels in plots *)
+(* /*{{{*/ Key converters *)
 keytox[key_] := <|
    Flatten[{
      Table[tssf["i`1`", i] -> i, {i, 12}],
      Table[tssf["j`1`", i] -> i, {i, 12}],
-     Table[tssf["d`1`", d] -> rightd[d - 1], {d, 0, 9}]
+     (* Table[tssf["d`1`", d] -> rightd[d - 1], {d, 0, 9}]*)
+		 Table[tssf["d`1`", d] -> d-1, {d,0,9}]
      }]|>[key]
 xymaker[data_] := Map[
   KeyValueMap[{keytox[#1], Abs@QuantityMagnitude[#2]} &],
@@ -158,6 +159,14 @@ flatassmerge = Association[KeyValueMap[
       	Values[inass]
       ]
 ]&]];
+
+flasme = KeyValueMap[
+	Module[{outkey = #1, outvals = #2},
+		AssociationThread[
+			Map[outkey <> # &, Keys[outvals]],
+			Values[outvals]
+		]
+	]&]
 
 assocdepth[ass_] := Module[
   {
