@@ -99,6 +99,12 @@ potkeys = {"rk", "c"};
 mukeys = Table[ToString@StringForm["mu`1`", i], {i, 4}];
 dukeys = Table[ToString@StringForm["d`1`", i], {i, 0, 9}];
 potleg = <|"rk" -> "RK, ", "c" -> "Coulomb, "|>;
+envlegabbr = <|
+	"fs" -> "FS",
+	"ss" -> "SS",
+	"hs" -> "HS",
+	"he" -> "HE"
+|>;
 envleg = <|
 	"fs" -> "Freestanding",
 	"ss" -> TraditionalForm[
@@ -210,7 +216,32 @@ barleglogcont = Reverse@Flatten[{1, Table[i*10^(-n), {n, 1, 4}, {i, {5, 1}}], 0}
 logblend[f_] := Blend[logblendcols,f]
 (* /*}}}*/*)
 
-dslp[plopts:OptionsPattern[]]:=(Module[{
+
+pdiff[v1_,v2_]:= Abs[100*Abs[v1-v2]/Mean[{v1,v2}]]
+pdiff[vals_List]:=With[{v1=Max[vals],v2=Min[vals]},Abs[100*Abs[v1-v2]/Mean[{v1,v2}]]]
+
+dslpb[plopts:OptionsPattern[]]:=(Module[{
+	imsi=First@Values@Merge[{Evaluate@FilterRules[{plopts},{"is"}],{"is"->{800,450}}},(#[[1]]&)], (* Custom option for ImageSize + AspectRatio *)
+	masi=First@Values@Merge[{Evaluate@FilterRules[{plopts},{"ms"}],{"ms"->24}},(#[[1]]&)], (* Custom option for specifying marker size *)
+	lasi=First@Values@Merge[{Evaluate@FilterRules[{plopts},{"ls"}],{"ls"->24}},(#[[1]]&)], (* Custom option for specifying label size *)
+	mast=First@Values@Merge[{Evaluate@FilterRules[{plopts},{"mt"}],{"mt"->feordered}},(#[[1]]&)], (* Custom option for Marker types *)
+	legopts=Values@Evaluate@FilterRules[{plopts},{lo}] (* Custom option for PlotLegends option specification. Actually can just put PlotLegends->{} as an option to ListPlot.. duh *)
+	},
+	ListPlot[
+		#,
+		PlotTheme->"Detailed",
+		ImageSize->imsi,AspectRatio->(imsi[[2]]/imsi[[1]]),
+		PlotStyle->randash,
+		PlotMarkers->marksize[mast,masi],
+		GridLinesStyle->{Thin,Gray},
+		LabelStyle->Directive[lasi,Black,FontFamily->"Arial"],
+		IntervalMarkers->"Bands",
+		IntervalMarkersStyle->Directive[Dashing[None]],
+		Evaluate@FilterRules[{plopts},Options[ListPlot]]
+	]
+]&)
+
+dslpe[plopts:OptionsPattern[]]:=(Module[{
 	imsi=First@Values@Merge[{Evaluate@FilterRules[{plopts},{"is"}],{"is"->{800,450}}},(#[[1]]&)], (* Custom option for ImageSize + AspectRatio *)
 	masi=First@Values@Merge[{Evaluate@FilterRules[{plopts},{"ms"}],{"ms"->24}},(#[[1]]&)], (* Custom option for specifying marker size *)
 	lasi=First@Values@Merge[{Evaluate@FilterRules[{plopts},{"ls"}],{"ls"->24}},(#[[1]]&)], (* Custom option for specifying label size *)

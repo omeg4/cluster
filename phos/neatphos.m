@@ -52,6 +52,7 @@ hoCen[mx_,my_,eps_,d_][n_,m_]:=With[{gamma=1/(2*eps*d^3),v0=(1/(eps*d))},Sqrt[2*
 (* Quick function that returns 0 for direct ("d" = -1 for direct) but Nhbn*lbn + lphos if "d" >= 0 *)
 rightd[d_]:=If[d==-1,0,d*lBN + lphos]
 
+(* /*{{{*/ old NDE funcs, suites, etc. *)
 CompPhos2[{mx_,my_,nhbn_,pot_,kappa_},eps_,nmax_]:=Module[
 	{
 		chi = chiphos,
@@ -94,6 +95,7 @@ CompPhos2[{mx_,my_,nhbn_,pot_,kappa_},eps_,nmax_]:=Module[
 		}
 	}
 ]
+(* /*}}}*/*)
 
 (* freezing this equation because i want to test something re: conjugates *)
 (* NormalizeEF[EF_,s_] := Module[*)
@@ -102,6 +104,8 @@ CompPhos2[{mx_,my_,nhbn_,pot_,kappa_},eps_,nmax_]:=Module[
 (*     MaxRecursion -> 20],{NIntegrate::slwcon,NIntegrate::eincr,General::stop}];*)
 (*   EF/Sqrt[norm]*)
 (* ]*)
+
+
 
 NormalizeEF[EF_,s_] := Module[
   {norm},
@@ -493,7 +497,6 @@ triassnint[ efs_, s_, op_, opts:OptionsPattern[]]:=Association[
 med[f_]:=({#["Result"],KeyTake[#,{"AbsoluteTiming","MessagesText","Timing"}]}&[KeyTake[EvaluationData[f],{"Result","AbsoluteTiming","MessagesText","Timing"}]])
 med[f_,x___]:=({#["Result"],KeyTake[#,{"AbsoluteTiming","MessagesText","Timing"}]}&[KeyTake[EvaluationData[f[x]],{"Result","AbsoluteTiming","MessagesText","Timing"}]])
 
-
 ndes[nmax_, mx_, my_, pot_, kappa_, chi_, d_, eps_, maxi_, vn_]:=Module[
 	{
 		tds,
@@ -520,6 +523,7 @@ ndes[nmax_, mx_, my_, pot_, kappa_, chi_, d_, eps_, maxi_, vn_]:=Module[
 	}
 ]
 
+(* /*{{{*/ "ndesscale" (THIS IS HOW I GOT RESULTS)/*{{{*/*)
 ndesscale[nmax_, mx_, my_, pot_, kappa_, chi_, d_, eps_, c_, maxi_, vn_]:=Module[
 	{
 		tds,
@@ -552,6 +556,8 @@ ndesscale[nmax_, mx_, my_, pot_, kappa_, chi_, d_, eps_, c_, maxi_, vn_]:=Module
 		]
 	}
 ]
+(* /*}}}*//*}}}*/*)
+
 
 ndespolar[nmax_, mx_, my_, pot_, kappa_, chi_, d_, eps_, maxi_, vn_]:=Module[
 	{
@@ -592,6 +598,7 @@ ndespolar[nmax_, mx_, my_, pot_, kappa_, chi_, d_, eps_, maxi_, vn_]:=Module[
 		Head/@efs
 	}
 ]
+
 
 (* "DEFAULT" NINTEGRATE OPTIONS FOR PHOS PAPER AS OF 5/23 *)
 (* {Method->"GlobalAdaptive",MinRecursion->1000,MaxRecursion->10^6} *)
@@ -734,6 +741,7 @@ ning[ef1_, ef2_, op_, s_]:=NIntegrate[
 	Method->"LocalAdaptive"
 ]
 
+(* /*{{{*/ grid w header functions *)
 nestedgridWheaders[data_,{innerrow_, innercolumn_,innergropts : OptionsPattern[]},{outerrow_, outercolumn_,outergropts : OptionsPattern[]}]:=Grid[
   Join[
    {PadLeft[outerrow, Length[outerrow] + 1, " "]} // Transpose,
@@ -778,8 +786,9 @@ gridWheaders[data_, rowheads_, columnheads_, gropts : OptionsPattern[]] := Grid[
   ItemStyle -> Directive[FontSize -> 20, Black, FontFamily -> "Arial"],
   Evaluate@FilterRules[{gropts}, Options[Grid]]
 ]
+(* /*}}}*/*)
 
-
+(* /*{{{*/ "newplt" functions *)
 newvarplt[data_,bounds_,frmlbl_,lgndlbl_,colors_,size_:{1600,900},lblsize_:30,plopts:OptionsPattern[]]:=
 	{
 	Framed@LineLegend[colors,lgndlbl,LegendLayout->{"Row",1},LabelStyle->Directive[lblsize,Black,FontFamily->"Arial"],LegendFunction->"Frame"],
@@ -887,4 +896,4 @@ insetlistplt[data_,colors_,markers_,ipos_,size_:{800,450},lblsize_:24,plopts:Opt
 		],
 	Scaled[{ipos[[1]],ipos[[2]]}],Scaled[{ipos[[3]],ipos[[4]]}]
 ]
-
+(* /*}}}*/*)
