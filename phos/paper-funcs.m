@@ -257,7 +257,7 @@ dslpe[plopts:OptionsPattern[]]:=(Module[{
 		GridLinesStyle->{Thin,Gray},
 		LabelStyle->Directive[lasi,Black,FontFamily->"Arial"],
 		IntervalMarkers->"Ellipses",
-		IntervalMarkersStyle->Directive[Dashing[None]],
+		IntervalMarkersStyle->Directive[Thick,Dashing[None]],
 		Evaluate@FilterRules[{plopts},Options[ListPlot]]
 	]
 ]&)
