@@ -57,7 +57,7 @@ showandexp[filename_, plt_] := TableForm@{
    bg[{combopltexp[filename, plt]}, LightRed],
    plt
   }
-framegrid[data_] := Grid[data, Frame -> All, ItemSize->Full]
+framegrid[data_,opts:OptionsPattern[]] := Grid[data, Frame -> All, ItemSize->Full, Evaluate@FilterRules[{opts},Options[Grid]]]
 (* /*}}}*/*)
 
 tssf[x___]:=ToString@StringForm[x]
