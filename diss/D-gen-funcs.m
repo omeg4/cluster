@@ -68,3 +68,47 @@ bg[clr_RGBColor, expr_] := Framed[expr, FrameStyle -> None, Background -> clr]
 fulldate:=DateString[{"Month","/","Day"," @ ","Time"," | "}]
 time:=DateString[{"Time"}]
 
+nestedgridWheaders[data_,{innerrow_, innercolumn_,innergropts : OptionsPattern[]},{outerrow_, outercolumn_,outergropts : OptionsPattern[]}]:=Grid[
+  Join[
+   {PadLeft[outerrow, Length[outerrow] + 1, " "]} // Transpose,
+   Join[
+    {outercolumn},
+    Map[
+     Grid[
+       Join[
+        {PadLeft[innerrow, Length[innerrow] + 1, " "]} // Transpose,
+        Join[
+         {innercolumn},
+         #
+         ],
+        2
+        ],
+       Dividers -> {{False, True}, {False, True}},
+       ItemStyle -> 
+        Directive[FontSize -> 14, Black, FontFamily -> "Arial"],
+       Evaluate@FilterRules[{innergropts}, Options[Grid]]
+       ] &,
+     data,
+     {2}
+     ]
+    ],
+   2
+   ],
+  Dividers -> {{False, True}, {False, True}},
+  ItemStyle -> Directive[FontSize -> 14, Black, FontFamily -> "Arial"],
+  Evaluate@FilterRules[{outergropts}, Options[Grid]]
+]
+
+gridWheaders[data_, rowheads_, columnheads_, gropts : OptionsPattern[]] := Grid[
+  Join[
+   {PadLeft[rowheads, Length[rowheads] + 1, " "]} // Transpose,
+   Join[
+    {columnheads},
+    data
+    ],
+   2
+   ],
+  Dividers -> {{False, True}, {False, True}},
+  ItemStyle -> Directive[FontSize -> 20, Black, FontFamily -> "Arial"],
+  Evaluate@FilterRules[{gropts}, Options[Grid]]
+]
