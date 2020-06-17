@@ -1,0 +1,26 @@
+/home/mbrunetti/cluster/phos/results/cartrescale2
+Starting Mathematica job
+
+SetDirectory::cdir: Cannot set current directory to $(pwd).
+
+Syntax::com: Warning: comma encountered with no adjacent expression. The expression will be treated as Null.  (line 775 of "/home/mbrunetti/cluster/phos/results/cartrescale2/test.m").
+
+NIntegrate::slwcon: Numerical integration converging too slowly; suspect one of the following: singularity, value of the integration is 0, highly oscillatory integrand, or WorkingPrecision too small.
+
+NIntegrate::slwcon: Numerical integration converging too slowly; suspect one of the following: singularity, value of the integration is 0, highly oscillatory integrand, or WorkingPrecision too small.
+
+NIntegrate::slwcon: Numerical integration converging too slowly; suspect one of the following: singularity, value of the integration is 0, highly oscillatory integrand, or WorkingPrecision too small.
+
+General::stop: Further output of NIntegrate::slwcon will be suppressed during this calculation.
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     -6
+NIntegrate::eincr: The global error of the strategy GlobalAdaptive has increased more than 2000 times. The global error is expected to decrease monotonically after a number of integrand evaluations. Suspect one of the following: the working precision is insufficient for the specified precision goal; the integrand is highly oscillatory or it is not a (piecewise) smooth function; or the true value of the integral is 0. Increasing the value of the GlobalAdaptive option MaxErrorIncreases might lead to a convergent numerical integration. NIntegrate obtained 2.56736 and 2.61718 10   for the integral and error estimates.
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     -6
+NIntegrate::eincr: The global error of the strategy GlobalAdaptive has increased more than 2000 times. The global error is expected to decrease monotonically after a number of integrand evaluations. Suspect one of the following: the working precision is insufficient for the specified precision goal; the integrand is highly oscillatory or it is not a (piecewise) smooth function; or the true value of the integral is 0. Increasing the value of the GlobalAdaptive option MaxErrorIncreases might lead to a convergent numerical integration. NIntegrate obtained 3.73111 and 6.13251 10   for the integral and error estimates.
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     -6
+NIntegrate::eincr: The global error of the strategy GlobalAdaptive has increased more than 2000 times. The global error is expected to decrease monotonically after a number of integrand evaluations. Suspect one of the following: the working precision is insufficient for the specified precision goal; the integrand is highly oscillatory or it is not a (piecewise) smooth function; or the true value of the integral is 0. Increasing the value of the GlobalAdaptive option MaxErrorIncreases might lead to a convergent numerical integration. NIntegrate obtained 6.57232 and 7.80032 10   for the integral and error estimates.
+
+General::stop: Further output of NIntegrate::eincr will be suppressed during this calculation.
+Job finished
